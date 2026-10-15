@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -90,8 +90,8 @@ Zeile für Zeile durch.
 | Ausgabe als Terminal-Tabelle, Markdown oder JSON (`--format`, `--out`)                                                         | funktioniert  |
 | macOS 13+ und Linux (x86_64 und arm64, Swift 6.2 und 6.4.1 in CI)                                                              | funktioniert  |
 | Bibliothek SizeLedgerKit mit DocC-Dokumentation                                                                                | funktioniert  |
-| `diff` zweier Berichte, mit einer Markdown-Zusammenfassung für Pull Requests                                                   | geplant (0.3) |
-| `budget`-Regeln in YAML (pro Pfad, gesamt, App-Clip-Limit) mit Exit-Code 1 und eine GitHub Action                              | geplant (0.5) |
+| `diff` zweier Berichte, mit einer Markdown-Zusammenfassung für Pull Requests                                                   | geplant (0.2) |
+| `budget`-Regeln in YAML (pro Pfad, gesamt, App-Clip-Limit) mit Exit-Code 1 und eine GitHub Action                              | geplant (0.3) |
 | HTML-Treemap in einer einzigen Datei; Asset-Katalog-Renditions über `assetutil` unter macOS                                    | geplant (0.8) |
 | Eingefrorenes JSON-Schema (Version 1)                                                                                          | geplant (1.0) |
 | Android `.apk` und `.aab`                                                                                                      | geplant (1.1) |

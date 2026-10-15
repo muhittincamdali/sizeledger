@@ -85,8 +85,8 @@ report line by line.
 | Output as a terminal table, Markdown or JSON (`--format`, `--out`) | works |
 | macOS 13+ and Linux (x86_64 and arm64, Swift 6.2 and 6.4.1 in CI) | works |
 | SizeLedgerKit library with DocC documentation | works |
-| `diff` of two reports, with a Markdown summary for pull requests | planned (0.3) |
-| `budget` rules in YAML (per path, total, App Clip limit) with exit code 1, and a GitHub Action | planned (0.5) |
+| `diff` of two reports, with a Markdown summary for pull requests | planned (0.2) |
+| `budget` rules in YAML (per path, total, App Clip limit) with exit code 1, and a GitHub Action | planned (0.3) |
 | Single-file HTML treemap; asset catalog renditions through `assetutil` on macOS | planned (0.8) |
 | Frozen JSON schema (version 1) | planned (1.0) |
 | Android `.apk` and `.aab` | planned (1.1) |

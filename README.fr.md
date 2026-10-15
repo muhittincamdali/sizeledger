@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -91,8 +91,8 @@ ligne par ligne.
 | Sortie en tableau de terminal, en Markdown ou en JSON (`--format`, `--out`)                                                               | fonctionne  |
 | macOS 13+ et Linux (x86_64 et arm64, Swift 6.2 et 6.4.1 en CI)                                                                            | fonctionne  |
 | Bibliothèque SizeLedgerKit avec documentation DocC                                                                                        | fonctionne  |
-| `diff` de deux rapports, avec un résumé Markdown pour les pull requests                                                                   | prévu (0.3) |
-| Règles `budget` en YAML (par chemin, total, limite d'App Clip) avec code de sortie 1, et une GitHub Action                                | prévu (0.5) |
+| `diff` de deux rapports, avec un résumé Markdown pour les pull requests                                                                   | prévu (0.2) |
+| Règles `budget` en YAML (par chemin, total, limite d'App Clip) avec code de sortie 1, et une GitHub Action                                | prévu (0.3) |
 | Treemap HTML dans un seul fichier ; renditions des asset catalogs via `assetutil` sous macOS                                              | prévu (0.8) |
 | Schéma JSON figé (version 1)                                                                                                              | prévu (1.0) |
 | Android `.apk` et `.aab`                                                                                                                  | prévu (1.1) |

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -88,8 +88,8 @@ sizeledger analyze path/to/MyApp.ipa
 | Вывод в виде таблицы в терминале, Markdown или JSON (`--format`, `--out`)                                      | работает          |
 | macOS 13+ и Linux (x86_64 и arm64, Swift 6.2 и 6.4.1 в CI)                                                     | работает          |
 | Библиотека SizeLedgerKit с документацией DocC                                                                  | работает          |
-| `diff` двух отчётов со сводкой в Markdown для pull request                                                     | планируется (0.3) |
-| Правила `budget` в YAML (по путям, общий размер, лимит App Clip) с кодом выхода 1 и GitHub Action              | планируется (0.5) |
+| `diff` двух отчётов со сводкой в Markdown для pull request                                                     | планируется (0.2) |
+| Правила `budget` в YAML (по путям, общий размер, лимит App Clip) с кодом выхода 1 и GitHub Action              | планируется (0.3) |
 | HTML-treemap в одном файле; rendition из asset catalog через `assetutil` на macOS                              | планируется (0.8) |
 | Зафиксированная схема JSON (версия 1)                                                                          | планируется (1.0) |
 | Android `.apk` и `.aab`                                                                                        | планируется (1.1) |

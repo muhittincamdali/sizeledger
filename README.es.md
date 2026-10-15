@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -90,8 +90,8 @@ línea.
 | Salida como tabla de terminal, Markdown o JSON (`--format`, `--out`)                                                  | funciona          |
 | macOS 13+ y Linux (x86_64 y arm64, Swift 6.2 y 6.4.1 en CI)                                                           | funciona          |
 | Librería SizeLedgerKit con documentación DocC                                                                         | funciona          |
-| `diff` de dos informes, con un resumen en Markdown para pull requests                                                 | planificado (0.3) |
-| Reglas `budget` en YAML (por ruta, total, límite de App Clip) con código de salida 1, y una GitHub Action             | planificado (0.5) |
+| `diff` de dos informes, con un resumen en Markdown para pull requests                                                 | planificado (0.2) |
+| Reglas `budget` en YAML (por ruta, total, límite de App Clip) con código de salida 1, y una GitHub Action             | planificado (0.3) |
 | Treemap en un solo archivo HTML; renditions de asset catalogs mediante `assetutil` en macOS                           | planificado (0.8) |
 | Esquema JSON congelado (versión 1)                                                                                    | planificado (1.0) |
 | Android `.apk` y `.aab`                                                                                               | planificado (1.1) |

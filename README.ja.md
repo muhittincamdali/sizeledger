@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -69,8 +69,8 @@ sizeledger analyze path/to/MyApp.ipa
 | ターミナルの表、Markdown、JSON での出力 (`--format`、`--out`)                                                 | 動作します   |
 | macOS 13+ と Linux (x86_64 と arm64、CI では Swift 6.2 と 6.4.1)                                              | 動作します   |
 | DocC ドキュメント付きの SizeLedgerKit ライブラリ                                                              | 動作します   |
-| 2 つのレポートの `diff` と、pull request 向けの Markdown サマリー                                             | 計画中 (0.3) |
-| YAML で書く `budget` ルール (パスごと、合計、App Clip の上限)、終了コード 1、GitHub Action                    | 計画中 (0.5) |
+| 2 つのレポートの `diff` と、pull request 向けの Markdown サマリー                                             | 計画中 (0.2) |
+| YAML で書く `budget` ルール (パスごと、合計、App Clip の上限)、終了コード 1、GitHub Action                    | 計画中 (0.3) |
 | 単一ファイルの HTML treemap、macOS の `assetutil` による asset catalog の rendition                           | 計画中 (0.8) |
 | 固定された JSON スキーマ (バージョン 1)                                                                       | 計画中 (1.0) |
 | Android の `.apk` と `.aab`                                                                                   | 計画中 (1.1) |

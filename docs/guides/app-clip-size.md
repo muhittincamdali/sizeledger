@@ -61,7 +61,7 @@ the App Thinning Size Report before you rely on it.
 
 ## Keep it under the limit in CI
 
-`budget` with an `appClip` rule is planned for sizeledger 0.5. Until then, a step like this fails
+`budget` with an `appClip` rule is planned for sizeledger 0.3. Until then, a step like this fails
 the build when the App Clip's install estimate passes 15 MB:
 
 ```sh

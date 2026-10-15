@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -86,8 +86,8 @@ sizeledger analyze path/to/MyApp.ipa
 | 터미널 표, Markdown, JSON으로 출력(`--format`, `--out`)                                                  | 동작        |
 | macOS 13+ 및 Linux(x86_64와 arm64, CI에서 Swift 6.2와 6.4.1)                                             | 동작        |
 | DocC 문서가 있는 SizeLedgerKit 라이브러리                                                                | 동작        |
-| 두 리포트의 `diff`와 pull request용 Markdown 요약                                                        | 계획됨(0.3) |
-| YAML로 작성하는 `budget` 규칙(경로별, 전체, App Clip 한도)과 종료 코드 1, 그리고 GitHub Action           | 계획됨(0.5) |
+| 두 리포트의 `diff`와 pull request용 Markdown 요약                                                        | 계획됨(0.2) |
+| YAML로 작성하는 `budget` 규칙(경로별, 전체, App Clip 한도)과 종료 코드 1, 그리고 GitHub Action           | 계획됨(0.3) |
 | 단일 파일 HTML treemap, macOS에서 `assetutil`을 통한 asset catalog rendition                             | 계획됨(0.8) |
 | 고정된 JSON 스키마(버전 1)                                                                               | 계획됨(1.0) |
 | Android `.apk` 및 `.aab`                                                                                 | 계획됨(1.1) |

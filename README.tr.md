@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -91,8 +91,8 @@ satır anlatır.
 | Terminal tablosu, Markdown veya JSON çıktısı (`--format`, `--out`)                                                            | çalışıyor         |
 | macOS 13+ ve Linux (x86_64 ve arm64, CI'da Swift 6.2 ve 6.4.1)                                                                | çalışıyor         |
 | DocC dokümantasyonlu SizeLedgerKit kütüphanesi                                                                                | çalışıyor         |
-| İki raporun `diff`'i, pull request'ler için Markdown özetiyle                                                                 | planlanıyor (0.3) |
-| YAML ile `budget` kuralları (yol başına, toplam, App Clip sınırı), çıkış kodu 1 ve bir GitHub Action                          | planlanıyor (0.5) |
+| İki raporun `diff`'i, pull request'ler için Markdown özetiyle                                                                 | planlanıyor (0.2) |
+| YAML ile `budget` kuralları (yol başına, toplam, App Clip sınırı), çıkış kodu 1 ve bir GitHub Action                          | planlanıyor (0.3) |
 | Tek dosyalık HTML treemap; macOS'ta `assetutil` ile asset catalog rendition'ları                                              | planlanıyor (0.8) |
 | Dondurulmuş JSON şeması (sürüm 1)                                                                                             | planlanıyor (1.0) |
 | Android `.apk` ve `.aab`                                                                                                      | planlanıyor (1.1) |

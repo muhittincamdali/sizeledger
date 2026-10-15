@@ -3,8 +3,8 @@
 How to measure the app on every pull request with sizeledger 0.1: show the breakdown in the job
 summary, keep the JSON report, and fail on a limit.
 
-The `diff` command (compare two reports, planned for 0.3) and `budget` rules with a GitHub
-Action (planned for 0.5) will make this shorter. Everything below works today.
+The `diff` command (compare two reports, planned for 0.2) and `budget` rules with a GitHub
+Action (planned for 0.3) will make this shorter. Everything below works today.
 
 ## 1. Build what you want to measure
 

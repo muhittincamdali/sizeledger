@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@cf7deedf1f53e4075a4a8a22287838c4a9ae7019 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -79,8 +79,8 @@ sizeledger analyze path/to/MyApp.ipa
 | 以终端表格、Markdown 或 JSON 输出（`--format`、`--out`）                                               | 可用          |
 | macOS 13+ 和 Linux（x86_64 和 arm64，CI 中使用 Swift 6.2 和 6.4.1）                                    | 可用          |
 | 带 DocC 文档的 SizeLedgerKit 库                                                                        | 可用          |
-| 比较两份报告的 `diff`，并为 pull request 生成 Markdown 摘要                                            | 计划中（0.3） |
-| 用 YAML 编写的 `budget` 规则（按路径、总量、App Clip 上限），以退出码 1 表示超限，并提供 GitHub Action | 计划中（0.5） |
+| 比较两份报告的 `diff`，并为 pull request 生成 Markdown 摘要                                            | 计划中（0.2） |
+| 用 YAML 编写的 `budget` 规则（按路径、总量、App Clip 上限），以退出码 1 表示超限，并提供 GitHub Action | 计划中（0.3） |
 | 单文件 HTML treemap；在 macOS 上通过 `assetutil` 查看 asset catalog 的 rendition                       | 计划中（0.8） |
 | 固定的 JSON schema（版本 1）                                                                           | 计划中（1.0） |
 | Android `.apk` 和 `.aab`                                                                               | 计划中（1.1） |
