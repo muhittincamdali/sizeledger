@@ -7,6 +7,13 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- `--quiet` without `--out` is refused with exit status 64; before, it measured the app and
+  printed and wrote nothing.
+- `sizeledger MyApp.ipa` (an app where the subcommand belongs) shows the `sizeledger analyze`
+  command to run instead of only "Unexpected argument". The exit status is still 64.
+
 ### Security
 
 - An `.xcarchive` whose `Products`, `Products/Applications` or `<name>.app` was a symbolic link
