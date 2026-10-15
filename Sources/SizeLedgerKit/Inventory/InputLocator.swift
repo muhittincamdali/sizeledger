@@ -15,8 +15,13 @@ public enum InputError: Error, Equatable, Sendable {
 }
 
 extension InputError: CustomStringConvertible {
-    /// A sentence for the user that names the path.
+    /// A sentence for the user that names the path. Paths and entry names come from the input, so
+    /// control characters in them are replaced before the sentence reaches a terminal.
     public var description: String {
+        Sanitize.text(message)
+    }
+
+    private var message: String {
         switch self {
         case .notFound(let path):
             "\(path) does not exist"

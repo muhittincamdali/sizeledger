@@ -94,6 +94,9 @@ final class TinyApp {
         #expect(missing.status == 2)
         #expect(missing.output.isEmpty)
         #expect(missing.errors == "sizeledger: /nonexistent/App.ipa does not exist\n")
+        // The path is printed with its control characters replaced.
+        let escaped = try Run(["/nonexistent/\u{1B}[2JApp.ipa"])
+        #expect(escaped.errors == "sizeledger: /nonexistent/\u{FFFD}[2JApp.ipa does not exist\n")
 
         let tiny = try TinyApp()
         let blocked = tiny.folder.appendingPathComponent("file")

@@ -113,4 +113,12 @@ import Testing
         #expect(InputError.notFound("a.ipa").description == "a.ipa does not exist")
         #expect(InputError.severalApps("x.ipa", ["A.app", "B.app"]).description.contains("A.app, B.app"))
     }
+
+    @Test func messagesReplaceControlCharacters() {
+        let name = "Payload/A.app/\u{1B}]0;title\u{07}\n.bin"
+        #expect(ZipError.encrypted(name).description == "Payload/A.app/\u{FFFD}]0;title\u{FFFD}\u{FFFD}.bin is encrypted")
+        let error = InputError.unreadable("x.ipa", ZipError.unsupportedMethod(14, name).description)
+        #expect(!error.description.contains { $0.unicodeScalars.contains { $0.properties.generalCategory == .control } })
+        #expect(InputError.notFound("\u{1B}[2J.ipa").description == "\u{FFFD}[2J.ipa does not exist")
+    }
 }

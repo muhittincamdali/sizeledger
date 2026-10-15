@@ -207,8 +207,12 @@ public enum ZipError: Error, Equatable, Sendable {
 }
 
 extension ZipError: CustomStringConvertible {
-    /// A sentence for the user.
+    /// A sentence for the user, with control characters in entry names replaced.
     public var description: String {
+        Sanitize.text(message)
+    }
+
+    private var message: String {
         switch self {
         case .unreadable(let reason): "the file cannot be read: \(reason)"
         case .notAZipArchive: "not a ZIP archive (an .ipa is one)"
