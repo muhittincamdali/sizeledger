@@ -42,9 +42,16 @@ import Testing
             let scalar = Unicode.Scalar(UInt32(value))!
             #expect(Sanitize.text("a\(Character(scalar))b") == "a\u{FFFD}b")
         }
-        // Marks and right-to-left text are left alone.
-        #expect(Sanitize.text("\u{200E}\u{200F}\u{061C}") == "\u{200E}\u{200F}\u{061C}")
+        // Right-to-left text and the joiners it and emoji need are left alone.
         #expect(Sanitize.text("שלום مرحبا") == "שלום مرحبا")
+        #expect(Sanitize.text("می\u{200C}خواهم 👩\u{200D}💻") == "می\u{200C}خواهم 👩\u{200D}💻")
+    }
+
+    @Test func replacesInvisibleMarksAndSeparators() {
+        for value: UInt32 in [0x061C, 0x200B, 0x200E, 0x200F, 0x2028, 0x2029, 0x2060, 0xFEFF] {
+            let scalar = Unicode.Scalar(value)!
+            #expect(Sanitize.text("a\(Character(scalar))b") == "a\u{FFFD}b", "U+\(String(value, radix: 16))")
+        }
     }
 
     @Test func shortensPathsFromTheLeft() {
