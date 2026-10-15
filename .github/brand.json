@@ -18,5 +18,8 @@
     "targets": ["SizeLedgerKit"]
   },
   "languages": ["en", "tr", "zh-CN", "ja", "ko", "es", "de", "fr", "pt-BR", "ru"],
-  "socialTheme": "dark"
+  "socialTheme": "dark",
+  "extraBadges": [
+    { "key": "platforms", "label": "Platforms", "value": "macOS 13+ · Linux", "icon": "device" }
+  ]
 }
