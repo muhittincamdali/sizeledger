@@ -7,6 +7,14 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Security
+
+- GitHub typesets `$...$` (and `$$...$$`, `` $`...`$ ``) as math, even when the dollars are
+  backslash-escaped, so an app name, Info.plist value or file name such as
+  `$\color{green}{\textsf{Size check passed}}$` printed coloured or oversized LaTeX into a pull
+  request comment or job summary. The Markdown report now writes every word that holds a `$` in a
+  code span.
+
 ## [0.1.5] - 2026-10-15
 
 ### Changed

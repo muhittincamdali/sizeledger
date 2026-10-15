@@ -199,6 +199,62 @@
       "name": "escape-sequence",
       "row": "| `\ufffd]8;;https://evil.example\ufffdx` | `\ufffd]8;;https://evil.example\ufffdx` | end |",
       "text": "`\ufffd]8;;https://evil.example\ufffdx`"
+    },
+    {
+      "code": "`$\\color{green}{\\textsf{Size check passed}}$`",
+      "html": "<tr>\n<td><code class=\"notranslate\">$\\color{green}{\\textsf{Size</code> check <code class=\"notranslate\">passed}}$</code></td>\n<td><code class=\"notranslate\">$\\color{green}{\\textsf{Size check passed}}$</code></td>\n<td>end</td>\n</tr>",
+      "input": "$\\color{green}{\\textsf{Size check passed}}$",
+      "name": "math-color",
+      "row": "| `$\\color{green}{\\textsf{Size` check `passed}}$` | `$\\color{green}{\\textsf{Size check passed}}$` | end |",
+      "text": "`$\\color{green}{\\textsf{Size` check `passed}}$`"
+    },
+    {
+      "code": "`$\\huge{FAIL}$`",
+      "html": "<tr>\n<td><code class=\"notranslate\">$\\huge{FAIL}$</code></td>\n<td><code class=\"notranslate\">$\\huge{FAIL}$</code></td>\n<td>end</td>\n</tr>",
+      "input": "$\\huge{FAIL}$",
+      "name": "math-huge",
+      "row": "| `$\\huge{FAIL}$` | `$\\huge{FAIL}$` | end |",
+      "text": "`$\\huge{FAIL}$`"
+    },
+    {
+      "code": "`\\$x\\$`",
+      "html": "<tr>\n<td><code class=\"notranslate\">\\$x\\$</code></td>\n<td><code class=\"notranslate\">\\$x\\$</code></td>\n<td>end</td>\n</tr>",
+      "input": "\\$x\\$",
+      "name": "math-escaped-dollars",
+      "row": "| `\\$x\\$` | `\\$x\\$` | end |",
+      "text": "`\\$x\\$`"
+    },
+    {
+      "code": "`$$x^2$$`",
+      "html": "<tr>\n<td><code class=\"notranslate\">$$x^2$$</code></td>\n<td><code class=\"notranslate\">$$x^2$$</code></td>\n<td>end</td>\n</tr>",
+      "input": "$$x^2$$",
+      "name": "math-display",
+      "row": "| `$$x^2$$` | `$$x^2$$` | end |",
+      "text": "`$$x^2$$`"
+    },
+    {
+      "code": "``$`x^2`$``",
+      "html": "<tr>\n<td><code class=\"notranslate\">$`x^2`$</code></td>\n<td><code class=\"notranslate\">$`x^2`$</code></td>\n<td>end</td>\n</tr>",
+      "input": "$`x^2`$",
+      "name": "math-backtick",
+      "row": "| ``$`x^2`$`` | ``$`x^2`$`` | end |",
+      "text": "``$`x^2`$``"
+    },
+    {
+      "code": "`price $5 and $6`",
+      "html": "<tr>\n<td>price <code class=\"notranslate\">$5</code> and <code class=\"notranslate\">$6</code></td>\n<td><code class=\"notranslate\">price $5 and $6</code></td>\n<td>end</td>\n</tr>",
+      "input": "price $5 and $6",
+      "name": "math-words",
+      "row": "| price `$5` and `$6` | `price $5 and $6` | end |",
+      "text": "price `$5` and `$6`"
+    },
+    {
+      "code": "`Payload/$\\color{red}{x}$.app/Info.plist`",
+      "html": "<tr>\n<td><code class=\"notranslate\">Payload/$\\color{red}{x}$.app/Info.plist</code></td>\n<td><code class=\"notranslate\">Payload/$\\color{red}{x}$.app/Info.plist</code></td>\n<td>end</td>\n</tr>",
+      "input": "Payload/$\\color{red}{x}$.app/Info.plist",
+      "name": "math-path",
+      "row": "| `Payload/$\\color{red}{x}$.app/Info.plist` | `Payload/$\\color{red}{x}$.app/Info.plist` | end |",
+      "text": "`Payload/$\\color{red}{x}$.app/Info.plist`"
     }
   ]
 }
