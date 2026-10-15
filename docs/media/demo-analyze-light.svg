@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="745" height="948" viewBox="0 0 745 948" role="img" aria-label="sizeledger analyze Fixtures/apps/SampleShop-2.0.ipa --top 5: terminal output">
+<title>sizeledger · SampleShop 2.0 (.ipa)</title>
+<style>
+text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:13px;white-space:pre}
+.t{opacity:0;animation:show 0.01s linear forwards}
+.caret{opacity:0;animation:blink 1.1s step-end infinite}
+@keyframes show{to{opacity:1}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.t{animation:none;opacity:1}.caret{animation:none;opacity:1}}
+</style>
+<rect width="745" height="948" fill="#FFFFFF"/>
+<rect x="0.5" y="0.5" width="744" height="947" rx="10" fill="#F5F9FF" stroke="#D0E2F7"/>
+<path d="M0.5 34V10.5a10 10 0 0 1 10-10h724a10 10 0 0 1 10 10V34z" fill="#EAF4FF"/>
+<line x1="0.5" y1="34" x2="744.5" y2="34" stroke="#D0E2F7"/>
+<circle cx="20" cy="17" r="6" fill="#0071E3"/><circle cx="40" cy="17" r="6" fill="#5AC8FA"/><circle cx="60" cy="17" r="6" fill="#D0E2F7"/>
+<text x="372.5" y="22" text-anchor="middle" fill="#5A6B80" style="font-size:12px">sizeledger · SampleShop 2.0 (.ipa)</text>
+<text x="20" y="67" fill="#5A6B80"># Fixtures/apps: a SwiftUI sample app, built for the iOS Simulator</text>
+<text x="20" y="86"><tspan fill="#0071E3" font-weight="700">$ </tspan><tspan fill="#0B1F33"><tspan class="t" style="animation-delay:0.40s">s</tspan><tspan class="t" style="animation-delay:0.45s">i</tspan><tspan class="t" style="animation-delay:0.49s">z</tspan><tspan class="t" style="animation-delay:0.54s">e</tspan><tspan class="t" style="animation-delay:0.58s">l</tspan><tspan class="t" style="animation-delay:0.63s">e</tspan><tspan class="t" style="animation-delay:0.67s">d</tspan><tspan class="t" style="animation-delay:0.72s">g</tspan><tspan class="t" style="animation-delay:0.76s">e</tspan><tspan class="t" style="animation-delay:0.80s">r</tspan><tspan class="t" style="animation-delay:0.85s"> </tspan><tspan class="t" style="animation-delay:0.90s">a</tspan><tspan class="t" style="animation-delay:0.94s">n</tspan><tspan class="t" style="animation-delay:0.98s">a</tspan><tspan class="t" style="animation-delay:1.03s">l</tspan><tspan class="t" style="animation-delay:1.07s">y</tspan><tspan class="t" style="animation-delay:1.12s">z</tspan><tspan class="t" style="animation-delay:1.17s">e</tspan><tspan class="t" style="animation-delay:1.21s"> </tspan><tspan class="t" style="animation-delay:1.25s">F</tspan><tspan class="t" style="animation-delay:1.30s">i</tspan><tspan class="t" style="animation-delay:1.34s">x</tspan><tspan class="t" style="animation-delay:1.39s">t</tspan><tspan class="t" style="animation-delay:1.44s">u</tspan><tspan class="t" style="animation-delay:1.48s">r</tspan><tspan class="t" style="animation-delay:1.52s">e</tspan><tspan class="t" style="animation-delay:1.57s">s</tspan><tspan class="t" style="animation-delay:1.61s">/</tspan><tspan class="t" style="animation-delay:1.66s">a</tspan><tspan class="t" style="animation-delay:1.71s">p</tspan><tspan class="t" style="animation-delay:1.75s">p</tspan><tspan class="t" style="animation-delay:1.79s">s</tspan><tspan class="t" style="animation-delay:1.84s">/</tspan><tspan class="t" style="animation-delay:1.88s">S</tspan><tspan class="t" style="animation-delay:1.93s">a</tspan><tspan class="t" style="animation-delay:1.98s">m</tspan><tspan class="t" style="animation-delay:2.02s">p</tspan><tspan class="t" style="animation-delay:2.06s">l</tspan><tspan class="t" style="animation-delay:2.11s">e</tspan><tspan class="t" style="animation-delay:2.15s">S</tspan><tspan class="t" style="animation-delay:2.20s">h</tspan><tspan class="t" style="animation-delay:2.25s">o</tspan><tspan class="t" style="animation-delay:2.29s">p</tspan><tspan class="t" style="animation-delay:2.33s">-</tspan><tspan class="t" style="animation-delay:2.38s">2</tspan><tspan class="t" style="animation-delay:2.42s">.</tspan><tspan class="t" style="animation-delay:2.47s">0</tspan><tspan class="t" style="animation-delay:2.51s">.</tspan><tspan class="t" style="animation-delay:2.56s">i</tspan><tspan class="t" style="animation-delay:2.60s">p</tspan><tspan class="t" style="animation-delay:2.65s">a</tspan><tspan class="t" style="animation-delay:2.69s"> </tspan><tspan class="t" style="animation-delay:2.74s">-</tspan><tspan class="t" style="animation-delay:2.78s">-</tspan><tspan class="t" style="animation-delay:2.83s">t</tspan><tspan class="t" style="animation-delay:2.88s">o</tspan><tspan class="t" style="animation-delay:2.92s">p</tspan><tspan class="t" style="animation-delay:2.96s"> </tspan><tspan class="t" style="animation-delay:3.01s">5</tspan></tspan></text>
+<text class="t" x="20" y="105" style="animation-delay:3.55s"><tspan fill="#00285C" font-weight="700">Sample Shop 2.0 (2)</tspan></text>
+<text class="t" x="20" y="124" style="animation-delay:3.59s"><tspan fill="#0B1F33">com.example.sampleshop · iphonesimulator · minimum OS 17.0</tspan></text>
+<text class="t" x="20" y="143" style="animation-delay:3.62s"><tspan fill="#0B1F33">SampleShop-2.0.ipa → SampleShop.app</tspan></text>
+<text class="t" x="20" y="162" style="animation-delay:3.66s"></text>
+<text class="t" x="20" y="181" style="animation-delay:3.69s"><tspan fill="#0B1F33">Total                                8.75 MB   21 files</tspan></text>
+<text class="t" x="20" y="200" style="animation-delay:3.73s"><tspan fill="#0B1F33">Install size (estimate)              8.80 MB   </tspan><tspan fill="#5A6B80">files rounded up to 4 KiB blocks</tspan></text>
+<text class="t" x="20" y="219" style="animation-delay:3.76s"><tspan fill="#0B1F33">Compressed in the .ipa               2.72 MB   </tspan><tspan fill="#5A6B80">bundle files only; the .ipa file is 2.72 MB</tspan></text>
+<text class="t" x="20" y="238" style="animation-delay:3.80s"></text>
+<text class="t" x="20" y="257" style="animation-delay:3.83s"><tspan fill="#00285C" font-weight="700">By category                             Size   Share  Files</tspan></text>
+<text class="t" x="20" y="276" style="animation-delay:3.87s"><tspan fill="#0B1F33">  Other resources                    6.22 MB   71.2%      5</tspan></text>
+<text class="t" x="20" y="295" style="animation-delay:3.90s"><tspan fill="#0B1F33">  Asset catalogs                     1.58 MB   18.1%      1</tspan></text>
+<text class="t" x="20" y="314" style="animation-delay:3.94s"><tspan fill="#0B1F33">  Localizations                     396.4 kB    4.5%      7</tspan></text>
+<text class="t" x="20" y="333" style="animation-delay:3.97s"><tspan fill="#0B1F33">  Frameworks                        293.3 kB    3.4%      6</tspan></text>
+<text class="t" x="20" y="352" style="animation-delay:4.01s"><tspan fill="#0B1F33">  Main executable                   245.3 kB    2.8%      1</tspan></text>
+<text class="t" x="20" y="371" style="animation-delay:4.04s"><tspan fill="#0B1F33">  Code signature                      6.9 kB    0.1%      1</tspan></text>
+<text class="t" x="20" y="390" style="animation-delay:4.08s"></text>
+<text class="t" x="20" y="409" style="animation-delay:4.12s"><tspan fill="#00285C" font-weight="700">Largest items                           Size   Share  Files</tspan></text>
+<text class="t" x="20" y="428" style="animation-delay:4.15s"><tspan fill="#0B1F33">  catalog.json                       6.19 MB   70.8%      1</tspan></text>
+<text class="t" x="20" y="447" style="animation-delay:4.18s"><tspan fill="#0B1F33">  Assets.car                         1.58 MB   18.1%      1</tspan></text>
+<text class="t" x="20" y="466" style="animation-delay:4.22s"><tspan fill="#0B1F33">  SampleShop                        245.3 kB    2.8%      1</tspan></text>
+<text class="t" x="20" y="485" style="animation-delay:4.25s"><tspan fill="#0B1F33">  Frameworks/ShopCore.framework     163.3 kB    1.9%      3</tspan></text>
+<text class="t" x="20" y="504" style="animation-delay:4.29s"><tspan fill="#0B1F33">  Frameworks/Analytics.framework    130.0 kB    1.5%      3</tspan></text>
+<text class="t" x="20" y="523" style="animation-delay:4.32s"><tspan fill="#5A6B80">  … and 12 more (--top shows more)</tspan></text>
+<text class="t" x="20" y="542" style="animation-delay:4.36s"></text>
+<text class="t" x="20" y="561" style="animation-delay:4.39s"><tspan fill="#00285C" font-weight="700">Languages (7 .lproj languages)          Size   Share  Files</tspan></text>
+<text class="t" x="20" y="580" style="animation-delay:4.43s"><tspan fill="#0B1F33">  tr                                 83.1 kB    0.9%      1</tspan></text>
+<text class="t" x="20" y="599" style="animation-delay:4.46s"><tspan fill="#0B1F33">  ja                                 82.0 kB    0.9%      1</tspan></text>
+<text class="t" x="20" y="618" style="animation-delay:4.50s"><tspan fill="#0B1F33">  fr                                 47.5 kB    0.5%      1</tspan></text>
+<text class="t" x="20" y="637" style="animation-delay:4.54s"><tspan fill="#0B1F33">  de                                 46.2 kB    0.5%      1</tspan></text>
+<text class="t" x="20" y="656" style="animation-delay:4.57s"><tspan fill="#0B1F33">  en                                 46.1 kB    0.5%      1</tspan></text>
+<text class="t" x="20" y="675" style="animation-delay:4.60s"><tspan fill="#5A6B80">  … and 2 more (--top shows more)</tspan></text>
+<text class="t" x="20" y="694" style="animation-delay:4.64s"></text>
+<text class="t" x="20" y="713" style="animation-delay:4.67s"><tspan fill="#00285C" font-weight="700">Binaries                                Size   Architectures</tspan></text>
+<text class="t" x="20" y="732" style="animation-delay:4.71s"><tspan fill="#0B1F33">  SampleShop                        245.3 kB   x86_64 97.7 kB, arm64 130.7 kB</tspan></text>
+<text class="t" x="20" y="751" style="animation-delay:4.75s"><tspan fill="#0B1F33">  …/ShopCore.framework/ShopCore     161.1 kB   x86_64 54.7 kB, arm64 79.2 kB</tspan></text>
+<text class="t" x="20" y="770" style="animation-delay:4.78s"><tspan fill="#0B1F33">  …/Analytics.framework/Analytics   127.9 kB   x86_64 33.6 kB, arm64 62.4 kB</tspan></text>
+<text class="t" x="20" y="789" style="animation-delay:4.81s"></text>
+<text class="t" x="20" y="808" style="animation-delay:4.85s"><tspan fill="#00285C" font-weight="700">Notes</tspan></text>
+<text class="t" x="20" y="827" style="animation-delay:4.88s"><tspan fill="#0B1F33">  - Simulator build (iphonesimulator): it has no App Store thinning or</tspan></text>
+<text class="t" x="20" y="846" style="animation-delay:4.92s"><tspan fill="#0B1F33">    encryption, and its binaries are built for the simulator, so a device build</tspan></text>
+<text class="t" x="20" y="865" style="animation-delay:4.96s"><tspan fill="#0B1F33">    of the same app differs in size.</tspan></text>
+<text class="t" x="20" y="884" style="animation-delay:4.99s"><tspan fill="#0B1F33">  - 3 binaries contain more than one architecture. Sizes count every slice; a</tspan></text>
+<text class="t" x="20" y="903" style="animation-delay:5.03s"><tspan fill="#0B1F33">    device keeps one, so after App Store thinning these binaries are smaller.</tspan></text>
+<text class="t" x="20" y="922" style="animation-delay:5.26s"><tspan fill="#0071E3" font-weight="700">$ </tspan></text>
+<rect class="caret" x="35.66" y="910" width="7.83" height="16" fill="#0071E3" style="animation-delay:5.26s"/>
+</svg>
