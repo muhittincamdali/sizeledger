@@ -82,8 +82,9 @@ public enum MarkdownReport {
 
     /// Plain text safe in a table cell, a heading or a list item. Line breaks become spaces, so the
     /// value stays on its line; Markdown and HTML syntax is backslash-escaped; and a word GitHub
-    /// would turn into a link, an @mention or an issue reference goes in a code span, the one
-    /// place where none of those apply (backslashes and entities do not stop them).
+    /// would turn into a link, an @mention, an issue reference or math goes in a code span, the
+    /// one place where none of those apply (backslashes and entities do not stop them: GitHub
+    /// renders `\$x\$` as math too).
     ///
     /// Everything works on Unicode scalars, not `Character`s: a combining mark after `|` or a
     /// backtick makes one `Character` that compares unequal to it, while GitHub still sees the
@@ -95,7 +96,7 @@ public enum MarkdownReport {
             if !first { result.append(" ") }
             first = false
             let word = String(token)
-            result += isReference(word) ? code(word) : escaped(word)
+            result += needsCodeSpan(word) ? code(word) : escaped(word)
         }
         return result
     }
@@ -128,10 +129,12 @@ public enum MarkdownReport {
         return String(scalars)
     }
 
-    /// Whether GitHub would link this word: a URL, a `www.` host, an email address or @mention
-    /// (any `@`), an issue or pull request reference (`#` before a digit) or something that looks
-    /// like a commit hash.
-    private static func isReference(_ word: String) -> Bool {
+    /// Whether GitHub would link or typeset this word: a URL, a `www.` host, an email address or
+    /// @mention (any `@`), an issue or pull request reference (`#` before a digit), something that
+    /// looks like a commit hash, or a `$` that could open or close inline math (`$x$`, `$$x$$`
+    /// and `` $`x`$ ``), where a LaTeX command such as `\color` or `\huge` would change the text.
+    private static func needsCodeSpan(_ word: String) -> Bool {
+        if word.unicodeScalars.contains("$") { return true }
         let lower = word.lowercased()
         if lower.contains("://") || lower.contains("www.") || lower.contains("mailto:") || lower.contains("xmpp:") { return true }
         if word.unicodeScalars.contains("@") { return true }

@@ -6,7 +6,7 @@
 
 For every case the table row built from `text` and `code` is sent to `gh api markdown` in gfm
 mode, with this repository as context so @mentions and #references would resolve, and the
-row's HTML is stored. The script exits with status 1 when GitHub turned a value into a link,
+row's HTML is stored. The script exits with status 1 when GitHub turned a value into a link, math,
 mention, image or extra cell; MarkdownEscapingTests checks the same on every test run.
 """
 import json
@@ -20,7 +20,7 @@ FIXTURE = os.path.join(
 )
 CONTEXT = "muhittincamdali/sizeledger"
 BODY = re.compile(r"<tbody>\s*(.*?)\s*</tbody>", re.S)
-MARKUP = ["<a ", "<img", "user-mention", "issue-link", "<script", "<br"]
+MARKUP = ["<a ", "<img", "user-mention", "issue-link", "<script", "<br", "math-renderer", "<math"]
 
 
 def render(markdown):

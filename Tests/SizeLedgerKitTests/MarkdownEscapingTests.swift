@@ -7,7 +7,7 @@ import Testing
 /// what `MarkdownReport.text` and `.code` make of it, the table row built from them and the HTML
 /// GitHub rendered for that row (`Fixtures/scripts/render-markdown-fixture.py`, which calls
 /// `gh api markdown` in gfm mode). This test fails when the escaping changes without the fixture
-/// being rendered again, or when GitHub's HTML shows a link, mention, image or extra cell.
+/// being rendered again, or when GitHub's HTML shows a link, mention, image, math or extra cell.
 @Suite struct MarkdownEscapingTests {
     struct Case: Codable {
         var name: String
@@ -53,7 +53,7 @@ import Testing
             let html = try #require(item.html, "\(item.name): run Fixtures/scripts/render-markdown-fixture.py")
             #expect(html.components(separatedBy: "<td").count - 1 == 3, "\(item.name): the row was split")
             #expect(html.contains("<td>end</td>"), "\(item.name): the marker cell moved")
-            for markup in ["<a ", "<img", "user-mention", "issue-link", "<script", "<br"] {
+            for markup in ["<a ", "<img", "user-mention", "issue-link", "<script", "<br", "math-renderer", "<math"] {
                 #expect(!html.contains(markup), "\(item.name): GitHub rendered \(markup)")
             }
         }
