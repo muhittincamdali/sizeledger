@@ -7,6 +7,18 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- `--max-depth` accepts 1 to 100, and `SizeLedger.analyze` lowers a higher `maxDepth` to
+  `AnalysisLimits.deepestAllowed` (100). The default stays 64.
+
+### Fixed
+
+- With `--max-depth` raised far enough, a bundle about 254 folders deep made `--format json` print
+  nothing and exit 0: `JSONEncoder` stops at 512 levels and the error was dropped. An encoding
+  error now ends with a message and exit status 2, and the depth ceiling keeps reports well inside
+  what JSON encoding and decoding handle, on any thread.
+
 ## [0.1.4] - 2026-10-15
 
 ### Added

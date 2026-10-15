@@ -106,6 +106,26 @@ final class TinyApp {
         #expect(unwritable.errors.hasPrefix("sizeledger: cannot write "))
     }
 
+    @Test func writesJSONForTheDeepestBundleItAccepts() throws {
+        // --max-depth 1000 once let a bundle 254 folders deep through, and its JSON report came
+        // out empty with exit status 0. The flag now stops at 100, and a bundle that deep still
+        // gives a report that encodes and decodes.
+        let tiny = try TinyApp()
+        let depth = AnalysisLimits.deepestAllowed
+        let deep = tiny.folder.appendingPathComponent("Deep.app/" + Array(repeating: "d", count: depth).joined(separator: "/"))
+        try FileManager.default.createDirectory(at: deep, withIntermediateDirectories: true)
+        try Data("x".utf8).write(to: deep.appendingPathComponent("f"))
+        let app = tiny.folder.appendingPathComponent("Deep.app").path
+
+        let run = try Run([app, "--max-depth", "\(depth)", "--format", "json"])
+        #expect(run.status == 0)
+        #expect(run.errors.isEmpty)
+        #expect(try SizeReport.decode(from: Data(run.output.utf8)).totals.files == 1)
+
+        #expect(throws: (any Error).self) { _ = try Analyze.parse([app, "--max-depth", "\(depth + 1)"]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse([app, "--max-depth", "1000"]) }
+    }
+
     @Test func refusesAnXcodeArchiveThatLinksOutside() throws {
         let tiny = try TinyApp()
         let applications = tiny.folder.appendingPathComponent("Linked.xcarchive/Products/Applications")
@@ -124,7 +144,10 @@ final class TinyApp {
         #expect(throws: (any Error).self) { _ = try Analyze.parse([]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--quiet"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "-q", "--format", "json"]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--max-depth", "0"]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--max-depth", "101"]) }
         #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "-q", "-o", "size.json"]) }
+        #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "--max-depth", "100"]) }
     }
 
     @Test func pointsToAnalyzeWhenTheSubcommandIsMissing() {

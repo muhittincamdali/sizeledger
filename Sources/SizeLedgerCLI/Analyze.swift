@@ -54,7 +54,7 @@ public struct Analyze: ParsableCommand {
     @Option(help: ArgumentHelp("Refuse an .ipa entry whose uncompressed-to-stored size ratio is above this (zip bomb).", valueName: "ratio"))
     var maxRatio: UInt64 = AnalysisLimits.default.maxCompressionRatio
 
-    @Option(help: ArgumentHelp("Refuse a path nested deeper than this many folders.", valueName: "n"))
+    @Option(help: ArgumentHelp("Refuse a path nested deeper than this many folders (at most \(AnalysisLimits.deepestAllowed)).", valueName: "n"))
     var maxDepth: Int = AnalysisLimits.default.maxDepth
 
     public init() {}
@@ -68,7 +68,9 @@ public struct Analyze: ParsableCommand {
         guard maxFiles >= 1 else { throw ValidationError("--max-files must be 1 or more.") }
         guard maxBytes >= 1 else { throw ValidationError("--max-bytes must be 1 or more.") }
         guard maxRatio >= 1 else { throw ValidationError("--max-ratio must be 1 or more.") }
-        guard maxDepth >= 1 else { throw ValidationError("--max-depth must be 1 or more.") }
+        guard (1...AnalysisLimits.deepestAllowed).contains(maxDepth) else {
+            throw ValidationError("--max-depth must be from 1 to \(AnalysisLimits.deepestAllowed); a deeper report cannot be written as JSON.")
+        }
     }
 
     var limits: AnalysisLimits {
@@ -102,11 +104,23 @@ public struct Analyze: ParsableCommand {
             return ExitStatus.failure
         }
 
+        // Encoded before anything is written or printed, so a report JSON cannot hold ends with a
+        // message and status 2, not with an empty file or empty output and status 0.
+        var json = Data()
+        if out != nil || (format == .json && !quiet) {
+            do {
+                json = try report.jsonData()
+            } catch {
+                errors.write("sizeledger: cannot encode the report as JSON: \(error.localizedDescription)\n")
+                return ExitStatus.failure
+            }
+        }
+
         if let out {
             do {
                 let url = URL(fileURLWithPath: out)
                 try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-                try report.jsonData().write(to: url, options: .atomic)
+                try json.write(to: url, options: .atomic)
             } catch {
                 errors.write("sizeledger: cannot write \(out): \(error.localizedDescription)\n")
                 return ExitStatus.failure
@@ -121,8 +135,7 @@ public struct Analyze: ParsableCommand {
         case .markdown:
             output.write(MarkdownReport.render(report, options: .init(top: top)))
         case .json:
-            // jsonData() only fails for values JSON cannot hold; a report has none.
-            output.write(String(decoding: (try? report.jsonData()) ?? Data(), as: UTF8.self))
+            output.write(String(decoding: json, as: UTF8.self))
         }
         return ExitStatus.success
     }

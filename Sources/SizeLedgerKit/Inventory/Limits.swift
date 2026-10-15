@@ -14,7 +14,8 @@ public struct AnalysisLimits: Sendable, Equatable {
     /// Largest ratio of a single file's declared uncompressed size to its stored (compressed)
     /// size. A higher ratio is a zip bomb, not a real asset.
     public var maxCompressionRatio: UInt64
-    /// Deepest path (number of `/`-separated components) measured.
+    /// Deepest path (number of `/`-separated components) measured. Values above
+    /// ``deepestAllowed`` are lowered to it.
     public var maxDepth: Int
 
     /// Creates a set of limits. Any argument left out keeps the default.
@@ -32,6 +33,19 @@ public struct AnalysisLimits: Sendable, Equatable {
 
     /// The defaults, documented in the README's Limits section.
     public static let `default` = AnalysisLimits()
+
+    /// The highest ``maxDepth`` that is honoured. The JSON report nests two levels per folder,
+    /// and `JSONEncoder` and `JSONDecoder` recurse once per level: a few hundred folders pass the
+    /// encoder's 512-level limit, and fewer than that can already exhaust the stack of a thread
+    /// that is not the main one. 100 folders is far deeper than any real bundle.
+    public static let deepestAllowed = 100
+
+    /// These limits with ``maxDepth`` lowered to ``deepestAllowed``.
+    var honoured: AnalysisLimits {
+        var limits = self
+        limits.maxDepth = min(maxDepth, Self.deepestAllowed)
+        return limits
+    }
 
     /// The number of `/`-separated components in a bundle path.
     static func depth(of path: String) -> Int {

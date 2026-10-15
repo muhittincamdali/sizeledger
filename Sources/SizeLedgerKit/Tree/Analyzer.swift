@@ -7,9 +7,10 @@ extension SizeLedger {
     /// the archive's directory, and only Info.plist and Mach-O headers are read.
     ///
     /// - Throws: ``InputError`` when the path is missing, of an unsupported kind, or contains no
-    ///   app or several apps.
+    ///   app or several apps, or when it passes one of `limits`. A `limits.maxDepth` above
+    ///   ``AnalysisLimits/deepestAllowed`` counts as that ceiling.
     public static func analyze(_ url: URL, limits: AnalysisLimits = .default) throws -> SizeReport {
-        let source = try InputLocator.open(url, limits: limits)
+        let source = try InputLocator.open(url, limits: limits.honoured)
         return Analyzer(source: source).report(inputName: url.lastPathComponent)
     }
 }
