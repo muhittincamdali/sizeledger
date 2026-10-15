@@ -63,24 +63,26 @@ enum MachO {
     }
 
     /// Parses every slice. `read(ranges)` returns the bytes of the file in each range, cut short
-    /// where the file ends. It is called at most three times, each time with one range per slice
-    /// of at most `headerProbe` or `headerSize + maximumLoadCommandBytes` bytes, so what is held
-    /// in memory follows the size of the headers, never the offsets a fat header claims.
+    /// where the file ends. It is called at most three times (twice for a thin binary), with one
+    /// range per slice of at most `headerProbe` or `headerSize + maximumLoadCommandBytes` bytes,
+    /// so what is held in memory follows the size of the headers, never the offsets a fat header
+    /// claims.
     static func slices(fileSize: UInt64, read: ([Range<Int>]) throws -> [Data]) throws -> [MachOSlice] {
         let head = try read([0..<headerProbe])[0]
         guard let format = format(of: head) else { throw ParseError.notMachO }
 
+        // The start of each slice (for a thin binary, the bytes already read), then, for slices
+        // whose load commands go past it, exactly as far as the commands reach.
         let ranges: [(offset: Int, size: UInt64)]
+        var windows: [Data]
         switch format {
         case .thin:
             ranges = [(0, fileSize)]
+            windows = [head]
         case .fat(let is64):
             ranges = try fatRanges(ByteReader(head), is64: is64, fileSize: fileSize)
+            windows = try read(ranges.map { $0.offset..<($0.offset + Int(min($0.size, UInt64(headerProbe)))) })
         }
-
-        // The start of each slice, then, for slices whose load commands go past it, exactly as
-        // far as the commands reach.
-        var windows = try read(ranges.map { $0.offset..<($0.offset + Int(min($0.size, UInt64(headerProbe)))) })
         let commandEnds = try zip(ranges, windows).map { range, window in
             try loadCommandsEnd(ByteReader(window), size: range.size)
         }

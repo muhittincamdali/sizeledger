@@ -99,7 +99,7 @@ import Testing
         #expect(slices.first?.segments.count == 63)
         let commandEnd = 32 + Int(try ByteReader(data).uint32LE(at: 20))
         #expect(commandEnd > 4_096)
-        #expect(requests == [[0..<4_096], [0..<4_096], [0..<commandEnd]])
+        #expect(requests == [[0..<4_096], [0..<commandEnd]])
     }
 
     @Test func keepsReadsSmallWhenAFatHeaderPointsFarIntoTheFile() throws {
