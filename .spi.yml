@@ -1,0 +1,6 @@
+# Swift Package Index: build the documentation of the library target. The platform matrix comes
+# from Package.swift (macOS) plus SPI's own Linux builds.
+version: 1
+builder:
+  configs:
+    - documentation_targets: [SizeLedgerKit]

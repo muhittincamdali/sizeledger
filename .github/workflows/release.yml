@@ -1,0 +1,247 @@
+name: Release
+
+# Runs when a version tag (v1.2.3) is pushed:
+#
+# 1. verify: the tag matches SizeLedger.version and CHANGELOG.md has a section for it; the tests
+#    pass; a universal macOS binary (arm64 and x86_64) is built and run on the SampleShop fixture.
+# 2. linux: a release binary for x86_64 and for aarch64, built in the Swift 6.4.1 Ubuntu 22.04
+#    image with the Swift runtime linked in and symbols stripped (it needs glibc 2.35 or later and
+#    libstdc++; checked on Ubuntu 22.04 and Debian 12), and run
+#    on the same fixture.
+# 3. github-release: creates the GitHub release with that CHANGELOG section as its notes, the
+#    three archives and SHA256SUMS. A release that already exists keeps its notes; only missing
+#    files are added.
+# 4. homebrew: writes Formula/sizeledger.rb from the release's SHA256SUMS and opens a pull request
+#    on muhittincamdali/homebrew-tap (secret HOMEBREW_TAP_TOKEN; without it the formula is only
+#    uploaded as an artifact).
+#
+# Swift Package Index builds tagged versions by itself once the package is listed there.
+# Run it by hand with an existing tag to redo the Homebrew step.
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag, e.g. v0.1.0
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify and build for macOS
+    runs-on: macos-26
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          persist-credentials: false
+
+      - name: Check tag, version and changelog
+        id: version
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          if ! printf '%s' "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'; then
+            echo "::error::$TAG is not a version tag such as v1.2.3"
+            exit 1
+          fi
+          version="${TAG#v}"
+          source="$(sed -n 's/.*static let version = "\(.*\)".*/\1/p' Sources/SizeLedgerKit/SizeLedger.swift)"
+          if [ "$source" != "$version" ]; then
+            echo "::error::Tag $TAG does not match SizeLedger.version $source"
+            exit 1
+          fi
+          scripts/release-notes.sh "$version" > "$RUNNER_TEMP/notes.md"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Test
+        run: |
+          swift build --build-tests
+          swift test --skip-build --parallel
+
+      - name: Build the universal binary
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          swift build -c release --arch arm64 --arch x86_64 --product sizeledger
+          binary="$(swift build -c release --arch arm64 --arch x86_64 --product sizeledger --show-bin-path)/sizeledger"
+          lipo -info "$binary"
+          test "$("$binary" --version)" = "$VERSION"
+          "$binary" analyze Fixtures/apps/SampleShop-2.0.ipa > "$RUNNER_TEMP/report.txt"
+          diff -u Fixtures/snapshots/SampleShop-2.0.txt "$RUNNER_TEMP/report.txt"
+          mkdir -p "$RUNNER_TEMP/package" "$RUNNER_TEMP/release"
+          cp "$binary" LICENSE README.md CHANGELOG.md "$RUNNER_TEMP/package/"
+          tar -czf "$RUNNER_TEMP/release/sizeledger-$VERSION-macos-universal.tar.gz" -C "$RUNNER_TEMP/package" .
+          cp "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/release/notes.md"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-macos
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+
+  linux:
+    name: Build for Linux ${{ matrix.arch }}
+    needs: verify
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    container:
+      image: swift:6.4.1-jammy@sha256:16a660c2c67035d383b450a9911ebb6a218371a57ba4bef59073e38dd4526bb4
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
+          persist-credentials: false
+
+      - name: Build
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          swift build -c release --static-swift-stdlib -Xlinker -s --product sizeledger
+          binary="$(swift build -c release --static-swift-stdlib -Xlinker -s --product sizeledger --show-bin-path)/sizeledger"
+          test "$("$binary" --version)" = "$VERSION"
+          "$binary" analyze Fixtures/apps/SampleShop-2.0.ipa > "$RUNNER_TEMP/report.txt"
+          diff -u Fixtures/snapshots/SampleShop-2.0.txt "$RUNNER_TEMP/report.txt"
+          mkdir -p "$RUNNER_TEMP/package" "$RUNNER_TEMP/release"
+          cp "$binary" LICENSE README.md CHANGELOG.md "$RUNNER_TEMP/package/"
+          tar -czf "$RUNNER_TEMP/release/sizeledger-$VERSION-linux-$ARCH.tar.gz" -C "$RUNNER_TEMP/package" .
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: release-linux-${{ matrix.arch }}
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+
+  github-release:
+    name: GitHub release
+    needs: [verify, linux]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: release-*
+          path: release
+          merge-multiple: true
+
+      - name: Create the release, or add missing files to an existing one
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.verify.outputs.tag }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          cd release
+          sha256sum ./*.tar.gz | sed 's| \./| |' > SHA256SUMS
+          cat SHA256SUMS
+          prerelease=""
+          case "$VERSION" in *-*) prerelease="--prerelease" ;; esac
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG exists; its notes are left as they are."
+            existing="$(gh release view "$TAG" --json assets --jq '.assets[].name')"
+            for file in ./*.tar.gz SHA256SUMS; do
+              if ! printf '%s\n' "$existing" | grep -Fxq "$(basename "$file")"; then
+                gh release upload "$TAG" "$file"
+              fi
+            done
+          else
+            gh release create "$TAG" ./*.tar.gz SHA256SUMS \
+              --title "sizeledger $VERSION" --notes-file notes.md --verify-tag $prerelease
+          fi
+
+  homebrew:
+    name: Homebrew formula
+    needs: [verify, github-release]
+    if: >-
+      always() && needs.verify.result == 'success' && !contains(needs.verify.outputs.version, '-') &&
+      (needs.github-release.result == 'success' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.verify.outputs.tag }}
+          persist-credentials: false
+
+      - name: Write the formula from the release checksums
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          url="https://github.com/muhittincamdali/sizeledger/releases/download/v$VERSION/SHA256SUMS"
+          for attempt in $(seq 1 20); do
+            if curl -fsSL -o "$RUNNER_TEMP/SHA256SUMS" "$url"; then break; fi
+            if [ "$attempt" = 20 ]; then echo "::error::$url is not available"; exit 1; fi
+            sleep 30
+          done
+          mkdir -p "$RUNNER_TEMP/formula"
+          scripts/homebrew-formula.sh "$VERSION" "$RUNNER_TEMP/SHA256SUMS" > "$RUNNER_TEMP/formula/sizeledger.rb"
+          cat "$RUNNER_TEMP/formula/sizeledger.rb"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: homebrew-formula
+          path: ${{ runner.temp }}/formula/sizeledger.rb
+          if-no-files-found: error
+
+      - name: Open a pull request on the tap
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::HOMEBREW_TAP_TOKEN is not set; the formula is in the homebrew-formula artifact."
+            exit 0
+          fi
+          branch="sizeledger-$VERSION"
+          gh repo clone muhittincamdali/homebrew-tap "$RUNNER_TEMP/tap" -- --depth 1
+          cd "$RUNNER_TEMP/tap"
+          git switch -c "$branch"
+          mkdir -p Formula
+          cp "$RUNNER_TEMP/formula/sizeledger.rb" Formula/sizeledger.rb
+          git add Formula/sizeledger.rb
+          if git diff --cached --quiet; then
+            echo "Formula/sizeledger.rb is already at $VERSION."
+            exit 0
+          fi
+          git -c user.name="Muhittin Camdali" -c user.email="muhittincamdali@gmail.com" \
+            commit -m "sizeledger $VERSION" -m "Formula for sizeledger $VERSION from the GitHub release binaries."
+          gh auth setup-git
+          git push origin "$branch"
+          gh pr create --repo muhittincamdali/homebrew-tap --head "$branch" \
+            --title "sizeledger $VERSION" \
+            --body "Updates Formula/sizeledger.rb to sizeledger $VERSION (https://github.com/muhittincamdali/sizeledger/releases/tag/v$VERSION)."
