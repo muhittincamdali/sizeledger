@@ -7,6 +7,11 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `Sanitize.text(_:)` is public, so a program that prints report values itself can clean them the
+  way the table and the Markdown report do. The DocC articles and `Examples/LibraryUsage` use it.
+
 ### Security
 
 - GitHub typesets `$...$` (and `$$...$$`, `` $`...`$ ``) as math, even when the dollars are
@@ -14,6 +19,11 @@ All notable changes to sizeledger are listed here. The format follows
   `$\color{green}{\textsf{Size check passed}}$` printed coloured or oversized LaTeX into a pull
   request comment or job summary. The Markdown report now writes every word that holds a `$` in a
   code span.
+- The table and the Markdown report kept the invisible marks U+200E, U+200F and U+061C, the
+  zero-width U+200B, U+2060 and U+FEFF, and the separators U+2028 and U+2029 in file names and
+  Info.plist values. A mark can move a `.` or `/` to the other side of a name without being seen;
+  they are now replaced with U+FFFD, as is the command `sizeledger` suggests when an app is given
+  without `analyze`. The joiners U+200C and U+200D stay.
 
 ## [0.1.5] - 2026-10-15
 
