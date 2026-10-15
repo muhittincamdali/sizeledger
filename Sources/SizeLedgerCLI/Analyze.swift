@@ -102,11 +102,23 @@ public struct Analyze: ParsableCommand {
             return ExitStatus.failure
         }
 
+        // Encoded before anything is written or printed, so a report JSON cannot hold ends with a
+        // message and status 2, not with an empty file or empty output and status 0.
+        var json = Data()
+        if out != nil || (format == .json && !quiet) {
+            do {
+                json = try report.jsonData()
+            } catch {
+                errors.write("sizeledger: cannot encode the report as JSON: \(error.localizedDescription)\n")
+                return ExitStatus.failure
+            }
+        }
+
         if let out {
             do {
                 let url = URL(fileURLWithPath: out)
                 try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-                try report.jsonData().write(to: url, options: .atomic)
+                try json.write(to: url, options: .atomic)
             } catch {
                 errors.write("sizeledger: cannot write \(out): \(error.localizedDescription)\n")
                 return ExitStatus.failure
@@ -121,8 +133,7 @@ public struct Analyze: ParsableCommand {
         case .markdown:
             output.write(MarkdownReport.render(report, options: .init(top: top)))
         case .json:
-            // jsonData() only fails for values JSON cannot hold; a report has none.
-            output.write(String(decoding: (try? report.jsonData()) ?? Data(), as: UTF8.self))
+            output.write(String(decoding: json, as: UTF8.self))
         }
         return ExitStatus.success
     }
