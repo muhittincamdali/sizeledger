@@ -3,7 +3,8 @@ import Foundation
 /// An app bundle folder on disk: a `.app`, or the one inside an `.xcarchive`.
 ///
 /// Symbolic links are listed as links and not followed, the way `du` counts them, so a link to a
-/// folder elsewhere does not add that folder's size.
+/// folder elsewhere does not add that folder's size. `root` itself is opened as given;
+/// `InputLocator` makes sure it is not a link inside an `.xcarchive`.
 struct DirectorySource: BundleSource {
     let kind: InputKind
     let root: URL

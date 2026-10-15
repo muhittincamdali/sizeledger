@@ -91,6 +91,40 @@ import Testing
         #expect(source.entries.map(\.path) == ["Demo"])
     }
 
+    @Test(
+        "refuses an .xcarchive whose way to the app goes through a symbolic link",
+        arguments: [
+            ("Products", "../Elsewhere/Products"),
+            ("Products/Applications", "../../Elsewhere/Products/Applications"),
+            ("Products/Applications/Demo.app", "../../../Elsewhere/Products/Applications/Demo.app"),
+        ]
+    )
+    func refusesLinksInsideAnXcodeArchive(link: String, destination: String) throws {
+        let temp = try TemporaryDirectory()
+        try temp.file("Elsewhere/Products/Applications/Demo.app/id_rsa", size: 10)
+        try temp.file("Demo.xcarchive/Info.plist", size: 10)
+        try temp.symlink("Demo.xcarchive/" + link, to: destination)
+        // The link resolves, so following it would have measured the folder outside the archive.
+        let linked = temp.url.appendingPathComponent("Demo.xcarchive/Products/Applications/Demo.app/id_rsa")
+        #expect(FileManager.default.fileExists(atPath: linked.path))
+
+        let expected = InputError.unreadable(
+            temp.url.appendingPathComponent("Demo.xcarchive/" + link).path,
+            "it is a symbolic link, and links inside an .xcarchive are not followed"
+        )
+        #expect(throws: expected) {
+            _ = try InputLocator.open(temp.url.appendingPathComponent("Demo.xcarchive"))
+        }
+    }
+
+    @Test func followsAnInputPathThatIsALink() throws {
+        let temp = try TemporaryDirectory()
+        try temp.file("Builds/Demo.app/Demo", size: 64)
+        try temp.symlink("Latest.app", to: "Builds/Demo.app")
+        let source = try InputLocator.open(temp.url.appendingPathComponent("Latest.app"))
+        #expect(source.entries.map(\.path) == ["Demo"])
+    }
+
     @Test func explainsInputsItCannotRead() throws {
         let temp = try TemporaryDirectory()
         try temp.directory("Plain")
