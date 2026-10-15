@@ -18,7 +18,12 @@ public enum ByteFormat {
     /// `part` as a share of `whole` with one decimal place: `36.0%`.
     public static func share(_ part: UInt64, of whole: UInt64) -> String {
         guard whole > 0 else { return "0.0%" }
-        let tenths = (part * 1_000 + whole / 2) / whole
+        let (scaled, overflow) = part.multipliedReportingOverflow(by: 1_000)
+        let (rounded, overflowAgain) = scaled.addingReportingOverflow(whole / 2)
+        // Only sizes near 2^64, from a crafted input, take the floating-point path.
+        let tenths = overflow || overflowAgain
+            ? UInt64(Swift.min((Double(part) * 1_000 / Double(whole)).rounded(), 1e15))
+            : rounded / whole
         return "\(tenths / 10).\(tenths % 10)%"
     }
 
@@ -26,9 +31,14 @@ public enum ByteFormat {
     static func decimal(_ bytes: UInt64, unit: UInt64, places: Int) -> String {
         var scale: UInt64 = 1
         for _ in 0..<places { scale *= 10 }
-        let scaled = (bytes * scale + unit / 2) / unit
-        let whole = scaled / scale
-        let fraction = String(scaled % scale)
+        // Whole units and the remainder are scaled apart, so sizes up to UInt64.max cannot overflow.
+        var whole = bytes / unit
+        var tail = (bytes % unit * scale + unit / 2) / unit
+        if tail == scale {
+            whole += 1
+            tail = 0
+        }
+        let fraction = String(tail)
         return "\(whole)." + String(repeating: "0", count: places - fraction.count) + fraction
     }
 }

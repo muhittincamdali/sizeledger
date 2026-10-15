@@ -15,6 +15,8 @@ import Testing
         (999_994_999, "999.99 MB"),
         (999_995_000, "1.00 GB"),
         (1_234_567_890, "1.23 GB"),
+        (999_999_999_999_999_999, "1000000000.00 GB"),
+        (.max, "18446744073.71 GB"),
     ])
     func bytes(value: UInt64, expected: String) {
         #expect(ByteFormat.string(value) == expected)
@@ -25,6 +27,8 @@ import Testing
         #expect(ByteFormat.share(2, of: 3) == "66.7%")
         #expect(ByteFormat.share(5, of: 5) == "100.0%")
         #expect(ByteFormat.share(0, of: 0) == "0.0%")
+        #expect(ByteFormat.share(.max, of: .max) == "100.0%")
+        #expect(ByteFormat.share(.max / 3, of: .max) == "33.3%")
     }
 
     @Test func replacesControlCharacters() {

@@ -7,6 +7,12 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Security
+
+- A crafted `.ipa` whose ZIP64 entries declared sizes near 2^64 bytes stopped sizeledger: adding
+  the sizes up, rounding them to 4 KiB blocks and printing them overflowed. Sizes now saturate at
+  the largest 64-bit value and print as `18446744073.71 GB`.
+
 ## [0.1.2] - 2026-10-15
 
 ### Added

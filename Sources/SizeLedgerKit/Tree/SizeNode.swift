@@ -26,7 +26,7 @@ enum InstallSize {
 
     static func estimate(_ entry: BundleEntry) -> UInt64 {
         guard !entry.isSymbolicLink, entry.bytes > 0 else { return 0 }
-        return (entry.bytes + blockSize - 1) / blockSize * blockSize
+        return entry.bytes.addingSaturating(blockSize - 1) / blockSize * blockSize
     }
 }
 
@@ -39,19 +39,19 @@ struct Tally: Equatable {
 
     mutating func add(_ entry: BundleEntry) {
         files += 1
-        bytes += entry.bytes
-        installBytes += InstallSize.estimate(entry)
+        bytes = bytes.addingSaturating(entry.bytes)
+        installBytes = installBytes.addingSaturating(InstallSize.estimate(entry))
         if let compressed = entry.compressedBytes {
-            compressedBytes = (compressedBytes ?? 0) + compressed
+            compressedBytes = (compressedBytes ?? 0).addingSaturating(compressed)
         }
     }
 
     static func + (lhs: Tally, rhs: Tally) -> Tally {
         var sum = lhs
         sum.files += rhs.files
-        sum.bytes += rhs.bytes
-        sum.installBytes += rhs.installBytes
-        if let compressed = rhs.compressedBytes { sum.compressedBytes = (sum.compressedBytes ?? 0) + compressed }
+        sum.bytes = sum.bytes.addingSaturating(rhs.bytes)
+        sum.installBytes = sum.installBytes.addingSaturating(rhs.installBytes)
+        if let compressed = rhs.compressedBytes { sum.compressedBytes = (sum.compressedBytes ?? 0).addingSaturating(compressed) }
         return sum
     }
 }
@@ -113,5 +113,15 @@ enum TreeBuilder {
     static func largestFirst(_ lhs: SizeNode, _ rhs: SizeNode) -> Bool {
         if lhs.bytes != rhs.bytes { return lhs.bytes > rhs.bytes }
         return lhs.name.utf8.lexicographicallyPrecedes(rhs.name.utf8)
+    }
+}
+
+extension UInt64 {
+    /// `self + other`, or `UInt64.max` when the sum does not fit. Sizes come from the input, and
+    /// a crafted `.ipa` can declare entries of almost 2^64 bytes; a report that says
+    /// 18446744073.71 GB is better than a crash.
+    func addingSaturating(_ other: UInt64) -> UInt64 {
+        let (sum, overflow) = addingReportingOverflow(other)
+        return overflow ? .max : sum
     }
 }
