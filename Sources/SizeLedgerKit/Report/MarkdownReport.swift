@@ -80,60 +80,83 @@ public enum MarkdownReport {
         if hidden > 0 { lines += ["", "\(hidden) more in the JSON report."] }
     }
 
-    /// Plain text with Markdown and HTML syntax escaped, and any word GitHub would autolink put
-    /// in a code span, so a file name or Info.plist value cannot inject a clickable link.
+    /// Plain text safe in a table cell, a heading or a list item. Line breaks become spaces, so the
+    /// value stays on its line; Markdown and HTML syntax is backslash-escaped; and a word GitHub
+    /// would turn into a link, an @mention or an issue reference goes in a code span, the one
+    /// place where none of those apply (backslashes and entities do not stop them).
+    ///
+    /// Everything works on Unicode scalars, not `Character`s: a combining mark after `|` or a
+    /// backtick makes one `Character` that compares unequal to it, while GitHub still sees the
+    /// pipe or backtick byte.
     static func text(_ value: String) -> String {
         var result = ""
         var first = true
-        for token in Sanitize.text(value).split(separator: " ", omittingEmptySubsequences: false) {
+        for token in oneLine(value).split(separator: " ", omittingEmptySubsequences: false) {
             if !first { result.append(" ") }
             first = false
             let word = String(token)
-            result += autolinks(word) ? code(word) : escaped(word)
+            result += isReference(word) ? code(word) : escaped(word)
         }
         return result
     }
 
-    /// Markdown and HTML syntax characters backslash-escaped.
+    /// Characters GitHub can read as Markdown or HTML syntax.
+    private static let syntax: Set<Unicode.Scalar> = [
+        "\\", "&", "`", "*", "_", "[", "]", "(", ")", "<", ">", "|", "#", "!", "~",
+    ]
+
+    /// Control characters replaced and every line break (LF, CR, VT, FF, NEL, U+2028, U+2029)
+    /// turned into a space.
+    static func oneLine(_ value: String) -> String {
+        var scalars = String.UnicodeScalarView()
+        for scalar in value.unicodeScalars {
+            switch scalar.value {
+            case 0x0A, 0x0B, 0x0C, 0x0D, 0x85, 0x2028, 0x2029: scalars.append(" ")
+            default: scalars.append(scalar)
+            }
+        }
+        return Sanitize.text(String(scalars))
+    }
+
+    /// Each syntax scalar preceded by a backslash.
     private static func escaped(_ value: String) -> String {
-        var result = ""
-        for character in value {
-            if "\\`*_[]<>|#!~&".contains(character) { result.append("\\") }
-            result.append(character)
+        var scalars = String.UnicodeScalarView()
+        for scalar in value.unicodeScalars {
+            if syntax.contains(scalar) { scalars.append("\\") }
+            scalars.append(scalar)
         }
-        return result
+        return String(scalars)
     }
 
-    /// Whether GitHub-flavoured Markdown would turn this word into a link: an `http(s)`/`ftp` URL,
-    /// a `www.` host or a bare email. Backslash escapes do not disable GitHub's autolink
-    /// extension, so such a word goes in a code span instead, where nothing is markup.
-    private static func autolinks(_ word: String) -> Bool {
-        if word.contains("://") || word.lowercased().hasPrefix("www.") { return true }
-        if let at = word.firstIndex(of: "@") { return word[word.index(after: at)...].contains(".") }
-        return false
+    /// Whether GitHub would link this word: a URL, a `www.` host, an email address or @mention
+    /// (any `@`), an issue or pull request reference (`#` before a digit) or something that looks
+    /// like a commit hash.
+    private static func isReference(_ word: String) -> Bool {
+        let lower = word.lowercased()
+        if lower.contains("://") || lower.contains("www.") || lower.contains("mailto:") || lower.contains("xmpp:") { return true }
+        if word.unicodeScalars.contains("@") { return true }
+        let scalars = Array(word.unicodeScalars)
+        for (index, scalar) in scalars.enumerated() where scalar == "#" && index + 1 < scalars.count {
+            if ("0"..."9").contains(scalars[index + 1]) { return true }
+        }
+        let hex = scalars.filter { ("0"..."9").contains($0) || ("a"..."f").contains($0) || ("A"..."F").contains($0) }
+        return scalars.count >= 7 && hex.count == scalars.count && scalars.contains(where: { ("0"..."9").contains($0) })
     }
 
-    /// A code span that holds any text: the fence is longer than the longest run of backticks
-    /// inside, and `|` is escaped because GitHub splits table cells on it even in code.
+    /// A code span that holds any text on one line: the fence is longer than the longest run of
+    /// backticks inside, a space pads text that starts or ends with a backtick, and `|` is escaped
+    /// because GitHub splits table cells on it even in code.
     static func code(_ value: String) -> String {
-        let clean = Sanitize.text(value).replacingAll("|", with: "\\|")
+        var clean = String.UnicodeScalarView()
         var longest = 0, run = 0
-        for character in clean {
-            run = character == "`" ? run + 1 : 0
+        for scalar in oneLine(value).unicodeScalars {
+            run = scalar == "`" ? run + 1 : 0
             longest = max(longest, run)
+            if scalar == "|" { clean.append("\\") }
+            clean.append(scalar)
         }
         let fence = String(repeating: "`", count: longest + 1)
-        let padding = clean.hasPrefix("`") || clean.hasSuffix("`") ? " " : ""
-        return fence + padding + clean + padding + fence
-    }
-}
-
-extension String {
-    func replacingAll(_ target: Character, with replacement: String) -> String {
-        var result = ""
-        for character in self {
-            if character == target { result += replacement } else { result.append(character) }
-        }
-        return result
+        let padding = clean.first == "`" || clean.last == "`" ? " " : ""
+        return fence + padding + String(clean) + padding + fence
     }
 }

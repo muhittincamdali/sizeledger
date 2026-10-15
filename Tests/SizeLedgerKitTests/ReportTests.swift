@@ -101,7 +101,7 @@ import Testing
 @Suite struct MarkdownReportTests {
     @Test func rendersTablesForASummary() throws {
         let markdown = MarkdownReport.render(try TextReportTests.report())
-        #expect(markdown.hasPrefix("### Shop 1.2 (34): app size\n"))
+        #expect(markdown.hasPrefix(#"### Shop 1.2 \(34\): app size"# + "\n"))
         #expect(markdown.contains("`Shop.ipa` → `Shop.app` · com.example.shop · iphoneos · minimum OS 17.0"))
         #expect(markdown.contains("| **Total** (12 files) | **59.5 kB** |"))
         #expect(markdown.contains("| Compressed in the .ipa | 59.5 kB |"))
@@ -112,11 +112,11 @@ import Testing
     }
 
     @Test func escapesMarkdownInValuesFromTheApp() {
-        #expect(MarkdownReport.text("a|b *c* <img> [x](y)") == #"a\|b \*c\* \<img\> \[x\](y)"#)
+        #expect(MarkdownReport.text("a|b *c* <img> [x](y)") == #"a\|b \*c\* \<img\> \[x\]\(y\)"#)
         #expect(MarkdownReport.code("plain.txt") == "`plain.txt`")
         #expect(MarkdownReport.code("a`b") == "``a`b``")
         #expect(MarkdownReport.code("`edge`") == "`` `edge` ``")
         #expect(MarkdownReport.code("x|y") == #"`x\|y`"#)
-        #expect(MarkdownReport.code("line\nbreak") == "`line\u{FFFD}break`")
+        #expect(MarkdownReport.code("line\nbreak") == "`line break`")
     }
 }

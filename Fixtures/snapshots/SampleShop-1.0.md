@@ -1,4 +1,4 @@
-### Sample Shop 1.0 (1): app size
+### Sample Shop 1.0 \(1\): app size
 
 `SampleShop-1.0.ipa` → `SampleShop.app` · com.example.sampleshop · iphonesimulator · minimum OS 17.0
 
@@ -55,7 +55,7 @@
 
 #### Notes
 
-- Simulator build (iphonesimulator): it has no App Store thinning or encryption, and its binaries are built for the simulator, so a device build of the same app differs in size.
+- Simulator build \(iphonesimulator\): it has no App Store thinning or encryption, and its binaries are built for the simulator, so a device build of the same app differs in size.
 - 2 binaries contain more than one architecture. Sizes count every slice; a device keeps one, so after App Store thinning these binaries are smaller.
 
 <sub>sizeledger \<version\>. Sizes in decimal units (1 MB = 1,000,000 bytes). The install size rounds every file up to 4 KiB blocks; it is an estimate, not the App Store's number.</sub>
