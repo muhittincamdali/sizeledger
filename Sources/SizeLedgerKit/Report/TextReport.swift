@@ -1,12 +1,14 @@
 /// The report as terminal text: the app, its totals, then categories, the largest items,
 /// languages and binaries, and the notes.
 public enum TextReport {
+    /// What to include and how to style it.
     public struct Options: Sendable {
         /// How many of the largest items to list.
         public var top: Int
         /// Use ANSI bold and colour.
         public var color: Bool
 
+        /// Options with the given list length and colour setting.
         public init(top: Int = 10, color: Bool = false) {
             self.top = top
             self.color = color
@@ -17,6 +19,7 @@ public enum TextReport {
     static let labelWidth = 34
     static let sizeWidth = 10
 
+    /// The report as lines of text, ending with a newline.
     public static func render(_ report: SizeReport, options: Options = Options()) -> String {
         var out = Writer(color: options.color)
         header(report, &out)

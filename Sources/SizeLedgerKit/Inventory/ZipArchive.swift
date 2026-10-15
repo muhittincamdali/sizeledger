@@ -194,14 +194,20 @@ struct ZipArchive: Sendable {
 
 /// Why a ZIP archive could not be read.
 public enum ZipError: Error, Equatable, Sendable {
+    /// The file cannot be opened; the reason follows.
     case unreadable(String)
+    /// The file has no ZIP end-of-central-directory record.
     case notAZipArchive
+    /// A record points outside the file or has the wrong signature.
     case malformed(String)
+    /// The named entry is encrypted.
     case encrypted(String)
+    /// The named entry uses a compression method other than stored or DEFLATE.
     case unsupportedMethod(UInt16, String)
 }
 
 extension ZipError: CustomStringConvertible {
+    /// A sentence for the user.
     public var description: String {
         switch self {
         case .unreadable(let reason): "the file cannot be read: \(reason)"

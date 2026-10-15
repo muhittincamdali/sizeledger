@@ -1,0 +1,14 @@
+# Generated or recorded files: kept exactly as produced.
+Fixtures/
+.github/brand/
+docs/media/
+_work/
+.build/
+# DocC articles use ``Symbol`` links, which Markdown formatters rewrite to plain code.
+Sources/**/*.docc/
+# Written by the repository kit (apply.mjs); reformatting them would make every re-run a change.
+.github/workflows/ci.yml
+.github/workflows/docs.yml
+.github/workflows/quality.yml
+/README*.md
+CHANGELOG.md

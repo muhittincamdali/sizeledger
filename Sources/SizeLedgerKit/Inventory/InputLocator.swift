@@ -2,14 +2,20 @@ import Foundation
 
 /// Why an input could not be measured.
 public enum InputError: Error, Equatable, Sendable {
+    /// Nothing exists at the path.
     case notFound(String)
+    /// The path is not an `.app` folder, an `.ipa` (ZIP) file or an `.xcarchive` folder.
     case unsupported(String)
+    /// The archive holds no app bundle.
     case noApp(String)
+    /// The archive holds more than one app bundle; their names follow.
     case severalApps(String, [String])
+    /// The input exists but cannot be read; the reason follows.
     case unreadable(String, String)
 }
 
 extension InputError: CustomStringConvertible {
+    /// A sentence for the user that names the path.
     public var description: String {
         switch self {
         case .notFound(let path):

@@ -23,9 +23,12 @@ extension SizeReport {
     }
 }
 
+/// Why a saved report could not be read.
 public enum ReportError: Error, Equatable, Sendable, CustomStringConvertible {
+    /// The report was written with a newer layout than this version reads.
     case newerSchema(Int)
 
+    /// A sentence for the user.
     public var description: String {
         switch self {
         case .newerSchema(let version):

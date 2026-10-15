@@ -22,6 +22,7 @@ public enum SizeCategory: String, Codable, CaseIterable, Sendable, Comparable {
     /// Everything else: storyboards, fonts, data files, resource bundles.
     case resources
 
+    /// The name the text and Markdown reports use.
     public var title: String {
         switch self {
         case .executable: "Main executable"

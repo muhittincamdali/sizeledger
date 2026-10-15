@@ -7,6 +7,7 @@ public struct MachOSlice: Codable, Equatable, Sendable {
     public var architecture: String
     /// Where the slice starts in the file (0 for a thin binary).
     public var offset: UInt64
+    /// Size of the slice in the file.
     public var bytes: UInt64
     /// `executable`, `dylib`, `bundle` or another Mach-O file type.
     public var fileType: String
@@ -20,8 +21,11 @@ public struct MachOSlice: Codable, Equatable, Sendable {
     public var codeSignatureBytes: UInt64
 }
 
+/// A segment of a Mach-O slice, such as `__TEXT` or `__LINKEDIT`.
 public struct MachOSegment: Codable, Equatable, Sendable {
+    /// The segment name.
     public var name: String
+    /// Bytes the segment takes in the file.
     public var bytes: UInt64
 }
 
