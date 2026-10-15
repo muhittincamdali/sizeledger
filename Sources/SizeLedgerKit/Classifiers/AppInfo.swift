@@ -5,6 +5,7 @@ import Foundation
 public struct AppInfo: Codable, Equatable, Sendable {
     /// `CFBundleDisplayName`, or `CFBundleName` when there is no display name.
     public var name: String?
+    /// `CFBundleIdentifier`.
     public var bundleIdentifier: String?
     /// `CFBundleShortVersionString`.
     public var version: String?
@@ -19,6 +20,7 @@ public struct AppInfo: Codable, Equatable, Sendable {
     /// True when the bundle is an App Clip (its Info.plist has an `NSAppClip` dictionary).
     public var isAppClip: Bool
 
+    /// Creates app information; every field defaults to unknown.
     public init(
         name: String? = nil,
         bundleIdentifier: String? = nil,

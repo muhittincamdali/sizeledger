@@ -1,15 +1,21 @@
 /// A folder or file in the size tree. A folder's numbers are the sums of its children.
 public struct SizeNode: Codable, Equatable, Sendable {
+    /// File or folder name; the root is the bundle's name.
     public var name: String
+    /// Files under this node (1 for a file).
     public var files: Int
+    /// Sizes added up.
     public var bytes: UInt64
+    /// Install size estimate (whole 4 KiB blocks).
     public var installBytes: UInt64
+    /// Size inside the `.ipa`; only for `.ipa` input.
     public var compressedBytes: UInt64?
     /// Set on files only; folders can mix categories.
     public var category: SizeCategory?
     /// Set on folders only, largest first (ties by name).
     public var children: [SizeNode]?
 
+    /// True for folders, which have ``children``.
     public var isFolder: Bool { children != nil }
 }
 

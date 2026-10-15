@@ -2,8 +2,11 @@ import Foundation
 
 /// What was measured: an app bundle folder, an `.ipa` archive or an Xcode archive.
 public enum InputKind: String, Codable, Sendable {
+    /// An `.app` bundle folder.
     case app
+    /// An `.ipa` archive.
     case ipa
+    /// An Xcode archive; the app inside `Products/Applications` is measured.
     case xcarchive
 }
 
@@ -15,8 +18,10 @@ public struct BundleEntry: Sendable, Equatable {
     public var bytes: UInt64
     /// Size inside the `.ipa`; `nil` for a folder on disk.
     public var compressedBytes: UInt64?
+    /// True for a symbolic link, which is listed but not followed.
     public var isSymbolicLink: Bool
 
+    /// Creates an entry.
     public init(path: String, bytes: UInt64, compressedBytes: UInt64? = nil, isSymbolicLink: Bool = false) {
         self.path = path
         self.bytes = bytes

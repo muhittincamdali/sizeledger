@@ -1,15 +1,18 @@
 /// The report as GitHub-flavoured Markdown, for a pull request comment or a job summary
 /// (`>> $GITHUB_STEP_SUMMARY`).
 public enum MarkdownReport {
+    /// What to include.
     public struct Options: Sendable {
         /// How many of the largest items to list.
         public var top: Int
 
+        /// Options with the given list length.
         public init(top: Int = 10) {
             self.top = top
         }
     }
 
+    /// The report as Markdown, ending with a newline.
     public static func render(_ report: SizeReport, options: Options = Options()) -> String {
         var lines: [String] = []
         let app = report.app
