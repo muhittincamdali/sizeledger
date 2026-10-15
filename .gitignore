@@ -1,0 +1,22 @@
+# SwiftPM and Xcode output
+.build/
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcodeproj/
+/Packages/
+
+# Fixture build intermediates (the finished apps in Fixtures/apps are tracked)
+Fixtures/.build/
+
+# Reports written by local runs
+/size/
+
+# lychee link checker cache (local runs of the links job)
+.lycheecache
+
+# Local scratch space
+_work/
+
+# macOS
+.DS_Store

@@ -1,0 +1,4 @@
+# Sample apps and archives are binary test data: no line-ending or diff changes.
+Fixtures/apps/** -text -diff
+*.ipa binary
+*.car binary

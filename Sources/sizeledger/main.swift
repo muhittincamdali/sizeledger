@@ -1,0 +1,3 @@
+import SizeLedgerCLI
+
+SizeLedgerCommand.main()
