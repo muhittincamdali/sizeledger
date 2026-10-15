@@ -8,8 +8,8 @@ extension SizeLedger {
     ///
     /// - Throws: ``InputError`` when the path is missing, of an unsupported kind, or contains no
     ///   app or several apps.
-    public static func analyze(_ url: URL) throws -> SizeReport {
-        let source = try InputLocator.open(url)
+    public static func analyze(_ url: URL, limits: AnalysisLimits = .default) throws -> SizeReport {
+        let source = try InputLocator.open(url, limits: limits)
         return Analyzer(source: source).report(inputName: url.lastPathComponent)
     }
 }
