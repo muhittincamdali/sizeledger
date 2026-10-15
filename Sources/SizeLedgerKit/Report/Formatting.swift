@@ -47,11 +47,14 @@ public enum ByteFormat {
 enum Sanitize {
     /// Replaces control characters, including the escape character that starts terminal
     /// sequences, with U+FFFD, so a file name cannot move the output around or change colours.
+    /// The bidirectional embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069)
+    /// go too: an override can make `gpj.exe` display as `exe.jpg` and reorder the rest of a
+    /// table row. The marks U+200E, U+200F and U+061C stay; they only nudge neutral characters.
     static func text(_ value: String) -> String {
         var result = String.UnicodeScalarView()
         for scalar in value.unicodeScalars {
             switch scalar.value {
-            case 0x00...0x1F, 0x7F...0x9F: result.append("\u{FFFD}")
+            case 0x00...0x1F, 0x7F...0x9F, 0x202A...0x202E, 0x2066...0x2069: result.append("\u{FFFD}")
             default: result.append(scalar)
             }
         }

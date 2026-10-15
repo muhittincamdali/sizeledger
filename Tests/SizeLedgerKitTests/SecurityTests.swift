@@ -154,6 +154,21 @@ import Testing
         #expect(json.contains("\\u007f"))
     }
 
+    @Test func tableAndMarkdownDropBidirectionalOverrides() throws {
+        // U+202E (right-to-left override) makes "Trojan\u{202E}gpj.exe" display as
+        // "Trojanexe.jpg"; U+2066 to U+2069 isolate and reorder the rest of a row.
+        let temp = try TemporaryDirectory()
+        try temp.file("App.app/Info.plist", contents: Data("<plist></plist>".utf8))
+        try temp.file("App.app/Trojan\u{202E}gpj.exe", size: 5_000)
+        try temp.file("App.app/a\u{2066}b\u{2069}.lproj/x.strings", size: 4_000)
+        let report = try SizeLedger.analyze(temp.url.appendingPathComponent("App.app"))
+        let bidi = Set((0x202A...0x202E).map { $0 } + (0x2066...0x2069).map { $0 })
+        for output in [TextReport.render(report), MarkdownReport.render(report)] {
+            #expect(!output.unicodeScalars.contains { bidi.contains(Int($0.value)) })
+            #expect(output.contains("Trojan\u{FFFD}gpj.exe"))
+        }
+    }
+
     @Test func markdownNeutralizesAutolinks() {
         let url = MarkdownReport.text("see https://evil.example/x now")
         #expect(url.contains("`https://evil.example/x`"))

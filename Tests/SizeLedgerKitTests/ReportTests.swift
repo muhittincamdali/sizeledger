@@ -36,6 +36,17 @@ import Testing
         #expect(Sanitize.text("Ünïcödé 日本") == "Ünïcödé 日本")
     }
 
+    @Test func replacesBidirectionalControls() {
+        let controls = (0x202A...0x202E).map { $0 } + (0x2066...0x2069).map { $0 }
+        for value in controls {
+            let scalar = Unicode.Scalar(UInt32(value))!
+            #expect(Sanitize.text("a\(Character(scalar))b") == "a\u{FFFD}b")
+        }
+        // Marks and right-to-left text are left alone.
+        #expect(Sanitize.text("\u{200E}\u{200F}\u{061C}") == "\u{200E}\u{200F}\u{061C}")
+        #expect(Sanitize.text("שלום مرحبا") == "שלום مرحبا")
+    }
+
     @Test func shortensPathsFromTheLeft() {
         #expect(Sanitize.shortened("  Frameworks/ShopCore.framework/ShopCore", width: 33) == "  …/ShopCore.framework/ShopCore")
         #expect(Sanitize.shortened("  Frameworks/A.framework/A", width: 33) == "  Frameworks/A.framework/A")
