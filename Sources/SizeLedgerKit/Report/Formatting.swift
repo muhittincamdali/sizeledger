@@ -36,7 +36,7 @@ public enum ByteFormat {
 /// Makes text that comes from the measured app (file names, Info.plist values) safe to print.
 enum Sanitize {
     /// Replaces control characters, including the escape character that starts terminal
-    /// sequences, with U+FFFD, so a file name cannot move the cursor or change colours.
+    /// sequences, with U+FFFD, so a file name cannot move the output around or change colours.
     static func text(_ value: String) -> String {
         var result = String.UnicodeScalarView()
         for scalar in value.unicodeScalars {
