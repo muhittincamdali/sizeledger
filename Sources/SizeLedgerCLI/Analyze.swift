@@ -45,6 +45,18 @@ public struct Analyze: ParsableCommand {
     @Flag(name: .shortAndLong, help: "Print nothing; needs --out.")
     var quiet = false
 
+    @Option(help: ArgumentHelp("Refuse an input with more files than this.", valueName: "n"))
+    var maxFiles: Int = AnalysisLimits.default.maxFiles
+
+    @Option(help: ArgumentHelp("Refuse an input declaring more uncompressed bytes than this.", valueName: "bytes"))
+    var maxBytes: UInt64 = AnalysisLimits.default.maxTotalBytes
+
+    @Option(help: ArgumentHelp("Refuse an .ipa entry whose uncompressed-to-stored size ratio is above this (zip bomb).", valueName: "ratio"))
+    var maxRatio: UInt64 = AnalysisLimits.default.maxCompressionRatio
+
+    @Option(help: ArgumentHelp("Refuse a path nested deeper than this many folders.", valueName: "n"))
+    var maxDepth: Int = AnalysisLimits.default.maxDepth
+
     public init() {}
 
     public func validate() throws {
@@ -53,6 +65,14 @@ public struct Analyze: ParsableCommand {
         guard !quiet || out != nil else {
             throw ValidationError("--quiet prints nothing, so it needs --out <file> to write the report to.")
         }
+        guard maxFiles >= 1 else { throw ValidationError("--max-files must be 1 or more.") }
+        guard maxBytes >= 1 else { throw ValidationError("--max-bytes must be 1 or more.") }
+        guard maxRatio >= 1 else { throw ValidationError("--max-ratio must be 1 or more.") }
+        guard maxDepth >= 1 else { throw ValidationError("--max-depth must be 1 or more.") }
+    }
+
+    var limits: AnalysisLimits {
+        AnalysisLimits(maxFiles: maxFiles, maxTotalBytes: maxBytes, maxCompressionRatio: maxRatio, maxDepth: maxDepth)
     }
 
     public func run() throws {
@@ -76,7 +96,7 @@ public struct Analyze: ParsableCommand {
     ) -> Int32 {
         let report: SizeReport
         do {
-            report = try SizeLedger.analyze(URL(fileURLWithPath: input))
+            report = try SizeLedger.analyze(URL(fileURLWithPath: input), limits: limits)
         } catch {
             errors.write("sizeledger: \(error)\n")
             return ExitStatus.failure
