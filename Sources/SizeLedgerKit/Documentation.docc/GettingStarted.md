@@ -8,7 +8,7 @@ In `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1"),
+    .package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.2"),
 ],
 targets: [
     .executableTarget(

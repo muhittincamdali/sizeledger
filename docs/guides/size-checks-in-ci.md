@@ -24,7 +24,7 @@ but the report notes that its numbers differ from a device build.
 On a macOS runner, the release binary needs no toolchain:
 
 ```sh
-version=0.1.1
+version=0.1.2
 base="https://github.com/muhittincamdali/sizeledger/releases/download/v$version"
 curl -fsSLO "$base/sizeledger-$version-macos-universal.tar.gz"
 curl -fsSLO "$base/SHA256SUMS"

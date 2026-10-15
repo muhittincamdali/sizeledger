@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@45c49e938b57cf9ea6e1cc58be521060242517f3 status=reviewed -->
+<!-- i18n-source: README.md@b80bc647b33e641bb2b3b4ba0162f099dead48c0 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -107,7 +107,7 @@ satır anlatır.
 | Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                                           |
 | Yayın ikili dosyası     | [Releases](https://github.com/muhittincamdali/sizeledger/releases) sayfasından `sizeledger-<version>-macos-universal.tar.gz` ya da `-linux-x86_64` / `-linux-aarch64` dosyasını indirin, `SHA256SUMS` ile doğrulayın, `sizeledger`'ı `PATH` içine koyun |
 | Kaynaktan               | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (ikili dosya `.build/release/sizeledger` yolundadır)                                                                                           |
-| Swift paketi            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`, ürün `SizeLedgerKit`                                                                                                                                                   |
+| Swift paketi            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.2")`, ürün `SizeLedgerKit`                                                                                                                                                   |
 
 Derlemek için Swift 6.2 veya üzeri gerekir (Mac'te Xcode 26 veya üzeri). Linux yayın ikili
 dosyaları Swift çalışma zamanını içerir ve glibc 2.35 veya üzerini gerektirir (Ubuntu 22.04,

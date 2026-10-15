@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@45c49e938b57cf9ea6e1cc58be521060242517f3 status=reviewed -->
+<!-- i18n-source: README.md@b80bc647b33e641bb2b3b4ba0162f099dead48c0 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -104,7 +104,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                         |
 | Бинарник из релиза      | Скачайте `sizeledger-<version>-macos-universal.tar.gz` или `-linux-x86_64` / `-linux-aarch64` со страницы [Releases](https://github.com/muhittincamdali/sizeledger/releases), сверьте с `SHA256SUMS` и положите `sizeledger` в `PATH` |
 | Из исходников           | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (бинарник будет в `.build/release/sizeledger`)                                                                               |
-| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`, product `SizeLedgerKit`                                                                                                                              |
+| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.2")`, product `SizeLedgerKit`                                                                                                                              |
 
 Для сборки нужен Swift 6.2 или новее (на Mac — Xcode 26 или новее). Бинарники для Linux содержат
 рантайм Swift и требуют glibc 2.35 или новее (Ubuntu 22.04, Debian 12 или новее).
