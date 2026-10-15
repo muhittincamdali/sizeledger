@@ -32,8 +32,11 @@ import Testing
         #expect(Sanitize.text("Ünïcödé 日本") == "Ünïcödé 日本")
     }
 
-    @Test func shortensFromTheMiddle() {
-        #expect(Sanitize.middleTruncated("Frameworks/VeryLongName.framework", width: 15) == "Framewo…amework")
+    @Test func shortensPathsFromTheLeft() {
+        #expect(Sanitize.shortened("  Frameworks/ShopCore.framework/ShopCore", width: 33) == "  …/ShopCore.framework/ShopCore")
+        #expect(Sanitize.shortened("  Frameworks/A.framework/A", width: 33) == "  Frameworks/A.framework/A")
+        #expect(Sanitize.shortened("PlugIns/Widget.appex/VeryLongExecutableName", width: 20) == "VeryLongE…utableName")
+        #expect(Sanitize.shortened("AnExtremelyLongSingleFileName.json", width: 15) == "AnExtre…me.json")
         #expect(Sanitize.middleTruncated("short", width: 15) == "short")
     }
 

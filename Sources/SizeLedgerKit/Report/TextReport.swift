@@ -123,7 +123,7 @@ public enum TextReport {
     }
 
     private static func row(_ label: String, _ bytes: UInt64, _ rest: String...) -> String {
-        let name = Sanitize.middleTruncated(label, width: labelWidth - 1)
+        let name = Sanitize.shortened(label, width: labelWidth - 1)
         var line = name.rightPadded(labelWidth) + ByteFormat.string(bytes).leftPadded(sizeWidth)
         if rest.count == 2 {
             line += rest[0].leftPadded(8) + rest[1].leftPadded(7)
