@@ -7,6 +7,8 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-15
+
 ### Added
 
 - `--max-files`, `--max-bytes`, `--max-ratio` and `--max-depth`, and `AnalysisLimits` with
@@ -115,7 +117,8 @@ First release: `sizeledger analyze` and the SizeLedgerKit library.
 - Release binaries for macOS (universal) and Linux (x86_64, aarch64), and a Homebrew formula
   written by the release workflow.
 
-[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.0...v0.1.1
