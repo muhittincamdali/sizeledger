@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@b93379684b7bf4675f09ce10eff583bc22bf4d53 status=reviewed -->
+<!-- i18n-source: README.md@f714a689d4fd0fecb85723b581d3d12cdd938b5e status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -181,7 +181,8 @@ App Clips.
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
 En total son 95 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
-tarda una mediana de 11.4 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release.
+tarda una mediana de 10.5 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release,
+incluido el arranque del proceso; [scripts/bench.sh](scripts/bench.sh) repite la medición.
 
 ## Límites
 

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@b93379684b7bf4675f09ce10eff583bc22bf4d53 status=reviewed -->
+<!-- i18n-source: README.md@f714a689d4fd0fecb85723b581d3d12cdd938b5e status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -184,7 +184,7 @@ App Clip'lere uygular.
 
 Toplam 95 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
 2.0'ı ölçmek, release derlemesiyle bir Mac'te (Apple silicon) 21 çalıştırmanın medyanı olarak
-11.4 ms sürer.
+10.5 ms sürer (süreç başlatma dahil). Ölçüm [scripts/bench.sh](scripts/bench.sh) ile tekrarlanabilir.
 
 ## Sınırlar
 
