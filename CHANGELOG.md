@@ -1,0 +1,37 @@
+# Changelog
+
+All notable changes to sizeledger are listed here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and versions follow
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html). Until 1.0, the JSON report layout
+(`schemaVersion` 0) may change in a minor version; the changelog says when it does.
+
+## [Unreleased]
+
+## [0.1.0] - 2026-10-15
+
+First release: `sizeledger analyze` and the SizeLedgerKit library.
+
+### Added
+
+- `sizeledger analyze <input>` for an `.app` folder, an `.ipa` or an `.xcarchive`: totals, a
+  breakdown by category (main executable, frameworks, app extensions, App Clips, watch app,
+  localizations, asset catalogs, code signature, other resources), the largest components, the
+  `.lproj` languages across the whole bundle, and every Mach-O binary with its architecture
+  slices.
+- Three sizes kept apart: the files added up, an install size estimate (whole 4 KiB blocks) and,
+  for an `.ipa`, the compressed size; notes for simulator builds, universal binaries, files
+  outside the bundle, App Clips and unreadable input.
+- Output as a terminal table, GitHub Markdown or JSON (`--format`), the JSON report written to a
+  file with `--out`, `--top`, `--color` and `--quiet`. Exit status 0, 2 for unreadable input and
+  64 for invalid options.
+- SizeLedgerKit: `SizeLedger.analyze(_:)`, `SizeReport` with a stable JSON encoding, text and
+  Markdown renderers, documented with DocC.
+- A ZIP reader (with ZIP64), a DEFLATE decoder and a Mach-O parser (thin, fat and fat64) in
+  Swift, so the library has no dependencies and runs on macOS and Linux.
+- SampleShop, a two-version sample app built for the iOS Simulator by a script, with report
+  snapshots and a check that the totals agree with `du` within 1% on macOS and Linux.
+- Release binaries for macOS (universal) and Linux (x86_64, aarch64), and a Homebrew formula
+  written by the release workflow.
+
+[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/muhittincamdali/sizeledger/releases/tag/v0.1.0
