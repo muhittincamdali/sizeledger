@@ -48,7 +48,7 @@ public struct Analyze: ParsableCommand {
     @Option(help: ArgumentHelp("Refuse an input with more files than this.", valueName: "n"))
     var maxFiles: Int = AnalysisLimits.default.maxFiles
 
-    @Option(help: ArgumentHelp("Refuse an input declaring more uncompressed bytes than this.", valueName: "bytes"))
+    @Option(help: ArgumentHelp("Refuse an .ipa declaring more uncompressed bytes than this. Folders (.app, .xcarchive) are not decompressed and have no such limit.", valueName: "bytes"))
     var maxBytes: UInt64 = AnalysisLimits.default.maxTotalBytes
 
     @Option(help: ArgumentHelp("Refuse an .ipa entry whose uncompressed-to-stored size ratio is above this (zip bomb).", valueName: "ratio"))

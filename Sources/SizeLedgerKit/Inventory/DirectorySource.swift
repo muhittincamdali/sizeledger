@@ -32,7 +32,9 @@ struct DirectorySource: BundleSource {
     /// Walks the bundle with an explicit stack, not recursion, so a folder nested thousands deep
     /// cannot overflow the call stack. Symbolic links are listed, never followed, so a link to a
     /// folder outside the bundle is one entry, not that folder's contents. Depth and entry-count
-    /// caps stop a crafted, extracted archive from exhausting memory or time.
+    /// caps stop a crafted, extracted archive from exhausting memory or time. The file count is
+    /// checked entry by entry, but each folder's listing is read whole first, so a single folder
+    /// holding millions of names costs that listing's memory before the walk stops.
     private static func walk(_ root: String, limits: AnalysisLimits) throws -> [BundleEntry] {
         let manager = FileManager.default
         var entries: [BundleEntry] = []

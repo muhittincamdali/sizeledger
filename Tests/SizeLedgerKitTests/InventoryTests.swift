@@ -27,6 +27,38 @@ import Testing
         #expect(try source.contents(of: "Demo", ranges: [4_990..<5_010, 100..<104, 6_000..<6_010]).map(\.count) == [10, 4, 0])
     }
 
+    @Test func folderWalkStopsAtTheDepthLimit() throws {
+        let temp = try TemporaryDirectory()
+        try temp.file("Two.app/a/b/f", size: 1)
+        try temp.file("Three.app/a/b/c/f", size: 1)
+        let limits = AnalysisLimits(maxDepth: 2)
+
+        let two = try DirectorySource(root: temp.url.appendingPathComponent("Two.app"), kind: .app, limits: limits)
+        #expect(two.entries.map(\.path) == ["a/b/f"])
+        let error = try #require(throws: InputError.self) {
+            _ = try DirectorySource(root: temp.url.appendingPathComponent("Three.app"), kind: .app, limits: limits)
+        }
+        guard case .unreadable(let path, let reason) = error else { Issue.record("\(error)"); return }
+        #expect(path.hasSuffix("Three.app/a/b/c"))
+        #expect(reason == "it is nested deeper than 2 folders (raise --max-depth)")
+    }
+
+    @Test func folderWalkStopsAtTheFileLimit() throws {
+        let temp = try TemporaryDirectory()
+        for name in ["a", "b", "c"] {
+            try temp.file("Three.app/\(name)", size: 1)
+        }
+        try temp.symlink("Three.app/sub/link", to: "../a")
+        let root = temp.url.appendingPathComponent("Three.app")
+
+        // Folders do not count; files and links do.
+        #expect(try DirectorySource(root: root, kind: .app, limits: AnalysisLimits(maxFiles: 4)).entries.count == 4)
+        let error = try #require(throws: InputError.self) {
+            _ = try DirectorySource(root: root, kind: .app, limits: AnalysisLimits(maxFiles: 3))
+        }
+        #expect(error == .unreadable(root.path, "it has more than 3 files (raise --max-files)"))
+    }
+
     @Test func readsTheAppInsideAnIPA() throws {
         var builder = ZipBuilder()
         builder.add("Payload/", mode: 0o040755)

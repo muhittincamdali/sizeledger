@@ -71,8 +71,13 @@ struct Analyzer {
     }
 
     private func readInfo(notes: inout [String]) -> AppInfo {
-        guard source.entries.contains(where: { $0.path == "Info.plist" && !$0.isSymbolicLink }) else {
-            notes.append("No Info.plist at the top of \(source.bundleName): the app's name, version and main executable are unknown, so the executable is counted under other resources.")
+        let unknown = "the app's name, version and main executable are unknown, so the executable is counted under other resources."
+        guard let plist = source.entries.first(where: { $0.path == "Info.plist" }) else {
+            notes.append("No Info.plist at the top of \(source.bundleName): \(unknown)")
+            return AppInfo()
+        }
+        guard !plist.isSymbolicLink else {
+            notes.append("Info.plist at the top of \(source.bundleName) is a symbolic link, and links are not followed: \(unknown)")
             return AppInfo()
         }
         guard let data = try? source.contents(of: "Info.plist", limit: Self.infoPlistLimit),

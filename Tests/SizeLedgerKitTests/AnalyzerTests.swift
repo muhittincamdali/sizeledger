@@ -120,6 +120,19 @@ import Testing
         #expect(report.notes.first?.hasPrefix("No Info.plist at the top of Bare.app") == true)
     }
 
+    @Test func notesAnInfoPlistThatIsALink() throws {
+        // The plist is there but is a link; saying "No Info.plist" sent people looking for a
+        // missing file.
+        let temp = try TemporaryDirectory()
+        try temp.file("Real.plist", contents: Data("<plist></plist>".utf8))
+        try temp.file("Linked.app/Linked", contents: MachOBuilder().build())
+        try temp.symlink("Linked.app/Info.plist", to: temp.url.appendingPathComponent("Real.plist").path)
+        let report = try SizeLedger.analyze(temp.url.appendingPathComponent("Linked.app"))
+        #expect(report.app == AppInfo())
+        #expect(report.notes.first?.hasPrefix("Info.plist at the top of Linked.app is a symbolic link, and links are not followed: ") == true)
+        #expect(!report.notes.contains { $0.hasPrefix("No Info.plist") })
+    }
+
     @Test func notesBrokenMachOHeadersAndCarriesOn() throws {
         let temp = try TemporaryDirectory()
         var broken = MachOBuilder().build()
