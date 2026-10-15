@@ -1,0 +1,23 @@
+{
+  "name": "sizeledger",
+  "repository": "muhittincamdali/sizeledger",
+  "tagline": {
+    "en": "Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."
+  },
+  "tags": {
+    "en": ["App size", ".ipa", "Swift", "macOS + Linux"]
+  },
+  "motif": "phone",
+  "buttons": ["start", "docs", "guides", "examples"],
+  "links": {
+    "docs": "https://muhittincamdali.github.io/sizeledger/",
+    "guides": "docs/guides/",
+    "examples": "Examples/"
+  },
+  "docc": {
+    "targets": ["SizeLedgerKit"]
+  },
+  "languages": ["en", "tr", "zh-CN", "ja", "ko", "es", "de", "fr", "pt-BR", "ru"],
+  "i18nStrict": false,
+  "socialTheme": "dark"
+}
