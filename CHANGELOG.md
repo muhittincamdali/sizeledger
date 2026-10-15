@@ -7,6 +7,11 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- README translations: Türkçe, 简体中文, 日本語, 한국어, Español, Deutsch, Français, Português (Brasil)
+  and Русский, linked from the language selector.
+
 ## [0.1.0] - 2026-10-15
 
 First release: `sizeledger analyze` and the SizeLedgerKit library.

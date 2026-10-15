@@ -31,10 +31,6 @@ exclude = [
   '^https?://api\.example\.com',
   # Pull request and comparison pages that only exist after a push.
   '^https://github\.com/[^/]+/[^/]+/compare/',
-  # The language selector links the nine README translations, which are written in the next
-  # step (see CONTRIBUTING.md). Remove this line together with "i18nStrict": false in
-  # .github/brand.json when they land.
-  'README\.(tr|zh-CN|ja|ko|es|de|fr|pt-BR|ru)\.md$',
   # Release files are uploaded by the release workflow after the tag is pushed, so links to the
   # next version's binaries cannot resolve on the pull request that adds them.
   '^https://github\.com/muhittincamdali/sizeledger/releases/download/',

@@ -68,9 +68,11 @@ CI rejects unverifiable superlatives.
 
 ## Translations
 
-The language selector at the top of the README links nine translations that are written in a
-separate step. Until they exist, the link check skips them and the translation check is not
-strict (`"i18nStrict": false` in `.github/brand.json`); both are reverted when they land.
+The README is translated into nine languages (`README.<code>.md`, linked from the language
+selector). English is the source. Each translation's first line records the blob SHA of the
+`README.md` it follows; when `README.md` changes, the translation check in CI reports the files
+that are behind, and `git diff <sha> README.md` shows what to update.
+Code blocks and URLs stay identical to the English file.
 
 ## Releases
 

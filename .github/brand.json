@@ -18,6 +18,5 @@
     "targets": ["SizeLedgerKit"]
   },
   "languages": ["en", "tr", "zh-CN", "ja", "ko", "es", "de", "fr", "pt-BR", "ru"],
-  "i18nStrict": false,
   "socialTheme": "dark"
 }
