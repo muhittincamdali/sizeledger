@@ -131,6 +131,34 @@ import Testing
         #expect(report.notes.contains { $0.hasPrefix("Odd starts like a Mach-O file") })
     }
 
+    @Test func readsASliceFarIntoACompressedBinary() throws {
+        // A universal binary whose one slice starts 16 MiB in, deflated so the .ipa stays small:
+        // the shape of a crafted file whose fat header points 1 GB in, which once made sizeledger
+        // hold every byte before the slice in memory.
+        let offset = 16 << 20
+        let slice = MachOTests.app.build()
+        let head = Data([0xCA, 0xFE, 0xBA, 0xBE]) + be32(1)
+            + be32(0x0100_000C) + be32(0) + be32(UInt32(offset)) + be32(UInt32(slice.count)) + be32(14)
+        var stream = DeflateBuilder()
+        stream.literals(head)
+        stream.zeros(offset - head.count)
+        stream.literals(slice)
+        var builder = ZipBuilder()
+        builder.add("Payload/", mode: 0o040755)
+        builder.add("Payload/Far.app/", mode: 0o040755)
+        builder.addDeflated("Payload/Far.app/Far", stream: stream.finish(), size: offset + slice.count)
+        let temp = try TemporaryDirectory()
+        let url = try temp.file("Far.ipa", contents: builder.build())
+        #expect(try Data(contentsOf: url).count < 1 << 20)
+
+        let report = try SizeLedger.analyze(url)
+        let binary = try #require(report.binaries.first)
+        #expect(binary.bytes == UInt64(offset + slice.count))
+        #expect(binary.slices.map(\.offset) == [UInt64(offset)])
+        #expect(binary.slices.map(\.architecture) == ["arm64"])
+        #expect(binary.slices.first?.codeSignatureBytes == 2_345)
+    }
+
     @Test func roundTripsThroughJSON() throws {
         let report = try Self.analyzeFolder()
         let data = try report.jsonData()
