@@ -40,7 +40,7 @@ extension InputError: CustomStringConvertible {
 /// Finds the app bundle behind a path the user gave. The path itself is followed if it is a
 /// symbolic link, since the user named it; links inside the input are not.
 enum InputLocator {
-    static func open(_ url: URL) throws -> any BundleSource {
+    static func open(_ url: URL, limits: AnalysisLimits = .default) throws -> any BundleSource {
         let path = url.path
         var isDirectory: ObjCBool = false
         guard FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) else {
@@ -51,16 +51,16 @@ enum InputLocator {
         if isDirectory.boolValue {
             switch suffix {
             case "app":
-                return try readDirectory(url, kind: .app)
+                return try readDirectory(url, kind: .app, limits: limits)
             case "xcarchive":
-                return try readArchive(url)
+                return try readArchive(url, limits: limits)
             default:
                 throw InputError.unsupported(path)
             }
         }
 
         do {
-            return try IPASource(url: url)
+            return try IPASource(url: url, limits: limits)
         } catch ZipError.notAZipArchive {
             throw InputError.unsupported(path)
         } catch let error as ZipError {
@@ -71,7 +71,7 @@ enum InputLocator {
     /// The app in `Products/Applications`. The archive is the input, so a symbolic link on the way
     /// to the app (Products, Applications or the `.app` itself) is refused rather than followed:
     /// following it would measure, and print the file names of, a folder outside the archive.
-    private static func readArchive(_ url: URL) throws -> DirectorySource {
+    private static func readArchive(_ url: URL, limits: AnalysisLimits) throws -> DirectorySource {
         let name = url.lastPathComponent
         var applications = url
         for component in ["Products", "Applications"] {
@@ -92,7 +92,7 @@ enum InputLocator {
         guard apps.count == 1 else { throw InputError.severalApps(name, apps) }
         let bundle = applications.appendingPathComponent(app)
         if itemType(bundle) == .typeSymbolicLink { throw symbolicLinkError(bundle) }
-        return try readDirectory(bundle, kind: .xcarchive)
+        return try readDirectory(bundle, kind: .xcarchive, limits: limits)
     }
 
     /// The type of the item itself, read with lstat, so a symbolic link reports as a link; `nil`
@@ -105,9 +105,11 @@ enum InputLocator {
         .unreadable(url.path, "it is a symbolic link, and links inside an .xcarchive are not followed")
     }
 
-    private static func readDirectory(_ url: URL, kind: InputKind) throws -> DirectorySource {
+    private static func readDirectory(_ url: URL, kind: InputKind, limits: AnalysisLimits) throws -> DirectorySource {
         do {
-            return try DirectorySource(root: url, kind: kind)
+            return try DirectorySource(root: url, kind: kind, limits: limits)
+        } catch let error as InputError {
+            throw error
         } catch {
             throw InputError.unreadable(url.path, error.localizedDescription)
         }

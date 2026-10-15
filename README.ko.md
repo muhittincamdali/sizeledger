@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
+<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -111,6 +111,7 @@ sizeledger analyze path/to/MyApp.ipa
 
 ```text
 sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+                    [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
 | 옵션               | 설명                                                                        |
@@ -171,7 +172,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 101개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
+테스트는 모두 117개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
 silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값으로 10.5 ms가 걸립니다(프로세스 시작 포함).
 [scripts/bench.sh](scripts/bench.sh)로 같은 측정을 반복할 수 있습니다.
 
@@ -188,6 +189,13 @@ silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값�
   `..` 구성 요소가 있는 `.ipa`는 추측하지 않고 메시지와 함께 거부합니다.
 - 압축된 `.ipa` 항목 깊숙한 곳의 Mach-O 헤더를 읽기 위해 sizeledger는 그 앞의 모든 내용을 풀지만 32 KiB 창만 유지합니다. 따라서 조작된 항목은
   메모리가 아니라 시간을 소비하며, Mac(Apple silicon)에서 풀린 1 GB당 약 1 s가 걸립니다.
+
+- 입력은 신뢰할 수 없으므로, 조작되었거나 손상된 입력이라도 메모리·시간·스택을 소진시킬 수 없습니다.
+  sizeledger는 파일이 500,000개를 넘거나, 선언된 비압축 바이트가 8 GiB를 넘거나, `.ipa` 항목이 저장
+  크기의 300배를 넘게 풀리거나(zip 폭탄), 경로가 64개 폴더보다 깊게 중첩된 입력을 거부합니다. 이 값들은
+  `--max-files`, `--max-bytes`, `--max-ratio`, `--max-depth`로 높일 수 있습니다. 손상된 Mach-O 또는
+  ZIP 헤더는 "unreadable" 참고나 종료 상태 2의 명확한 오류를 내며 절대 충돌하지 않습니다. 중복된 항목
+  경로는 한 번만 계산됩니다.
 
 ## 문서
 

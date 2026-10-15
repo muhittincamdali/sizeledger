@@ -14,12 +14,10 @@ struct DirectorySource: BundleSource {
     var outsideEntries: [BundleEntry] { [] }
     var archiveBytes: UInt64? { nil }
 
-    init(root: URL, kind: InputKind) throws {
+    init(root: URL, kind: InputKind, limits: AnalysisLimits = .default) throws {
         self.root = root
         self.kind = kind
-        var found: [BundleEntry] = []
-        try Self.walk(root.path, prefix: "", into: &found)
-        entries = found.sortedByPath()
+        entries = try Self.walk(root.path, limits: limits).sortedByPath()
     }
 
     func contents(of path: String, ranges: [Range<Int>]) throws -> [Data] {
@@ -31,25 +29,40 @@ struct DirectorySource: BundleSource {
         }
     }
 
-    private static func walk(_ directory: String, prefix: String, into entries: inout [BundleEntry]) throws {
+    /// Walks the bundle with an explicit stack, not recursion, so a folder nested thousands deep
+    /// cannot overflow the call stack. Symbolic links are listed, never followed, so a link to a
+    /// folder outside the bundle is one entry, not that folder's contents. Depth and entry-count
+    /// caps stop a crafted, extracted archive from exhausting memory or time.
+    private static func walk(_ root: String, limits: AnalysisLimits) throws -> [BundleEntry] {
         let manager = FileManager.default
-        for name in try manager.contentsOfDirectory(atPath: directory) {
-            let absolute = directory + "/" + name
-            let relative = prefix.isEmpty ? name : prefix + "/" + name
-            // attributesOfItem reads the link itself (lstat), not what it points to.
-            let attributes = try manager.attributesOfItem(atPath: absolute)
-            let size = (attributes[.size] as? NSNumber)?.uint64Value ?? 0
-            switch attributes[.type] as? FileAttributeType {
-            case .typeDirectory?:
-                try walk(absolute, prefix: relative, into: &entries)
-            case .typeSymbolicLink?:
-                entries.append(BundleEntry(path: relative, bytes: size, isSymbolicLink: true))
-            case .typeRegular?:
-                entries.append(BundleEntry(path: relative, bytes: size))
-            default:
-                // Sockets, FIFOs and devices do not occur in app bundles and have no size.
-                continue
+        var entries: [BundleEntry] = []
+        var stack: [(directory: String, prefix: String, depth: Int)] = [(root, "", 0)]
+        while let (directory, prefix, depth) = stack.popLast() {
+            for name in try manager.contentsOfDirectory(atPath: directory) {
+                let absolute = directory + "/" + name
+                let relative = prefix.isEmpty ? name : prefix + "/" + name
+                // attributesOfItem reads the link itself (lstat), not what it points to.
+                let attributes = try manager.attributesOfItem(atPath: absolute)
+                let size = (attributes[.size] as? NSNumber)?.uint64Value ?? 0
+                switch attributes[.type] as? FileAttributeType {
+                case .typeDirectory?:
+                    guard depth < limits.maxDepth else {
+                        throw InputError.unreadable(absolute, "it is nested deeper than \(limits.maxDepth) folders (raise --max-depth)")
+                    }
+                    stack.append((absolute, relative, depth + 1))
+                case .typeSymbolicLink?:
+                    entries.append(BundleEntry(path: relative, bytes: size, isSymbolicLink: true))
+                case .typeRegular?:
+                    entries.append(BundleEntry(path: relative, bytes: size))
+                default:
+                    // Sockets, FIFOs and devices do not occur in app bundles and have no size.
+                    continue
+                }
+                guard entries.count <= limits.maxFiles else {
+                    throw InputError.unreadable(root, "it has more than \(limits.maxFiles) files (raise --max-files)")
+                }
             }
         }
+        return entries
     }
 }

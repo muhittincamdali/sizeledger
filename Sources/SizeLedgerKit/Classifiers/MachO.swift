@@ -173,7 +173,8 @@ enum MachO {
                 for _ in 0..<sectionCount {
                     let sectionName = try reader.fixedString(at: section, length: 16)
                     if sectionName.hasPrefix("__swift5_") {
-                        swiftBytes += wide ? try reader.uint64LE(at: section + 40) : UInt64(try reader.uint32LE(at: section + 36))
+                        let sectionBytes = wide ? try reader.uint64LE(at: section + 40) : UInt64(try reader.uint32LE(at: section + 36))
+                        swiftBytes = swiftBytes.addingSaturating(sectionBytes)
                     }
                     section += wide ? 80 : 68
                 }

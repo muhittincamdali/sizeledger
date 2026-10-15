@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
+<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -117,6 +117,7 @@ Debian 12 veya daha yenisi).
 
 ```text
 sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+                    [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
 | Seçenek            | Ne yapar                                                                   |
@@ -182,7 +183,7 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 101 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
+Toplam 117 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
 2.0'ı ölçmek, release derlemesiyle bir Mac'te (Apple silicon) 21 çalıştırmanın medyanı olarak
 10.5 ms sürer (süreç başlatma dahil). Ölçüm [scripts/bench.sh](scripts/bench.sh) ile tekrarlanabilir.
 
@@ -203,6 +204,14 @@ Toplam 101 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çal
 - Sıkıştırılmış bir `.ipa` girdisinin derinlerindeki bir Mach-O başlığına ulaşmak için sizeledger
   ondan önceki her şeyi açar ve yalnızca 32 KiB'lık bir pencere tutar; bu yüzden hazırlanmış bir
   girdi bellek değil zaman harcatır: bir Mac'te (Apple silicon) açılan her GB için yaklaşık 1 s.
+
+- Girdi güvenilmez olduğundan, hazırlanmış ya da bozuk bir girdi belleği, zamanı veya yığını
+  (stack) tüketemez. sizeledger; 500.000'den fazla dosyası olan, beyan edilmiş 8 GiB'den fazla
+  açılmış baytı olan, stored boyutunun 300 katından fazlasına açılan bir `.ipa` girdisi (zip
+  bombası) bulunan ya da 64 klasörden derine yuvalanmış bir yolu olan bir girdiyi reddeder; bunları
+  `--max-files`, `--max-bytes`, `--max-ratio` ve `--max-depth` ile yükseltebilirsiniz. Bozuk Mach-O
+  ya da ZIP başlıkları bir "unreadable" notu veya çıkış durumu 2 olan net bir hata verir, asla çökme
+  olmaz. Aynı ada sahip çift girdi bir kez sayılır.
 
 ## Dokümantasyon
 

@@ -58,6 +58,27 @@ enum Sanitize {
         return String(result)
     }
 
+    /// Escapes DEL and the C1 controls in already-encoded JSON as `\u00XX`, so a control character
+    /// in a file name cannot act on a terminal that prints the report while the JSON keeps the
+    /// exact codepoint. `JSONEncoder` already escapes the C0 controls. These bytes only ever sit
+    /// inside a JSON string, so the escape keeps the document valid.
+    static func jsonEscapingControlCharacters(_ json: String) -> String {
+        guard json.unicodeScalars.contains(where: { $0.value == 0x7F || (0x80...0x9F).contains($0.value) }) else {
+            return json
+        }
+        var result = ""
+        result.reserveCapacity(json.count)
+        for scalar in json.unicodeScalars {
+            if scalar.value == 0x7F || (0x80...0x9F).contains(scalar.value) {
+                let hex = String(scalar.value, radix: 16)
+                result += "\\u" + String(repeating: "0", count: 4 - hex.count) + hex
+            } else {
+                result.unicodeScalars.append(scalar)
+            }
+        }
+        return result
+    }
+
     /// Shortens a label to `width` characters. Paths lose their leading folders first
     /// (`…/ShopCore.framework/ShopCore`), since the end names the file; a single name that is
     /// still too long loses its middle. Leading spaces (indentation) are kept.

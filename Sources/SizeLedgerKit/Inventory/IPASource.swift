@@ -14,20 +14,25 @@ struct IPASource: BundleSource {
 
     var kind: InputKind { .ipa }
 
-    init(url: URL) throws {
-        let archive = try ZipArchive(url: url)
+    init(url: URL, limits: AnalysisLimits = .default) throws {
+        let archive = try ZipArchive(url: url, limits: limits)
         // Xcode never writes a ".." component, and unzip tools refuse or strip it. Counting such an
         // entry would put its bytes in a ".." folder of the bundle that does not exist on a device.
         if let entry = archive.entries.first(where: { $0.path.split(separator: "/").contains("..") }) {
             throw InputError.unreadable(url.path, "entry \(entry.path) has a \"..\" path component")
         }
+        try Self.check(archive.entries, url: url, limits: limits)
         let apps = Set(archive.entries.compactMap { Self.appName(in: $0.path) }).sorted()
         guard let app = apps.first else { throw InputError.noApp(url.lastPathComponent) }
         guard apps.count == 1 else { throw InputError.severalApps(url.lastPathComponent, apps) }
 
         let prefix = "Payload/\(app)/"
-        var inside: [BundleEntry] = []
-        var outside: [BundleEntry] = []
+        // A ZIP may list the same path twice; extraction keeps the last one, so measure that one
+        // once rather than adding both. Insertion order is preserved so the report is stable.
+        var insideOrder: [String] = []
+        var inside: [String: BundleEntry] = [:]
+        var outsideOrder: [String] = []
+        var outside: [String: BundleEntry] = [:]
         var byPath: [String: ZipEntry] = [:]
         for entry in archive.entries where !entry.isDirectory {
             let inBundle = entry.path.hasPrefix(prefix)
@@ -39,20 +44,42 @@ struct IPASource: BundleSource {
                 isSymbolicLink: entry.isSymbolicLink
             )
             if inBundle {
-                inside.append(record)
+                if inside[path] == nil { insideOrder.append(path) }
+                inside[path] = record
                 byPath[path] = entry
             } else {
-                outside.append(record)
+                if outside[path] == nil { outsideOrder.append(path) }
+                outside[path] = record
             }
         }
 
         self.archive = archive
         bundleName = app
-        entries = inside.sortedByPath()
-        outsideEntries = outside.sortedByPath()
+        entries = insideOrder.map { inside[$0]! }.sortedByPath()
+        outsideEntries = outsideOrder.map { outside[$0]! }.sortedByPath()
         entryByPath = byPath
         let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
         archiveBytes = (attributes?[.size] as? NSNumber)?.uint64Value
+    }
+
+    /// Refuses an archive whose declared sizes or paths exceed the limits: a single entry that
+    /// claims to unpack far beyond its stored size (a zip bomb), more total bytes than allowed, or
+    /// a path nested past the depth cap. The declared sizes come from the central directory, so
+    /// this runs before anything is decompressed.
+    private static func check(_ entries: [ZipEntry], url: URL, limits: AnalysisLimits) throws {
+        var total: UInt64 = 0
+        for entry in entries where !entry.isDirectory {
+            if AnalysisLimits.depth(of: entry.path) > limits.maxDepth {
+                throw InputError.unreadable(url.path, "entry \(entry.path) is nested deeper than \(limits.maxDepth) folders (raise --max-depth)")
+            }
+            if entry.uncompressedSize > entry.compressedSize.multipliedSaturating(by: limits.maxCompressionRatio) {
+                throw InputError.unreadable(url.path, "entry \(entry.path) declares \(entry.uncompressedSize) bytes from \(entry.compressedSize) stored, above the \(limits.maxCompressionRatio):1 ratio allowed (raise --max-ratio)")
+            }
+            total = total.addingSaturating(entry.uncompressedSize)
+            if total > limits.maxTotalBytes {
+                throw InputError.unreadable(url.path, "the archive declares more than \(limits.maxTotalBytes) uncompressed bytes (raise --max-bytes)")
+            }
+        }
     }
 
     func contents(of path: String, ranges: [Range<Int>]) throws -> [Data] {

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
+<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -117,6 +117,7 @@ Debian 12 ou plus récent).
 
 ```text
 sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+                    [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
 | Option             | Effet                                                                                     |
@@ -182,7 +183,7 @@ App Clips.
   fat64 ; ainsi que ZIP64, les archives endommagées et les noms de fichiers qui contiennent des séquences
   d'échappement de terminal.
 
-Au total, 101 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
+Au total, 117 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
 prend une médiane de 10.5 ms sur 21 exécutions, sur un Mac (Apple silicon) avec le build release,
 démarrage du processus compris ; [scripts/bench.sh](scripts/bench.sh) refait la mesure.
 
@@ -202,6 +203,14 @@ démarrage du processus compris ; [scripts/bench.sh](scripts/bench.sh) refait la
 - Pour atteindre un en-tête Mach-O situé loin dans une entrée compressée d'un `.ipa`, sizeledger
   décompresse tout ce qui le précède et ne garde qu'une fenêtre de 32 KiB ; une entrée forgée coûte
   donc du temps, pas de la mémoire : environ 1 s par GB décompressé sur un Mac (Apple silicon).
+
+- L'entrée n'est pas fiable : une entrée fabriquée ou endommagée ne peut donc épuiser ni la
+  mémoire, ni le temps, ni la pile. sizeledger refuse une entrée comptant plus de 500 000 fichiers,
+  déclarant plus de 8 Gio d'octets non compressés, contenant une entrée `.ipa` qui se décompresse à
+  plus de 300 fois sa taille stockée (une bombe zip) ou dont un chemin est imbriqué à plus de 64
+  dossiers ; relevez ces limites avec `--max-files`, `--max-bytes`, `--max-ratio` et `--max-depth`.
+  Des en-têtes Mach-O ou ZIP mal formés donnent une note "unreadable" ou une erreur claire avec le
+  statut de sortie 2, jamais un plantage. Un chemin d'entrée en double est compté une fois.
 
 ## Documentation
 

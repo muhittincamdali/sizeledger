@@ -6,7 +6,11 @@ extension SizeReport {
     public func jsonData() throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-        var data = try encoder.encode(self)
+        let encoded = try encoder.encode(self)
+        // JSONEncoder escapes C0 controls but passes DEL and the C1 controls through as raw bytes;
+        // a file name carrying one would reach a terminal that prints the report. They appear only
+        // inside string values, so escaping them as \u00XX keeps the JSON valid and the data exact.
+        var data = Data(Sanitize.jsonEscapingControlCharacters(String(decoding: encoded, as: UTF8.self)).utf8)
         data.append(0x0A)
         return data
     }

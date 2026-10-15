@@ -1,0 +1,204 @@
+{
+  "cases": [
+    {
+      "code": "`a\\|b`",
+      "html": "<tr>\n<td>a|b</td>\n<td><code class=\"notranslate\">a|b</code></td>\n<td>end</td>\n</tr>",
+      "input": "a|b",
+      "name": "pipe",
+      "row": "| a\\|b | `a\\|b` | end |",
+      "text": "a\\|b"
+    },
+    {
+      "code": "`a\\|\u0301b`",
+      "html": "<tr>\n<td>a|\u0301b</td>\n<td><code class=\"notranslate\">a|\u0301b</code></td>\n<td>end</td>\n</tr>",
+      "input": "a|\u0301b",
+      "name": "pipe-combining",
+      "row": "| a\\|\u0301b | `a\\|\u0301b` | end |",
+      "text": "a\\|\u0301b"
+    },
+    {
+      "code": "``a`\u0301b``",
+      "html": "<tr>\n<td>a`\u0301b</td>\n<td><code class=\"notranslate\">a`\u0301b</code></td>\n<td>end</td>\n</tr>",
+      "input": "a`\u0301b",
+      "name": "backtick-combining",
+      "row": "| a\\`\u0301b | ``a`\u0301b`` | end |",
+      "text": "a\\`\u0301b"
+    },
+    {
+      "code": "````x```y`z````",
+      "html": "<tr>\n<td>x```y`z</td>\n<td><code class=\"notranslate\">x```y`z</code></td>\n<td>end</td>\n</tr>",
+      "input": "x```y`z",
+      "name": "backtick-runs",
+      "row": "| x\\`\\`\\`y\\`z | ````x```y`z```` | end |",
+      "text": "x\\`\\`\\`y\\`z"
+    },
+    {
+      "code": "`` `\u0301x ``",
+      "html": "<tr>\n<td>`\u0301x</td>\n<td><code class=\"notranslate\">`\u0301x</code></td>\n<td>end</td>\n</tr>",
+      "input": "`\u0301x",
+      "name": "leading-backtick-combining",
+      "row": "| \\`\u0301x | `` `\u0301x `` | end |",
+      "text": "\\`\u0301x"
+    },
+    {
+      "code": "`dir\\`",
+      "html": "<tr>\n<td>dir\\</td>\n<td><code class=\"notranslate\">dir\\</code></td>\n<td>end</td>\n</tr>",
+      "input": "dir\\",
+      "name": "trailing-backslash",
+      "row": "| dir\\\\ | `dir\\` | end |",
+      "text": "dir\\\\"
+    },
+    {
+      "code": "`x\\\\|y`",
+      "html": "<tr>\n<td>x\\|y</td>\n<td><code class=\"notranslate\">x\\|y</code></td>\n<td>end</td>\n</tr>",
+      "input": "x\\|y",
+      "name": "backslash-pipe",
+      "row": "| x\\\\\\|y | `x\\\\|y` | end |",
+      "text": "x\\\\\\|y"
+    },
+    {
+      "code": "`one two`",
+      "html": "<tr>\n<td>one two</td>\n<td><code class=\"notranslate\">one two</code></td>\n<td>end</td>\n</tr>",
+      "input": "one\ntwo",
+      "name": "newline",
+      "row": "| one two | `one two` | end |",
+      "text": "one two"
+    },
+    {
+      "code": "`one two`",
+      "html": "<tr>\n<td>one two</td>\n<td><code class=\"notranslate\">one two</code></td>\n<td>end</td>\n</tr>",
+      "input": "one\rtwo",
+      "name": "carriage-return",
+      "row": "| one two | `one two` | end |",
+      "text": "one two"
+    },
+    {
+      "code": "`one two`",
+      "html": "<tr>\n<td>one two</td>\n<td><code class=\"notranslate\">one two</code></td>\n<td>end</td>\n</tr>",
+      "input": "one\u0085two",
+      "name": "next-line",
+      "row": "| one two | `one two` | end |",
+      "text": "one two"
+    },
+    {
+      "code": "`one two`",
+      "html": "<tr>\n<td>one two</td>\n<td><code class=\"notranslate\">one two</code></td>\n<td>end</td>\n</tr>",
+      "input": "one\u2028two",
+      "name": "line-separator",
+      "row": "| one two | `one two` | end |",
+      "text": "one two"
+    },
+    {
+      "code": "`one two`",
+      "html": "<tr>\n<td>one two</td>\n<td><code class=\"notranslate\">one two</code></td>\n<td>end</td>\n</tr>",
+      "input": "one\u2029two",
+      "name": "paragraph-separator",
+      "row": "| one two | `one two` | end |",
+      "text": "one two"
+    },
+    {
+      "code": "`a&#96;b`",
+      "html": "<tr>\n<td><code class=\"notranslate\">a&amp;#96;b</code></td>\n<td><code class=\"notranslate\">a&amp;#96;b</code></td>\n<td>end</td>\n</tr>",
+      "input": "a&#96;b",
+      "name": "entity-backtick",
+      "row": "| `a&#96;b` | `a&#96;b` | end |",
+      "text": "`a&#96;b`"
+    },
+    {
+      "code": "`&lt;img src=x&gt;`",
+      "html": "<tr>\n<td>&amp;lt;img src=x&amp;gt;</td>\n<td><code class=\"notranslate\">&amp;lt;img src=x&amp;gt;</code></td>\n<td>end</td>\n</tr>",
+      "input": "&lt;img src=x&gt;",
+      "name": "entity-lt",
+      "row": "| \\&lt;img src=x\\&gt; | `&lt;img src=x&gt;` | end |",
+      "text": "\\&lt;img src=x\\&gt;"
+    },
+    {
+      "code": "`<img src=x onerror=alert(1)>`",
+      "html": "<tr>\n<td>&lt;img src=x onerror=alert(1)&gt;</td>\n<td><code class=\"notranslate\">&lt;img src=x onerror=alert(1)&gt;</code></td>\n<td>end</td>\n</tr>",
+      "input": "<img src=x onerror=alert(1)>",
+      "name": "html",
+      "row": "| \\<img src=x onerror=alert\\(1\\)\\> | `<img src=x onerror=alert(1)>` | end |",
+      "text": "\\<img src=x onerror=alert\\(1\\)\\>"
+    },
+    {
+      "code": "`[x](https://evil.example)`",
+      "html": "<tr>\n<td><code class=\"notranslate\">[x](https://evil.example)</code></td>\n<td><code class=\"notranslate\">[x](https://evil.example)</code></td>\n<td>end</td>\n</tr>",
+      "input": "[x](https://evil.example)",
+      "name": "link",
+      "row": "| `[x](https://evil.example)` | `[x](https://evil.example)` | end |",
+      "text": "`[x](https://evil.example)`"
+    },
+    {
+      "code": "`![x](https://evil.example/p.png)`",
+      "html": "<tr>\n<td><code class=\"notranslate\">![x](https://evil.example/p.png)</code></td>\n<td><code class=\"notranslate\">![x](https://evil.example/p.png)</code></td>\n<td>end</td>\n</tr>",
+      "input": "![x](https://evil.example/p.png)",
+      "name": "image",
+      "row": "| `![x](https://evil.example/p.png)` | `![x](https://evil.example/p.png)` | end |",
+      "text": "`![x](https://evil.example/p.png)`"
+    },
+    {
+      "code": "`see https://evil.example/x now`",
+      "html": "<tr>\n<td>see <code class=\"notranslate\">https://evil.example/x</code> now</td>\n<td><code class=\"notranslate\">see https://evil.example/x now</code></td>\n<td>end</td>\n</tr>",
+      "input": "see https://evil.example/x now",
+      "name": "url",
+      "row": "| see `https://evil.example/x` now | `see https://evil.example/x now` | end |",
+      "text": "see `https://evil.example/x` now"
+    },
+    {
+      "code": "`host www.evil.example`",
+      "html": "<tr>\n<td>host <code class=\"notranslate\">www.evil.example</code></td>\n<td><code class=\"notranslate\">host www.evil.example</code></td>\n<td>end</td>\n</tr>",
+      "input": "host www.evil.example",
+      "name": "www",
+      "row": "| host `www.evil.example` | `host www.evil.example` | end |",
+      "text": "host `www.evil.example`"
+    },
+    {
+      "code": "`mail user@evil.example`",
+      "html": "<tr>\n<td>mail <code class=\"notranslate\">user@evil.example</code></td>\n<td><code class=\"notranslate\">mail user@evil.example</code></td>\n<td>end</td>\n</tr>",
+      "input": "mail user@evil.example",
+      "name": "email",
+      "row": "| mail `user@evil.example` | `mail user@evil.example` | end |",
+      "text": "mail `user@evil.example`"
+    },
+    {
+      "code": "`ping @octocat`",
+      "html": "<tr>\n<td>ping <code class=\"notranslate\">@octocat</code></td>\n<td><code class=\"notranslate\">ping @octocat</code></td>\n<td>end</td>\n</tr>",
+      "input": "ping @octocat",
+      "name": "mention",
+      "row": "| ping `@octocat` | `ping @octocat` | end |",
+      "text": "ping `@octocat`"
+    },
+    {
+      "code": "`fixes #1`",
+      "html": "<tr>\n<td>fixes <code class=\"notranslate\">#1</code></td>\n<td><code class=\"notranslate\">fixes #1</code></td>\n<td>end</td>\n</tr>",
+      "input": "fixes #1",
+      "name": "issue",
+      "row": "| fixes `#1` | `fixes #1` | end |",
+      "text": "fixes `#1`"
+    },
+    {
+      "code": "`# title`",
+      "html": "<tr>\n<td># title</td>\n<td><code class=\"notranslate\"># title</code></td>\n<td>end</td>\n</tr>",
+      "input": "# title",
+      "name": "heading",
+      "row": "| \\# title | `# title` | end |",
+      "text": "\\# title"
+    },
+    {
+      "code": "`*bold* _it_ ~~del~~`",
+      "html": "<tr>\n<td>*bold* _it_ ~~del~~</td>\n<td><code class=\"notranslate\">*bold* _it_ ~~del~~</code></td>\n<td>end</td>\n</tr>",
+      "input": "*bold* _it_ ~~del~~",
+      "name": "emphasis",
+      "row": "| \\*bold\\* \\_it\\_ \\~\\~del\\~\\~ | `*bold* _it_ ~~del~~` | end |",
+      "text": "\\*bold\\* \\_it\\_ \\~\\~del\\~\\~"
+    },
+    {
+      "code": "`\ufffd]8;;https://evil.example\ufffdx`",
+      "html": "<tr>\n<td><code class=\"notranslate\">\ufffd]8;;https://evil.example\ufffdx</code></td>\n<td><code class=\"notranslate\">\ufffd]8;;https://evil.example\ufffdx</code></td>\n<td>end</td>\n</tr>",
+      "input": "\u001b]8;;https://evil.example\u0007x",
+      "name": "escape-sequence",
+      "row": "| `\ufffd]8;;https://evil.example\ufffdx` | `\ufffd]8;;https://evil.example\ufffdx` | end |",
+      "text": "`\ufffd]8;;https://evil.example\ufffdx`"
+    }
+  ]
+}

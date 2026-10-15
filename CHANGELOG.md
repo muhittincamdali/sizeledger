@@ -7,6 +7,33 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `--max-files`, `--max-bytes`, `--max-ratio` and `--max-depth`, and `AnalysisLimits` with
+  `SizeLedger.analyze(_:limits:)` in the library: an input with more than 500,000 files, more than
+  8 GiB of declared uncompressed bytes, an `.ipa` entry that declares more than 300 times its
+  stored size, or a path deeper than 64 folders is refused with exit status 2.
+
+### Changed
+
+- The Markdown report escapes `(` and `)` as well, and writes a URL, email address, @mention or
+  `#123` reference from the app in a code span. It renders the same; the Markdown source differs.
+- A path listed twice in an `.ipa` is counted once (the last entry, as an unzip tool keeps it).
+
+### Security
+
+- These crafted inputs stopped sizeledger or ran it out of memory or time, and now end with a
+  message: a Mach-O file whose `__swift5_` section sizes add past 2^64 (crash); a ZIP64 locator or
+  directory offset above `Int.max` (crash); an `.ipa` entry nested 32,000 folders deep (stack
+  overflow); 50 entries sharing one 1 GB DEFLATE stream in a 1 MB file (54 s); 1,000,000
+  central-directory entries (1 GB of memory).
+- The JSON report wrote DEL and the C1 controls in file names as raw bytes, which a terminal can
+  act on; they are now written as `\u007f`, `\u009b` and so on.
+- In the Markdown report, a combining mark after `|` or a backtick got past the escaping and could
+  split a table cell or close a code span, and URLs, emails, @mentions and `#` references from the
+  app became links or pinged users. Escaping now works on Unicode scalars, and each case is checked
+  against GitHub's renderer in `Fixtures/markdown/escaping.json`.
+
 ## [0.1.3] - 2026-10-15
 
 ### Security

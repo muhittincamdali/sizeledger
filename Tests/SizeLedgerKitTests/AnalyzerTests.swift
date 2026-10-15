@@ -170,7 +170,10 @@ import Testing
         let temp = try TemporaryDirectory()
         let url = try temp.file("Huge.ipa", contents: builder.build())
 
-        let report = try SizeLedger.analyze(url)
+        // The default limits refuse such an archive outright; with them lifted, the sums saturate.
+        #expect(throws: InputError.self) { _ = try SizeLedger.analyze(url) }
+        let unlimited = AnalysisLimits(maxTotalBytes: .max, maxCompressionRatio: .max)
+        let report = try SizeLedger.analyze(url, limits: unlimited)
         #expect(report.totals.files == 3)
         #expect(report.totals.bytes == .max)
         #expect(report.totals.installBytes == .max)

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
+<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -116,6 +116,7 @@ recientes).
 
 ```text
 sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+                    [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
 | Opción             | Qué hace                                                                       |
@@ -180,7 +181,7 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 101 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
+En total son 117 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
 tarda una mediana de 10.5 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release,
 incluido el arranque del proceso; [scripts/bench.sh](scripts/bench.sh) repite la medición.
 
@@ -201,6 +202,14 @@ incluido el arranque del proceso; [scripts/bench.sh](scripts/bench.sh) repite la
   sizeledger descomprime todo lo anterior y solo conserva una ventana de 32 KiB, así que una entrada
   manipulada cuesta tiempo, no memoria: alrededor de 1 s por GB descomprimido en un Mac (Apple
   silicon).
+
+- La entrada no es de confianza, así que una entrada manipulada o dañada no puede agotar la
+  memoria, el tiempo ni la pila. sizeledger rechaza una entrada con más de 500 000 archivos, con
+  más de 8 GiB de bytes sin comprimir declarados, con una entrada `.ipa` que se descomprime a más
+  de 300 veces su tamaño almacenado (una bomba zip) o con una ruta anidada a más de 64 carpetas;
+  súbelos con `--max-files`, `--max-bytes`, `--max-ratio` y `--max-depth`. Las cabeceras Mach-O o
+  ZIP mal formadas dan una nota "unreadable" o un error claro con estado de salida 2, nunca un
+  fallo. Una ruta de entrada duplicada se cuenta una vez.
 
 ## Documentación
 

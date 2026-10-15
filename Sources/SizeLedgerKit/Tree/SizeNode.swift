@@ -92,21 +92,34 @@ enum TreeBuilder {
         return node(named: rootName, from: root)
     }
 
-    private static func node(named name: String, from folder: Folder) -> SizeNode {
-        let children = folder.folders.map { node(named: $0.key, from: $0.value) } + folder.files
-        var tally = Tally()
-        for child in children {
-            tally = tally + Tally(files: child.files, bytes: child.bytes, installBytes: child.installBytes, compressedBytes: child.compressedBytes)
+    /// Builds every folder's node from the leaves up with an explicit stack, so a bundle nested
+    /// thousands of folders deep does not grow the call stack and crash.
+    private static func node(named rootName: String, from rootFolder: Folder) -> SizeNode {
+        var done: [ObjectIdentifier: SizeNode] = [:]
+        var stack: [(name: String, folder: Folder)] = [(rootName, rootFolder)]
+        while let top = stack.last {
+            let pending = top.folder.folders.filter { done[ObjectIdentifier($0.value)] == nil }
+            guard pending.isEmpty else {
+                for (name, folder) in pending { stack.append((name, folder)) }
+                continue
+            }
+            stack.removeLast()
+            let children = top.folder.folders.map { done[ObjectIdentifier($0.value)]! } + top.folder.files
+            var tally = Tally()
+            for child in children {
+                tally = tally + Tally(files: child.files, bytes: child.bytes, installBytes: child.installBytes, compressedBytes: child.compressedBytes)
+            }
+            done[ObjectIdentifier(top.folder)] = SizeNode(
+                name: top.name,
+                files: tally.files,
+                bytes: tally.bytes,
+                installBytes: tally.installBytes,
+                compressedBytes: tally.compressedBytes,
+                category: nil,
+                children: children.sorted(by: largestFirst)
+            )
         }
-        return SizeNode(
-            name: name,
-            files: tally.files,
-            bytes: tally.bytes,
-            installBytes: tally.installBytes,
-            compressedBytes: tally.compressedBytes,
-            category: nil,
-            children: children.sorted(by: largestFirst)
-        )
+        return done[ObjectIdentifier(rootFolder)]!
     }
 
     /// Largest first; equal sizes by name bytes, so the order never depends on hashing.
