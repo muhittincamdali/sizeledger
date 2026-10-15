@@ -203,7 +203,7 @@ import Testing
     @Test func refusesAZipBombQuicklyAndWithoutDecompressing() throws {
         let temp = try TemporaryDirectory()
         let ipa = try bombIPA(declared: (1 << 30) + (1 << 20), stored: 512, in: temp)
-        let elapsed = try ContinuousClock().measure {
+        let elapsed = ContinuousClock().measure {
             #expect(throws: InputError.self) { _ = try IPASource(url: ipa) }
         }
         #expect(elapsed < .seconds(2))
