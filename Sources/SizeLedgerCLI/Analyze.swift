@@ -42,13 +42,17 @@ public struct Analyze: ParsableCommand {
     @Option(help: "Colour in tty output: auto (only in a terminal, and not when NO_COLOR is set), always or never.")
     var color: ColorMode = .auto
 
-    @Flag(name: .shortAndLong, help: "Print nothing; use with --out.")
+    @Flag(name: .shortAndLong, help: "Print nothing; needs --out.")
     var quiet = false
 
     public init() {}
 
     public func validate() throws {
         guard top >= 1 else { throw ValidationError("--top must be 1 or more.") }
+        // Without --out, --quiet would measure the app and keep the result to itself.
+        guard !quiet || out != nil else {
+            throw ValidationError("--quiet prints nothing, so it needs --out <file> to write the report to.")
+        }
     }
 
     public func run() throws {

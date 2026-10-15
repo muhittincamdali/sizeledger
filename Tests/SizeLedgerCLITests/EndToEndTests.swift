@@ -63,6 +63,18 @@ import SizeLedgerKit
         let result = try Self.run(["analyze", "x.ipa", "--top", "0"])
         #expect(result.status == 64)
         #expect(result.errors.contains("--top must be 1 or more."))
+
+        let quiet = try Self.run(["analyze", "x.ipa", "--quiet"])
+        #expect(quiet.status == 64)
+        #expect(quiet.errors.contains("--quiet prints nothing, so it needs --out <file> to write the report to."))
+    }
+
+    @Test(.enabled(if: built, "run `swift build` first"))
+    func suggestsAnalyzeForAnAppWithoutASubcommand() throws {
+        let result = try Self.run(["MyApp.ipa", "--top", "5"])
+        #expect(result.status == 64)
+        #expect(result.output.isEmpty)
+        #expect(result.errors.hasPrefix("Error: MyApp.ipa is not a subcommand. To measure it, run:\n  sizeledger analyze MyApp.ipa --top 5\n"))
     }
 
     @Test(.enabled(if: built, "run `swift build` first"))

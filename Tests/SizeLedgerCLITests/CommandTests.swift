@@ -122,6 +122,26 @@ final class TinyApp {
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--top", "0"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--format", "html"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse([]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--quiet"]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "-q", "--format", "json"]) }
+        #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "-q", "-o", "size.json"]) }
+    }
+
+    @Test func pointsToAnalyzeWhenTheSubcommandIsMissing() {
+        #expect(SizeLedgerCommand.subcommandHint(for: ["build/MyApp.ipa"]) == """
+        build/MyApp.ipa is not a subcommand. To measure it, run:
+          sizeledger analyze build/MyApp.ipa
+        """)
+        // Options after the app are kept, and the command can be pasted into a shell.
+        #expect(SizeLedgerCommand.subcommandHint(for: ["My App.xcarchive/", "--format", "json"])?.hasSuffix(
+            "\n  sizeledger analyze 'My App.xcarchive/' --format json"
+        ) == true)
+        #expect(SizeLedgerCommand.subcommandHint(for: ["it's.APP"])?.hasSuffix(#"analyze 'it'\''s.APP'"#) == true)
+        #expect(SizeLedgerCommand.subcommandHint(for: ["\u{1B}[2J.ipa"])?.contains("\u{1B}") == false)
+        // Subcommands, options and words that are not apps get ArgumentParser's own messages.
+        for arguments in [["analyze", "x.ipa"], ["help"], ["--version"], ["anlyze", "x.ipa"], []] {
+            #expect(SizeLedgerCommand.subcommandHint(for: arguments) == nil)
+        }
     }
 
     @Test func helpListsTheExitStatuses() {
