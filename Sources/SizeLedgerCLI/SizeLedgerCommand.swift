@@ -46,12 +46,10 @@ public struct SizeLedgerCommand: ParsableCommand {
 
     private static let appExtensions: Set<String> = ["app", "ipa", "xcarchive"]
 
-    /// The argument as it would be typed in a shell, with control characters replaced so that it
-    /// cannot send terminal escape sequences.
+    /// The argument as it would be typed in a shell, cleaned by `Sanitize.text` like the report,
+    /// so that it cannot send terminal escape sequences or reverse the suggested command.
     private static func shellQuoted(_ argument: String) -> String {
-        let visible = String(String.UnicodeScalarView(argument.unicodeScalars.map { scalar in
-            scalar.properties.generalCategory == .control ? "\u{FFFD}" : scalar
-        }))
+        let visible = Sanitize.text(argument)
         let plain = visible.unicodeScalars.allSatisfy { scalar in
             scalar.isASCII && (CharacterSet.alphanumerics.contains(scalar) || "-_./+:=@%,".unicodeScalars.contains(scalar))
         }

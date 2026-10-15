@@ -17,9 +17,12 @@ import SizeLedgerKit
 let report = try SizeLedger.analyze(URL(fileURLWithPath: "build/MyApp.ipa"))
 print(ByteFormat.string(report.totals.bytes))          // "8.75 MB"
 for component in report.components.prefix(5) {
-    print(component.path, ByteFormat.string(component.bytes))
+    print(Sanitize.text(component.path), ByteFormat.string(component.bytes))
 }
 ```
+
+Paths, names and notes come from the app, so they go through ``Sanitize/text(_:)`` before they
+are printed; ``TextReport`` and ``MarkdownReport`` do that for you.
 
 Nothing is extracted to disk and nothing is executed. Sizes come from the file system or from the
 `.ipa`'s ZIP directory; only `Info.plist` and the headers of Mach-O files are read. The library
@@ -58,6 +61,7 @@ Every report carries three sizes, and they answer different questions:
 - ``TextReport``
 - ``MarkdownReport``
 - ``ByteFormat``
+- ``Sanitize``
 
 ### Errors
 

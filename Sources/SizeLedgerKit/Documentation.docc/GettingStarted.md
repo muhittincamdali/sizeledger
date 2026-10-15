@@ -51,9 +51,13 @@ for category in report.categories {
 
 for binary in report.binaries {
     let slices = binary.slices.map { "\($0.architecture) \(ByteFormat.string($0.bytes))" }
-    print(binary.path, slices.joined(separator: ", "))
+    print(Sanitize.text(binary.path), slices.joined(separator: ", "))
 }
 ```
+
+Paths, the app's name and the notes are the app's own strings and can hold terminal escape
+sequences or text-direction controls. Pass them through ``Sanitize/text(_:)`` before you print
+them, as above.
 
 ``SizeReport/notes`` says when the numbers need context, for example for a simulator build or a
 binary with more than one architecture. Show the notes wherever you show the numbers.

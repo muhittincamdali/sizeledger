@@ -44,17 +44,34 @@ public enum ByteFormat {
 }
 
 /// Makes text that comes from the measured app (file names, Info.plist values) safe to print.
-enum Sanitize {
+///
+/// Paths, names and notes in a ``SizeReport`` are the app's own strings, so an app can carry
+/// terminal escape sequences or text-direction controls in them. ``TextReport`` and
+/// ``MarkdownReport`` already clean what they print; pass any value you print yourself through
+/// ``text(_:)``:
+///
+/// ```swift
+/// for component in report.components {
+///     print(Sanitize.text(component.path), ByteFormat.string(component.bytes))
+/// }
+/// ```
+public enum Sanitize {
     /// Replaces control characters, including the escape character that starts terminal
     /// sequences, with U+FFFD, so a file name cannot move the output around or change colours.
     /// The bidirectional embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069)
     /// go too: an override can make `gpj.exe` display as `exe.jpg` and reorder the rest of a
-    /// table row. The marks U+200E, U+200F and U+061C stay; they only nudge neutral characters.
-    static func text(_ value: String) -> String {
+    /// table row. The marks U+200E, U+200F and U+061C go as well: they are invisible and still
+    /// move neutral characters such as `.` and `/` to the other side of a name. So do the
+    /// invisible U+200B, U+2060 and U+FEFF, which make two names that look the same differ, and
+    /// the line and paragraph separators U+2028 and U+2029, which some terminals break lines on.
+    /// Letters of right-to-left scripts and the joiners U+200C and U+200D, which those scripts
+    /// and emoji need, are kept.
+    public static func text(_ value: String) -> String {
         var result = String.UnicodeScalarView()
         for scalar in value.unicodeScalars {
             switch scalar.value {
             case 0x00...0x1F, 0x7F...0x9F, 0x202A...0x202E, 0x2066...0x2069: result.append("\u{FFFD}")
+            case 0x061C, 0x200B, 0x200E, 0x200F, 0x2028, 0x2029, 0x2060, 0xFEFF: result.append("\u{FFFD}")
             default: result.append(scalar)
             }
         }
