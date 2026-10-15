@@ -1,0 +1,56 @@
+name: Linux
+
+# sizeledger builds and runs on Linux too (an .ipa can be measured on any CI runner). The kit's
+# Swift CI in ci.yml runs on macOS, so this runs the same tests in the official Swift images on
+# x86_64 and arm64, with the oldest and the newest Swift release the package supports. The
+# fixture tests compare with the same snapshots as on macOS and check the totals against du on
+# ext4.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: linux-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: Swift ${{ matrix.swift.version }} on ${{ matrix.runner }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+        swift:
+          - version: "6.2.4"
+            image: swift:6.2.4-noble@sha256:eccc7a97f9b9881d9659e2e788081fd7675f86d39793b51200bfb178398b3784
+          - version: "6.4.1"
+            image: swift:6.4.1-noble@sha256:64f2c54113c2d5c234ed8fa2f59684b5d1ab3c4802657031679b4a8d6308a2dd
+    container:
+      image: ${{ matrix.swift.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Toolchain
+        run: swift --version
+
+      - name: Build
+        run: swift build --build-tests
+
+      - name: Test
+        run: swift test --skip-build --parallel
+
+      - name: Run the command on the fixture
+        run: |
+          .build/debug/sizeledger analyze Fixtures/apps/SampleShop-2.0.ipa > "$RUNNER_TEMP/report.txt"
+          diff -u Fixtures/snapshots/SampleShop-2.0.txt "$RUNNER_TEMP/report.txt"
