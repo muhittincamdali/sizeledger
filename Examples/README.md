@@ -36,7 +36,7 @@ The package depends on sizeledger through a local path so it builds against this
 your own package use the URL:
 
 ```swift
-.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0"),
+.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1"),
 ```
 
 ## GitHub Actions

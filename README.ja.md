@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
+<!-- i18n-source: README.md@1467617681e9a8acbb06f02bceb1fb87e76eecdd status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -84,7 +84,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew (macOS、Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                                 |
 | リリースのバイナリ      | [Releases](https://github.com/muhittincamdali/sizeledger/releases) から `sizeledger-<version>-macos-universal.tar.gz`、または `-linux-x86_64` / `-linux-aarch64` をダウンロードし、`SHA256SUMS` で検証して、`sizeledger` を `PATH` に置きます |
 | ソースから              | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (バイナリは `.build/release/sizeledger` です)                                                                                        |
-| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`、product は `SizeLedgerKit`                                                                                                                                   |
+| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`、product は `SizeLedgerKit`                                                                                                                                   |
 
 ビルドには Swift 6.2 以降が必要です (Mac では Xcode 26 以降)。Linux 向けのリリースバイナリには Swift ランタイムが含まれており、glibc 2.35 以降 (Ubuntu 22.04、Debian 12 以降) が必要です。
 

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
+<!-- i18n-source: README.md@1467617681e9a8acbb06f02bceb1fb87e76eecdd status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -106,7 +106,7 @@ Hasta que exista `budget`, comprobar un límite en CI es una línea de `jq`; con
 | Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                      |
 | Binario de la release   | Descarga `sizeledger-<version>-macos-universal.tar.gz` o `-linux-x86_64` / `-linux-aarch64` desde [Releases](https://github.com/muhittincamdali/sizeledger/releases), compruébalo con `SHA256SUMS` y pon `sizeledger` en tu `PATH` |
 | Desde el código fuente  | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (el binario es `.build/release/sizeledger`)                                                                               |
-| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`, producto `SizeLedgerKit`                                                                                                                          |
+| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`, producto `SizeLedgerKit`                                                                                                                          |
 
 Para compilar hace falta Swift 6.2 o posterior (Xcode 26 o posterior en un Mac). Los binarios de Linux
 incluyen el runtime de Swift y necesitan glibc 2.35 o posterior (Ubuntu 22.04, Debian 12 o más
