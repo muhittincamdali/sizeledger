@@ -96,8 +96,11 @@ import Testing
     }
 
     @Test func rejectsTruncatedLoadCommands() {
-        let data = Self.app.build().prefix(100)
-        #expect(throws: MachO.ParseError.truncated) { _ = try Self.slices(data) }
+        // The directory says the file is complete, but its data ends after 100 bytes.
+        let data = Self.app.build()
+        #expect(throws: MachO.ParseError.truncated) {
+            _ = try MachO.slices(fileSize: UInt64(data.count)) { limit in data.prefix(min(limit, 100)) }
+        }
     }
 
     @Test func namesArchitectures() {
@@ -108,5 +111,19 @@ import Testing
         #expect(MachO.architectureName(cpuType: 18, cpuSubtype: 0) == "cpu18")
         #expect(MachO.fileTypeName(8) == "bundle")
         #expect(MachO.fileTypeName(99) == "type99")
+    }
+
+    @Test func refusesLoadCommandSizesLargerThanTheSlice() {
+        var data = Self.app.build()
+        data.replaceSubrange(20..<24, with: le32(0x7FFF_FFFF))
+        var largest = 0
+        #expect(throws: MachO.ParseError.self) {
+            _ = try MachO.slices(fileSize: UInt64(data.count)) { limit in
+                largest = max(largest, limit)
+                return data.prefix(limit)
+            }
+        }
+        // Nothing past the first read was asked for.
+        #expect(largest <= 4_096)
     }
 }

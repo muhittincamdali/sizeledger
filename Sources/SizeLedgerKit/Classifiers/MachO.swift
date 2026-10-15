@@ -43,6 +43,10 @@ enum MachO {
         case malformed(String)
     }
 
+    /// Real binaries have well under 1 MB of load commands; more than this is a damaged or
+    /// crafted file.
+    static let maximumLoadCommandBytes = 16 << 20
+
     /// Recognizes a Mach-O file from its first four bytes.
     static func format(of prefix: Data) -> Format? {
         let reader = ByteReader(prefix)
@@ -99,7 +103,13 @@ enum MachO {
         let commandEnds = try ranges.map { range in
             let header = ByteReader(data)
             let headerSize = try header.uint32LE(at: range.offset) == 0xFEED_FACF ? 32 : 28
-            return range.offset + headerSize + Int(try header.uint32LE(at: range.offset + 20))
+            let commandBytes = Int(try header.uint32LE(at: range.offset + 20))
+            // The header's size field decides how much is read (and, in an .ipa, decompressed),
+            // so a value larger than the slice or than any real binary uses is refused.
+            guard commandBytes <= maximumLoadCommandBytes, UInt64(headerSize + commandBytes) <= range.size else {
+                throw ParseError.malformed("load commands of \(commandBytes) bytes do not fit the slice")
+            }
+            return range.offset + headerSize + commandBytes
         }
         try ensure(commandEnds.max() ?? 0)
         let reader = ByteReader(data)
