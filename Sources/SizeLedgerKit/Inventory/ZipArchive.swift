@@ -33,20 +33,20 @@ struct ZipArchive: Sendable {
     static let storedMethod: UInt16 = 0
     static let deflateMethod: UInt16 = 8
 
-    init(url: URL) throws(ZipError) {
+    init(url: URL, limits: AnalysisLimits = .default) throws(ZipError) {
         let data: Data
         do {
             data = try Data(contentsOf: url, options: .mappedIfSafe)
         } catch {
             throw .unreadable(error.localizedDescription)
         }
-        try self.init(data: data)
+        try self.init(data: data, limits: limits)
     }
 
-    init(data: Data) throws(ZipError) {
+    init(data: Data, limits: AnalysisLimits = .default) throws(ZipError) {
         reader = ByteReader(data)
         do {
-            entries = try Self.readCentralDirectory(reader)
+            entries = try Self.readCentralDirectory(reader, limits: limits)
         } catch let error as ZipError {
             throw error
         } catch {
@@ -101,7 +101,7 @@ struct ZipArchive: Sendable {
 
     // MARK: Central directory
 
-    private static func readCentralDirectory(_ reader: ByteReader) throws -> [ZipEntry] {
+    private static func readCentralDirectory(_ reader: ByteReader, limits: AnalysisLimits) throws -> [ZipEntry] {
         let end = try findEndOfCentralDirectory(reader)
         var entryCount = UInt64(try reader.uint16LE(at: end + 10))
         var directorySize = UInt64(try reader.uint32LE(at: end + 12))
@@ -110,7 +110,9 @@ struct ZipArchive: Sendable {
         // ZIP64: the classic record holds 0xFFFF.. markers and a locator right before it points
         // at the 64-bit record.
         if end >= 20, try reader.uint32LE(at: end - 20) == 0x0706_4B50 {
-            let record = Int(try reader.uint64LE(at: end - 20 + 8))
+            guard let record = Int(exactly: try reader.uint64LE(at: end - 20 + 8)) else {
+                throw ZipError.malformed("ZIP64 locator points past the end of the file")
+            }
             guard try reader.uint32LE(at: record) == 0x0606_4B50 else {
                 throw ZipError.malformed("ZIP64 locator does not point at a ZIP64 record")
             }
@@ -118,13 +120,20 @@ struct ZipArchive: Sendable {
             directorySize = try reader.uint64LE(at: record + 40)
             directoryOffset = try reader.uint64LE(at: record + 48)
         }
-        guard reader.contains(Int(directoryOffset), length: Int(directorySize)) else {
+        // The central directory is read one entry at a time, so memory follows the entries that
+        // fit, not a count a crafted archive claims. Refuse an implausible count up front.
+        guard entryCount <= UInt64(limits.maxFiles) else {
+            throw ZipError.tooLarge("the archive declares \(entryCount) entries, more than the \(limits.maxFiles) allowed (raise --max-files)")
+        }
+        guard let directoryStart = Int(exactly: directoryOffset), let directoryLength = Int(exactly: directorySize),
+              reader.contains(directoryStart, length: directoryLength)
+        else {
             throw ZipError.malformed("the central directory points outside the file")
         }
 
         var entries: [ZipEntry] = []
-        entries.reserveCapacity(Int(min(entryCount, 1 << 20)))
-        var offset = Int(directoryOffset)
+        entries.reserveCapacity(Int(min(entryCount, 1 << 16)))
+        var offset = directoryStart
         for _ in 0..<entryCount {
             guard try reader.uint32LE(at: offset) == 0x0201_4B50 else {
                 throw ZipError.malformed("central directory entry \(entries.count + 1) has no signature")
@@ -217,6 +226,8 @@ public enum ZipError: Error, Equatable, Sendable {
     case encrypted(String)
     /// The named entry uses a compression method other than stored or DEFLATE.
     case unsupportedMethod(UInt16, String)
+    /// The archive exceeds an ``AnalysisLimits`` cap; the reason names which one.
+    case tooLarge(String)
 }
 
 extension ZipError: CustomStringConvertible {
@@ -232,6 +243,7 @@ extension ZipError: CustomStringConvertible {
         case .malformed(let reason): "damaged ZIP archive: \(reason)"
         case .encrypted(let path): "\(path) is encrypted"
         case .unsupportedMethod(let method, let path): "\(path) uses compression method \(method); only stored (0) and DEFLATE (8) are supported"
+        case .tooLarge(let reason): "the archive is too large to measure safely: \(reason)"
         }
     }
 }
