@@ -9,7 +9,9 @@ public struct AnalysisLimits: Sendable, Equatable {
     /// Most files (archive entries or bundle files) measured. A crafted central directory can
     /// claim far more entries than its bytes hold; reading them all would exhaust memory.
     public var maxFiles: Int
-    /// Most total uncompressed bytes an input may declare, across every file.
+    /// Most total uncompressed bytes an `.ipa` may declare, across every entry. Only the `.ipa`
+    /// reader checks it: a bundle folder's sizes come from the file system and nothing in it is
+    /// decompressed, so its size costs no memory or time.
     public var maxTotalBytes: UInt64
     /// Largest ratio of a single file's declared uncompressed size to its stored (compressed)
     /// size. A higher ratio is a zip bomb, not a real asset.
