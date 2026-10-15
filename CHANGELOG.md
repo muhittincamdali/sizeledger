@@ -18,6 +18,17 @@ All notable changes to sizeledger are listed here. The format follows
   nothing and exit 0: `JSONEncoder` stops at 512 levels and the error was dropped. An encoding
   error now ends with a message and exit status 2, and the depth ceiling keeps reports well inside
   what JSON encoding and decoding handle, on any thread.
+- A top-level Info.plist that is a symbolic link got the note "No Info.plist"; the note now says
+  it is a link and that links are not followed.
+- The `--max-bytes` help said "input"; the limit applies to an `.ipa` only, since a bundle folder
+  is not decompressed.
+
+### Security
+
+- File names with the bidirectional overrides, embeddings and isolates (U+202A to U+202E, U+2066
+  to U+2069) reached the table and the Markdown report as they were, so a name could display as
+  something else (`gpj.exe` as `exe.jpg`) or reorder a table row. They are now replaced with
+  U+FFFD there; the JSON report still keeps every codepoint.
 
 ## [0.1.4] - 2026-10-15
 
