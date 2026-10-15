@@ -3,7 +3,7 @@ import PackageDescription
 
 // A small program that uses SizeLedgerKit: it prints the five largest items of an app and exits
 // with 1 when the install size estimate is over a limit you pass. In your own package, depend on
-// .package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.2") instead of the
+// .package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5") instead of the
 // local path.
 let package = Package(
     name: "LibraryUsage",
