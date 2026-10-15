@@ -7,6 +7,8 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-15
+
 ### Added
 
 - README translations: Türkçe, 简体中文, 日本語, 한국어, Español, Deutsch, Français, Português (Brasil)
@@ -56,5 +58,6 @@ First release: `sizeledger analyze` and the SizeLedgerKit library.
 - Release binaries for macOS (universal) and Linux (x86_64, aarch64), and a Homebrew formula
   written by the release workflow.
 
-[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/muhittincamdali/sizeledger/releases/tag/v0.1.0
