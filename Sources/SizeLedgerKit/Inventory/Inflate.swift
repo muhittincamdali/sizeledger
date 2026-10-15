@@ -11,6 +11,7 @@ enum Inflate {
     /// Decompresses `input`, stopping once at least `limit` bytes are produced.
     static func decompress(_ input: Data, limit: Int = .max) throws(InflateError) -> [UInt8] {
         var inflater = Inflater(input: [UInt8](input), limit: limit)
+        if limit == .max { inflater.output.reserveCapacity(input.count * 3) }
         try inflater.run()
         return inflater.output
     }
@@ -36,6 +37,7 @@ private let codeLengthOrder: [Int] = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 1
 /// ones fall back to walking the code lengths one bit at a time.
 private struct Huffman {
     static let fastBits = 9
+    static let fastMask = UInt64((1 << fastBits) - 1)
     static let maxBits = 15
 
     var counts = [Int](repeating: 0, count: maxBits + 1)
@@ -135,15 +137,26 @@ private struct Inflater {
         return value
     }
 
+    /// Tops the bit buffer up to at least 57 bits while input remains, so the decoding loop
+    /// rarely has to come back for more.
+    private mutating func refill() {
+        while bitCount <= 56, position < input.count {
+            bitBuffer |= UInt64(input[position]) << UInt64(bitCount)
+            position += 1
+            bitCount += 8
+        }
+    }
+
     private mutating func decode(_ code: Huffman) throws(InflateError) -> Int {
-        if fill(Huffman.fastBits) {
-            let entry = code.fast[Int(bitBuffer & UInt64((1 << Huffman.fastBits) - 1))]
-            if entry != 0 {
-                let length = Int(entry & 0xF)
-                bitBuffer >>= UInt64(length)
-                bitCount -= length
-                return Int(entry >> 4)
-            }
+        refill()
+        let entry = code.fast[Int(bitBuffer & Huffman.fastMask)]
+        let length = Int(entry & 0xF)
+        // Bits past the end of the input read as zero, so a short code that fits in the bits
+        // that are left is still decoded by the table.
+        if entry != 0, length <= bitCount {
+            bitBuffer >>= UInt64(length)
+            bitCount -= length
+            return Int(entry >> 4)
         }
         // Canonical decoding one bit at a time (as in zlib's reference decoder, puff.c).
         var value = 0, first = 0, index = 0
@@ -190,12 +203,11 @@ private struct Inflater {
             guard distanceIndex < distanceBase.count else { throw .invalidSymbol }
             let distance = distanceBase[distanceIndex] + (try bits(distanceExtra[distanceIndex]))
             guard distance <= output.count else { throw .distanceTooFar }
+            // Byte by byte: a slice of `output` appended to itself would keep a second reference
+            // to the buffer and force a copy of everything decoded so far. It also handles
+            // overlapping copies (distance < length) the way DEFLATE defines them.
             let start = output.count - distance
-            if distance >= length {
-                output.append(contentsOf: output[start..<(start + length)])
-            } else {
-                for offset in 0..<length { output.append(output[start + offset]) }
-            }
+            for offset in 0..<length { output.append(output[start + offset]) }
         }
     }
 
