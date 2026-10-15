@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -171,8 +171,8 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 87개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
-silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값으로 14.4 ms가 걸립니다.
+테스트는 모두 95개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
+silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값으로 11.4 ms가 걸립니다.
 
 ## 제한 사항
 
@@ -185,6 +185,8 @@ silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값�
   `.app`은 측정되지만, 그 파일은 "Other resources" 아래에 들어갑니다.
 - 앱이 둘 이상 들어 있거나, 암호화된 항목이 있거나, stored와 DEFLATE 외의 압축을 쓰거나, 항목 경로에
   `..` 구성 요소가 있는 `.ipa`는 추측하지 않고 메시지와 함께 거부합니다.
+- 압축된 `.ipa` 항목 깊숙한 곳의 Mach-O 헤더를 읽기 위해 sizeledger는 그 앞의 모든 내용을 풀지만 32 KiB 창만 유지합니다. 따라서 조작된 항목은
+  메모리가 아니라 시간을 소비하며, Mac(Apple silicon)에서 풀린 1 GB당 약 1 s가 걸립니다.
 
 ## 문서
 

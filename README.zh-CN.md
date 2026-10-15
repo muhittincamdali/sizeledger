@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -158,7 +158,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - **对照参考实现检验的读取器**：DEFLATE 解码器对照 zlib 的输出，覆盖 stored、fixed 和 dynamic 块；
   Mach-O 解析器覆盖 thin、32 位、fat 和 fat64 文件；还有 ZIP64、损坏的归档，以及包含终端转义序列的文件名。
 
-共有 87 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建在 Mac（Apple silicon）上测量 SampleShop 2.0，21 次运行的中位数为 14.4 ms。
+共有 95 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建在 Mac（Apple silicon）上测量 SampleShop 2.0，21 次运行的中位数为 11.4 ms。
 
 ## 局限
 
@@ -170,6 +170,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - iOS 风格的 bundle（iOS、iPadOS、tvOS、watchOS、visionOS）会被分类。带有 `Contents/` 文件夹的 macOS
   `.app` 会被测量，但其中的文件会归入 "Other resources"。
 - 包含多个应用、带加密条目、使用 stored 和 DEFLATE 以外压缩方式，或条目路径中含有 `..` 的 `.ipa`，会被拒绝并给出提示信息，而不是靠猜测处理。
+- 为了读取压缩的 `.ipa` 条目中靠后的 Mach-O 头，sizeledger 会解压它之前的全部内容，但只保留 32 KiB 的窗口，因此恶意构造的条目只会耗费时间，而不会耗费内存：在 Mac（Apple silicon）上每解压 1 GB 约需 1 s。
 
 ## 文档
 
