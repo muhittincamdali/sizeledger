@@ -63,6 +63,10 @@ import SizeLedgerKit
         let result = try Self.run(["analyze", "x.ipa", "--top", "0"])
         #expect(result.status == 64)
         #expect(result.errors.contains("--top must be 1 or more."))
+
+        let quiet = try Self.run(["analyze", "x.ipa", "--quiet"])
+        #expect(quiet.status == 64)
+        #expect(quiet.errors.contains("--quiet prints nothing, so it needs --out <file> to write the report to."))
     }
 
     @Test(.enabled(if: built, "run `swift build` first"))

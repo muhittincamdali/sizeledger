@@ -122,6 +122,9 @@ final class TinyApp {
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--top", "0"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--format", "html"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse([]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--quiet"]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "-q", "--format", "json"]) }
+        #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "-q", "-o", "size.json"]) }
     }
 
     @Test func pointsToAnalyzeWhenTheSubcommandIsMissing() {
