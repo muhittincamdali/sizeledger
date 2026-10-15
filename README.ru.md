@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@7fb9152ffe1777b8105bf26644733ed905545b6d status=reviewed -->
+<!-- i18n-source: README.md@df2e23beda33ece8449850d0c4f0dccd05f82ca8 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -177,7 +177,7 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   парсер Mach-O — на thin-, 32-битных, fat- и fat64-файлах; кроме того, ZIP64, повреждённые архивы и имена
   файлов с управляющими последовательностями терминала.
 
-Всего 117 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0 занимает
+Всего 124 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0 занимает
 в медиане 10.5 ms по 21 запуску на Mac (Apple silicon) в release-сборке, включая запуск процесса;
 [scripts/bench.sh](scripts/bench.sh) повторяет это измерение.
 

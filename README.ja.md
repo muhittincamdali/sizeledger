@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@7fb9152ffe1777b8105bf26644733ed905545b6d status=reviewed -->
+<!-- i18n-source: README.md@df2e23beda33ece8449850d0c4f0dccd05f82ca8 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -139,7 +139,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 117 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 10.5 ms です (プロセスの起動を含みます)。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
+テストは全部で 124 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 10.5 ms です (プロセスの起動を含みます)。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
 
 ## 制限事項
 

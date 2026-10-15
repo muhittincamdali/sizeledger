@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@7fb9152ffe1777b8105bf26644733ed905545b6d status=reviewed -->
+<!-- i18n-source: README.md@df2e23beda33ece8449850d0c4f0dccd05f82ca8 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -172,7 +172,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 117개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
+테스트는 모두 124개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
 silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값으로 10.5 ms가 걸립니다(프로세스 시작 포함).
 [scripts/bench.sh](scripts/bench.sh)로 같은 측정을 반복할 수 있습니다.
 
