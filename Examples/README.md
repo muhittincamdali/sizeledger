@@ -36,7 +36,7 @@ The package depends on sizeledger through a local path so it builds against this
 your own package use the URL:
 
 ```swift
-.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0"),
+.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1"),
 ```
 
 ## GitHub Actions
@@ -44,5 +44,5 @@ your own package use the URL:
 Copy [github-actions/app-size.yml](github-actions/app-size.yml) to `.github/workflows/` in your
 app's repository and replace the build step. It downloads the release binary, checks it against
 the release's `SHA256SUMS`, and appends the report to the job summary. Comparing two builds and
-size budgets are planned for sizeledger 0.3 and 0.5; the last step shows a limit check with `jq`
+size budgets are planned for sizeledger 0.2 and 0.3; the last step shows a limit check with `jq`
 until then. The [Size checks in CI](../docs/guides/size-checks-in-ci.md) guide explains each step.

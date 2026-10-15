@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -9,7 +9,7 @@
 
 <p align="center">
 <a href="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml"><img src="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml/badge.svg" alt="Status da CI"></a>
-<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="Versão mais recente: v0.1.0"></picture></a>
+<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="Versão mais recente: v0.1.1"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg" alt="Plataformas compatíveis: macOS 13+"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg" alt="Versão da linguagem: Swift 6.2+ · Swift 6 mode"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg" alt="Licença: MIT"></picture></a>
@@ -90,8 +90,8 @@ linha por linha.
 | Saída como tabela de terminal, Markdown ou JSON (`--format`, `--out`)                                                   | funciona        |
 | macOS 13+ e Linux (x86_64 e arm64, Swift 6.2 e 6.4.1 no CI)                                                             | funciona        |
 | Biblioteca SizeLedgerKit com documentação DocC                                                                          | funciona        |
-| `diff` de dois relatórios, com um resumo em Markdown para pull requests                                                 | planejado (0.3) |
-| Regras `budget` em YAML (por caminho, total, limite de App Clip) com código de saída 1 e uma GitHub Action              | planejado (0.5) |
+| `diff` de dois relatórios, com um resumo em Markdown para pull requests                                                 | planejado (0.2) |
+| Regras `budget` em YAML (por caminho, total, limite de App Clip) com código de saída 1 e uma GitHub Action              | planejado (0.3) |
 | Treemap em HTML de arquivo único; renditions de asset catalogs via `assetutil` no macOS                                 | planejado (0.8) |
 | Esquema JSON congelado (versão 1)                                                                                       | planejado (1.0) |
 | Android `.apk` e `.aab`                                                                                                 | planejado (1.1) |
@@ -106,7 +106,7 @@ Enquanto o `budget` não existe, checar um limite no CI é uma linha de `jq`; ve
 | Homebrew (macOS, Linux)  | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                    |
 | Binário da release       | Baixe `sizeledger-<version>-macos-universal.tar.gz` ou `-linux-x86_64` / `-linux-aarch64` em [Releases](https://github.com/muhittincamdali/sizeledger/releases), confira com `SHA256SUMS` e coloque o `sizeledger` no seu `PATH` |
 | A partir do código-fonte | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (o binário fica em `.build/release/sizeledger`)                                                                         |
-| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`, product `SizeLedgerKit`                                                                                                                         |
+| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`, product `SizeLedgerKit`                                                                                                                         |
 
 Para compilar, é preciso Swift 6.2 ou mais recente (Xcode 26 ou mais recente em um Mac). Os binários de
 release para Linux trazem o runtime do Swift e exigem glibc 2.35 ou mais recente (Ubuntu 22.04,

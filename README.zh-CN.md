@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -9,7 +9,7 @@
 
 <p align="center">
 <a href="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml"><img src="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml/badge.svg" alt="CI 状态"></a>
-<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="最新版本: v0.1.0"></picture></a>
+<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="最新版本: v0.1.1"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg" alt="支持的平台: macOS 13+"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg" alt="语言版本: Swift 6.2+ · Swift 6 mode"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg" alt="许可证: MIT"></picture></a>
@@ -79,8 +79,8 @@ sizeledger analyze path/to/MyApp.ipa
 | 以终端表格、Markdown 或 JSON 输出（`--format`、`--out`）                                               | 可用          |
 | macOS 13+ 和 Linux（x86_64 和 arm64，CI 中使用 Swift 6.2 和 6.4.1）                                    | 可用          |
 | 带 DocC 文档的 SizeLedgerKit 库                                                                        | 可用          |
-| 比较两份报告的 `diff`，并为 pull request 生成 Markdown 摘要                                            | 计划中（0.3） |
-| 用 YAML 编写的 `budget` 规则（按路径、总量、App Clip 上限），以退出码 1 表示超限，并提供 GitHub Action | 计划中（0.5） |
+| 比较两份报告的 `diff`，并为 pull request 生成 Markdown 摘要                                            | 计划中（0.2） |
+| 用 YAML 编写的 `budget` 规则（按路径、总量、App Clip 上限），以退出码 1 表示超限，并提供 GitHub Action | 计划中（0.3） |
 | 单文件 HTML treemap；在 macOS 上通过 `assetutil` 查看 asset catalog 的 rendition                       | 计划中（0.8） |
 | 固定的 JSON schema（版本 1）                                                                           | 计划中（1.0） |
 | Android `.apk` 和 `.aab`                                                                               | 计划中（1.1） |
@@ -95,7 +95,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew（macOS、Linux） | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                             |
 | 发布的二进制文件         | 从 [Releases](https://github.com/muhittincamdali/sizeledger/releases) 下载 `sizeledger-<version>-macos-universal.tar.gz`，或 `-linux-x86_64` / `-linux-aarch64`，用 `SHA256SUMS` 校验，然后把 `sizeledger` 放到 `PATH` 中 |
 | 从源码构建               | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release`（二进制文件位于 `.build/release/sizeledger`）                                                                    |
-| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`，product 为 `SizeLedgerKit`                                                                                                               |
+| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`，product 为 `SizeLedgerKit`                                                                                                               |
 
 构建需要 Swift 6.2 或更高版本（Mac 上需要 Xcode 26 或更高版本）。Linux 的发布二进制文件已包含 Swift
 运行时，需要 glibc 2.35 或更高版本（Ubuntu 22.04、Debian 12 或更新的系统）。

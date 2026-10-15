@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
+<!-- i18n-source: README.md@bad79671dfd9c33661ffb9a4e9310cf276a72e5f status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -9,7 +9,7 @@
 
 <p align="center">
 <a href="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml"><img src="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml/badge.svg" alt="CI ステータス"></a>
-<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="最新バージョン: v0.1.0"></picture></a>
+<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="最新バージョン: v0.1.1"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg" alt="対応プラットフォーム: macOS 13+"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg" alt="言語バージョン: Swift 6.2+ · Swift 6 mode"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg" alt="ライセンス: MIT"></picture></a>
@@ -69,8 +69,8 @@ sizeledger analyze path/to/MyApp.ipa
 | ターミナルの表、Markdown、JSON での出力 (`--format`、`--out`)                                                 | 動作します   |
 | macOS 13+ と Linux (x86_64 と arm64、CI では Swift 6.2 と 6.4.1)                                              | 動作します   |
 | DocC ドキュメント付きの SizeLedgerKit ライブラリ                                                              | 動作します   |
-| 2 つのレポートの `diff` と、pull request 向けの Markdown サマリー                                             | 計画中 (0.3) |
-| YAML で書く `budget` ルール (パスごと、合計、App Clip の上限)、終了コード 1、GitHub Action                    | 計画中 (0.5) |
+| 2 つのレポートの `diff` と、pull request 向けの Markdown サマリー                                             | 計画中 (0.2) |
+| YAML で書く `budget` ルール (パスごと、合計、App Clip の上限)、終了コード 1、GitHub Action                    | 計画中 (0.3) |
 | 単一ファイルの HTML treemap、macOS の `assetutil` による asset catalog の rendition                           | 計画中 (0.8) |
 | 固定された JSON スキーマ (バージョン 1)                                                                       | 計画中 (1.0) |
 | Android の `.apk` と `.aab`                                                                                   | 計画中 (1.1) |
@@ -84,7 +84,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew (macOS、Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                                 |
 | リリースのバイナリ      | [Releases](https://github.com/muhittincamdali/sizeledger/releases) から `sizeledger-<version>-macos-universal.tar.gz`、または `-linux-x86_64` / `-linux-aarch64` をダウンロードし、`SHA256SUMS` で検証して、`sizeledger` を `PATH` に置きます |
 | ソースから              | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (バイナリは `.build/release/sizeledger` です)                                                                                        |
-| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`、product は `SizeLedgerKit`                                                                                                                                   |
+| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.1")`、product は `SizeLedgerKit`                                                                                                                                   |
 
 ビルドには Swift 6.2 以降が必要です (Mac では Xcode 26 以降)。Linux 向けのリリースバイナリには Swift ランタイムが含まれており、glibc 2.35 以降 (Ubuntu 22.04、Debian 12 以降) が必要です。
 

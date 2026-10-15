@@ -3,8 +3,8 @@
 How to measure the app on every pull request with sizeledger 0.1: show the breakdown in the job
 summary, keep the JSON report, and fail on a limit.
 
-The `diff` command (compare two reports, planned for 0.3) and `budget` rules with a GitHub
-Action (planned for 0.5) will make this shorter. Everything below works today.
+The `diff` command (compare two reports, planned for 0.2) and `budget` rules with a GitHub
+Action (planned for 0.3) will make this shorter. Everything below works today.
 
 ## 1. Build what you want to measure
 
@@ -24,7 +24,7 @@ but the report notes that its numbers differ from a device build.
 On a macOS runner, the release binary needs no toolchain:
 
 ```sh
-version=0.1.0
+version=0.1.1
 base="https://github.com/muhittincamdali/sizeledger/releases/download/v$version"
 curl -fsSLO "$base/sizeledger-$version-macos-universal.tar.gz"
 curl -fsSLO "$base/SHA256SUMS"
