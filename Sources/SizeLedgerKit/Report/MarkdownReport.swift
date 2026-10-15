@@ -80,14 +80,37 @@ public enum MarkdownReport {
         if hidden > 0 { lines += ["", "\(hidden) more in the JSON report."] }
     }
 
-    /// Plain text with Markdown and HTML syntax escaped, safe inside a table cell.
+    /// Plain text with Markdown and HTML syntax escaped, and any word GitHub would autolink put
+    /// in a code span, so a file name or Info.plist value cannot inject a clickable link.
     static func text(_ value: String) -> String {
         var result = ""
-        for character in Sanitize.text(value) {
+        var first = true
+        for token in Sanitize.text(value).split(separator: " ", omittingEmptySubsequences: false) {
+            if !first { result.append(" ") }
+            first = false
+            let word = String(token)
+            result += autolinks(word) ? code(word) : escaped(word)
+        }
+        return result
+    }
+
+    /// Markdown and HTML syntax characters backslash-escaped.
+    private static func escaped(_ value: String) -> String {
+        var result = ""
+        for character in value {
             if "\\`*_[]<>|#!~&".contains(character) { result.append("\\") }
             result.append(character)
         }
         return result
+    }
+
+    /// Whether GitHub-flavoured Markdown would turn this word into a link: an `http(s)`/`ftp` URL,
+    /// a `www.` host or a bare email. Backslash escapes do not disable GitHub's autolink
+    /// extension, so such a word goes in a code span instead, where nothing is markup.
+    private static func autolinks(_ word: String) -> Bool {
+        if word.contains("://") || word.lowercased().hasPrefix("www.") { return true }
+        if let at = word.firstIndex(of: "@") { return word[word.index(after: at)...].contains(".") }
+        return false
     }
 
     /// A code span that holds any text: the fence is longer than the longest run of backticks
