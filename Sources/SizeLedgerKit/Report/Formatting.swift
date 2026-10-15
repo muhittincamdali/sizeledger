@@ -48,8 +48,24 @@ enum Sanitize {
         return String(result)
     }
 
-    /// Shortens `value` to `width` characters by cutting out the middle, which keeps both the
-    /// start of a path and the file name.
+    /// Shortens a label to `width` characters. Paths lose their leading folders first
+    /// (`…/ShopCore.framework/ShopCore`), since the end names the file; a single name that is
+    /// still too long loses its middle. Leading spaces (indentation) are kept.
+    static func shortened(_ value: String, width: Int) -> String {
+        guard value.count > width else { return value }
+        let indent = String(value.prefix { $0 == " " })
+        let body = String(value.dropFirst(indent.count))
+        let room = width - indent.count
+        var parts = body.split(separator: "/", omittingEmptySubsequences: false)
+        while parts.count > 1 {
+            parts.removeFirst()
+            let candidate = "…/" + parts.joined(separator: "/")
+            if candidate.count <= room { return indent + candidate }
+        }
+        return indent + middleTruncated(String(parts.last ?? Substring(body)), width: room)
+    }
+
+    /// Shortens `value` to `width` characters by cutting out the middle.
     static func middleTruncated(_ value: String, width: Int) -> String {
         guard value.count > width, width > 1 else { return value }
         let head = (width - 1) / 2
