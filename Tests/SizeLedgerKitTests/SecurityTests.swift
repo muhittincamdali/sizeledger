@@ -81,6 +81,21 @@ import Testing
         #expect(throws: InputError.self) { _ = try IPASource(url: ipa) }
     }
 
+    @Test func lowersAMaxDepthAboveTheCeiling() throws {
+        // A library caller asking for maxDepth 1000 gets the 100-folder ceiling, so the report it
+        // gets back can always be encoded as JSON.
+        let temp = try TemporaryDirectory()
+        let depth = AnalysisLimits.deepestAllowed
+        try temp.file("App.app/" + String(repeating: "d/", count: depth) + "f", contents: Data("x".utf8))
+        let accepted = try SizeLedger.analyze(temp.url.appendingPathComponent("App.app"), limits: AnalysisLimits(maxDepth: 1_000))
+        #expect(try SizeReport.decode(from: accepted.jsonData()) == accepted)
+
+        try temp.file("Deeper.app/" + String(repeating: "d/", count: depth + 1) + "f", contents: Data("x".utf8))
+        #expect(throws: InputError.self) {
+            _ = try SizeLedger.analyze(temp.url.appendingPathComponent("Deeper.app"), limits: AnalysisLimits(maxDepth: 1_000))
+        }
+    }
+
     @Test func countsADuplicatePathOnce() throws {
         let temp = try TemporaryDirectory()
         var builder = ZipBuilder()

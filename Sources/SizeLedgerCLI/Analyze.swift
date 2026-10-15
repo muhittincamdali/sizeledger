@@ -54,7 +54,7 @@ public struct Analyze: ParsableCommand {
     @Option(help: ArgumentHelp("Refuse an .ipa entry whose uncompressed-to-stored size ratio is above this (zip bomb).", valueName: "ratio"))
     var maxRatio: UInt64 = AnalysisLimits.default.maxCompressionRatio
 
-    @Option(help: ArgumentHelp("Refuse a path nested deeper than this many folders.", valueName: "n"))
+    @Option(help: ArgumentHelp("Refuse a path nested deeper than this many folders (at most \(AnalysisLimits.deepestAllowed)).", valueName: "n"))
     var maxDepth: Int = AnalysisLimits.default.maxDepth
 
     public init() {}
@@ -68,7 +68,9 @@ public struct Analyze: ParsableCommand {
         guard maxFiles >= 1 else { throw ValidationError("--max-files must be 1 or more.") }
         guard maxBytes >= 1 else { throw ValidationError("--max-bytes must be 1 or more.") }
         guard maxRatio >= 1 else { throw ValidationError("--max-ratio must be 1 or more.") }
-        guard maxDepth >= 1 else { throw ValidationError("--max-depth must be 1 or more.") }
+        guard (1...AnalysisLimits.deepestAllowed).contains(maxDepth) else {
+            throw ValidationError("--max-depth must be from 1 to \(AnalysisLimits.deepestAllowed); a deeper report cannot be written as JSON.")
+        }
     }
 
     var limits: AnalysisLimits {
