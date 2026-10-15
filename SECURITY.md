@@ -38,4 +38,4 @@ report you ask for with `--out`, makes no network requests, does not extract arc
 never runs code from the app. Inputs are untrusted, so reports that fit this policy include, for
 example: a crafted `.ipa` or Mach-O file that makes sizeledger crash, hang, use unbounded memory,
 read outside the file, or write anywhere but the `--out` file; and file names or Info.plist values
-that put terminal escape sequences or Markdown links into the printed report.
+that put terminal escape sequences, Markdown links or math into the printed report.
