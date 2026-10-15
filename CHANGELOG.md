@@ -7,6 +7,14 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Security
+
+- An `.xcarchive` whose `Products`, `Products/Applications` or `<name>.app` was a symbolic link
+  made sizeledger measure the folder the link pointed to, outside the archive: the names and
+  sizes of its files went into the report and Mach-O headers there were read. Links on the way to
+  the archived app are now refused with exit status 2. A path you pass yourself is still followed
+  when it is a link.
+
 ## [0.1.1] - 2026-10-15
 
 ### Added

@@ -106,6 +106,18 @@ final class TinyApp {
         #expect(unwritable.errors.hasPrefix("sizeledger: cannot write "))
     }
 
+    @Test func refusesAnXcodeArchiveThatLinksOutside() throws {
+        let tiny = try TinyApp()
+        let applications = tiny.folder.appendingPathComponent("Linked.xcarchive/Products/Applications")
+        try FileManager.default.createDirectory(at: applications, withIntermediateDirectories: true)
+        try FileManager.default.createSymbolicLink(atPath: applications.appendingPathComponent("Tiny.app").path, withDestinationPath: tiny.app)
+
+        let run = try Run([tiny.folder.appendingPathComponent("Linked.xcarchive").path, "--format", "json"])
+        #expect(run.status == 2)
+        #expect(run.output.isEmpty)
+        #expect(run.errors.hasSuffix("Tiny.app cannot be read: it is a symbolic link, and links inside an .xcarchive are not followed\n"))
+    }
+
     @Test func rejectsInvalidOptions() {
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--top", "0"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--format", "html"]) }
