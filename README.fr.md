@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
+<!-- i18n-source: README.md@df2e23beda33ece8449850d0c4f0dccd05f82ca8 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -183,7 +183,7 @@ App Clips.
   fat64 ; ainsi que ZIP64, les archives endommagées et les noms de fichiers qui contiennent des séquences
   d'échappement de terminal.
 
-Au total, 117 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
+Au total, 124 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
 prend une médiane de 10.5 ms sur 21 exécutions, sur un Mac (Apple silicon) avec le build release,
 démarrage du processus compris ; [scripts/bench.sh](scripts/bench.sh) refait la mesure.
 
@@ -203,12 +203,13 @@ démarrage du processus compris ; [scripts/bench.sh](scripts/bench.sh) refait la
 - Pour atteindre un en-tête Mach-O situé loin dans une entrée compressée d'un `.ipa`, sizeledger
   décompresse tout ce qui le précède et ne garde qu'une fenêtre de 32 KiB ; une entrée forgée coûte
   donc du temps, pas de la mémoire : environ 1 s par GB décompressé sur un Mac (Apple silicon).
-
 - L'entrée n'est pas fiable : une entrée fabriquée ou endommagée ne peut donc épuiser ni la
-  mémoire, ni le temps, ni la pile. sizeledger refuse une entrée comptant plus de 500 000 fichiers,
-  déclarant plus de 8 Gio d'octets non compressés, contenant une entrée `.ipa` qui se décompresse à
-  plus de 300 fois sa taille stockée (une bombe zip) ou dont un chemin est imbriqué à plus de 64
-  dossiers ; relevez ces limites avec `--max-files`, `--max-bytes`, `--max-ratio` et `--max-depth`.
+  mémoire, ni le temps, ni la pile. sizeledger refuse une entrée comptant plus de 500 000 fichiers
+  ou un chemin imbriqué à plus de 64 dossiers, un `.ipa` déclarant plus de 8 Gio d'octets non
+  compressés et une entrée `.ipa` qui se décompresse à plus de 300 fois sa taille stockée (une
+  bombe zip) ; relevez ces limites avec `--max-files`, `--max-depth`, `--max-bytes` et
+  `--max-ratio`. `--max-depth` va jusqu'à 100 au plus, pour que le rapport JSON puisse toujours
+  être écrit, et `--max-bytes` ne s'applique qu'à un `.ipa`, car un dossier n'est pas décompressé.
   Des en-têtes Mach-O ou ZIP mal formés donnent une note "unreadable" ou une erreur claire avec le
   statut de sortie 2, jamais un plantage. Un chemin d'entrée en double est compté une fois.
 

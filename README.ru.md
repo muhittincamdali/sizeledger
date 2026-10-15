@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
+<!-- i18n-source: README.md@df2e23beda33ece8449850d0c4f0dccd05f82ca8 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -177,7 +177,7 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   парсер Mach-O — на thin-, 32-битных, fat- и fat64-файлах; кроме того, ZIP64, повреждённые архивы и имена
   файлов с управляющими последовательностями терминала.
 
-Всего 117 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0 занимает
+Всего 124 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0 занимает
 в медиане 10.5 ms по 21 запуску на Mac (Apple silicon) в release-сборке, включая запуск процесса;
 [scripts/bench.sh](scripts/bench.sh) повторяет это измерение.
 
@@ -197,12 +197,13 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
 - Чтобы добраться до заголовка Mach-O глубоко внутри сжатой записи `.ipa`, sizeledger распаковывает
   всё, что идёт перед ним, но хранит только окно в 32 KiB, поэтому специально подготовленная запись
   стоит времени, а не памяти: около 1 s на распакованный GB на Mac (Apple silicon).
-
 - Входные данные не являются доверенными, поэтому подготовленный или повреждённый ввод не может
-  исчерпать память, время или стек. sizeledger отклоняет ввод, в котором больше 500 000 файлов,
-  больше 8 ГиБ заявленных несжатых байтов, есть запись `.ipa`, распаковывающаяся более чем в 300 раз
-  больше её хранимого размера (zip-бомба), или путь вложен глубже 64 папок; поднять эти пределы
-  можно с помощью `--max-files`, `--max-bytes`, `--max-ratio` и `--max-depth`. Повреждённые
+  исчерпать память, время или стек. sizeledger отклоняет ввод, в котором больше 500 000 файлов или
+  путь вложен глубже 64 папок, `.ipa`, заявляющий больше 8 ГиБ несжатых байтов, и `.ipa` с записью,
+  распаковывающейся более чем в 300 раз больше её хранимого размера (zip-бомба); поднять эти
+  пределы можно с помощью `--max-files`, `--max-depth`, `--max-bytes` и `--max-ratio`.
+  `--max-depth` можно поднять не выше 100, чтобы JSON-отчёт всегда можно было записать, а
+  `--max-bytes` действует только для `.ipa`, поскольку папка не распаковывается. Повреждённые
   заголовки Mach-O или ZIP дают пометку "unreadable" или понятную ошибку с кодом выхода 2, но
   никогда не приводят к сбою. Повторяющийся путь записи учитывается один раз.
 

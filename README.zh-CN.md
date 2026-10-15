@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
+<!-- i18n-source: README.md@df2e23beda33ece8449850d0c4f0dccd05f82ca8 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -159,7 +159,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - **对照参考实现检验的读取器**：DEFLATE 解码器对照 zlib 的输出，覆盖 stored、fixed 和 dynamic 块；
   Mach-O 解析器覆盖 thin、32 位、fat 和 fat64 文件；还有 ZIP64、损坏的归档，以及包含终端转义序列的文件名。
 
-共有 117 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建在 Mac（Apple silicon）上测量 SampleShop 2.0，21 次运行的中位数为 10.5 ms（包括进程启动）。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
+共有 124 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建在 Mac（Apple silicon）上测量 SampleShop 2.0，21 次运行的中位数为 10.5 ms（包括进程启动）。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
 
 ## 局限
 
@@ -172,12 +172,12 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
   `.app` 会被测量，但其中的文件会归入 "Other resources"。
 - 包含多个应用、带加密条目、使用 stored 和 DEFLATE 以外压缩方式，或条目路径中含有 `..` 的 `.ipa`，会被拒绝并给出提示信息，而不是靠猜测处理。
 - 为了读取压缩的 `.ipa` 条目中靠后的 Mach-O 头，sizeledger 会解压它之前的全部内容，但只保留 32 KiB 的窗口，因此恶意构造的条目只会耗费时间，而不会耗费内存：在 Mac（Apple silicon）上每解压 1 GB 约需 1 s。
-
-- 输入不可信，因此精心构造或损坏的输入不会耗尽内存、时间或栈。sizeledger 会拒绝文件超过 500,000 个、
-  声明的未压缩字节超过 8 GiB、某个 `.ipa` 条目解压后超过其存储大小 300 倍（zip 炸弹），或路径嵌套深度
-  超过 64 层的输入；可用 `--max-files`、`--max-bytes`、`--max-ratio` 和 `--max-depth` 调高这些上限。
-  损坏的 Mach-O 或 ZIP 头会给出 "unreadable" 提示或退出状态为 2 的明确错误，绝不崩溃。重复的条目路径
-  只计一次。
+- 输入不可信，因此精心构造或损坏的输入不会耗尽内存、时间或栈。sizeledger 会拒绝以下输入：文件超过
+  500,000 个、路径嵌套深度超过 64 层、`.ipa` 声明的未压缩字节超过 8 GiB，或某个 `.ipa` 条目解压后超过其
+  存储大小 300 倍（zip 炸弹）；可用 `--max-files`、`--max-depth`、`--max-bytes` 和 `--max-ratio` 调高这些
+  上限。为保证 JSON 报告总能写出，`--max-depth` 最多为 100；文件夹不会被解压，因此 `--max-bytes` 只适用于
+  `.ipa`。损坏的 Mach-O 或 ZIP 头会给出 "unreadable" 提示或退出状态为 2 的明确错误，绝不崩溃。重复的条目
+  路径只计一次。
 
 ## 文档
 
