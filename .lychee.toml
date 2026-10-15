@@ -38,6 +38,9 @@ exclude = [
   # Release files are uploaded by the release workflow after the tag is pushed, so links to the
   # next version's binaries cannot resolve on the pull request that adds them.
   '^https://github\.com/muhittincamdali/sizeledger/releases/download/',
+  # CHANGELOG.md links a version's release page in the pull request that adds the section, before
+  # the tag exists.
+  '^https://github\.com/muhittincamdali/sizeledger/releases/tag/',
 ]
 
 exclude_path = [
