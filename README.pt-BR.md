@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
+<!-- i18n-source: README.md@7fb9152ffe1777b8105bf26644733ed905545b6d status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -199,14 +199,15 @@ incluindo a inicialização do processo; [scripts/bench.sh](scripts/bench.sh) re
 - Para chegar a um cabeçalho Mach-O no fundo de uma entrada comprimida de um `.ipa`, o sizeledger
   descomprime tudo o que vem antes e mantém só uma janela de 32 KiB; assim, uma entrada forjada
   custa tempo, não memória: cerca de 1 s por GB descomprimido em um Mac (Apple silicon).
-
 - A entrada não é confiável, então uma entrada forjada ou corrompida não pode esgotar memória,
-  tempo nem a pilha. O sizeledger recusa uma entrada com mais de 500.000 arquivos, com mais de
-  8 GiB de bytes não comprimidos declarados, com uma entrada `.ipa` que se descompacta para mais de
-  300 vezes o tamanho armazenado (uma bomba zip) ou com um caminho aninhado além de 64 pastas;
-  aumente esses limites com `--max-files`, `--max-bytes`, `--max-ratio` e `--max-depth`. Cabeçalhos
-  Mach-O ou ZIP malformados geram uma nota "unreadable" ou um erro claro com status de saída 2,
-  nunca uma falha. Um caminho de entrada duplicado é contado uma vez.
+  tempo nem a pilha. O sizeledger recusa uma entrada com mais de 500.000 arquivos ou com um
+  caminho aninhado além de 64 pastas, um `.ipa` que declara mais de 8 GiB de bytes não comprimidos
+  e uma entrada `.ipa` que se descompacta para mais de 300 vezes o tamanho armazenado (uma bomba
+  zip); aumente esses limites com `--max-files`, `--max-depth`, `--max-bytes` e `--max-ratio`.
+  `--max-depth` vai até no máximo 100 para que o relatório JSON sempre possa ser escrito, e
+  `--max-bytes` vale só para um `.ipa`, já que uma pasta não é descompactada. Cabeçalhos Mach-O ou
+  ZIP malformados geram uma nota "unreadable" ou um erro claro com status de saída 2, nunca uma
+  falha. Um caminho de entrada duplicado é contado uma vez.
 
 ## Documentação
 

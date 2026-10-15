@@ -193,14 +193,14 @@ start included; [scripts/bench.sh](scripts/bench.sh) repeats the measurement.
 - To reach a Mach-O header far into a compressed `.ipa` entry, sizeledger decompresses everything
   before it and keeps only a 32 KiB window, so a crafted entry costs time, not memory: about 1 s per
   decompressed GB on a Mac (Apple silicon).
-
 - The input is untrusted, so a crafted or damaged one cannot exhaust memory, time or the stack.
-  sizeledger refuses an input with more than 500,000 files, with more than 8 GiB of declared
-  uncompressed bytes, with an `.ipa` entry that unpacks to more than 300 times its stored size (a
-  zip bomb), or with a path nested deeper than 64 folders; raise these with `--max-files`,
-  `--max-bytes`, `--max-ratio` and `--max-depth`. Malformed Mach-O or ZIP headers give an
-  "unreadable" note or a clear error with exit status 2, never a crash. A duplicate entry path is
-  counted once.
+  sizeledger refuses an input with more than 500,000 files or a path nested deeper than 64
+  folders, an `.ipa` declaring more than 8 GiB of uncompressed bytes, and an `.ipa` entry that
+  unpacks to more than 300 times its stored size (a zip bomb); raise these with `--max-files`,
+  `--max-depth`, `--max-bytes` and `--max-ratio`. `--max-depth` goes up to 100 so that the JSON
+  report can always be written, and `--max-bytes` applies to an `.ipa` only, since a folder is not
+  decompressed. Malformed Mach-O or ZIP headers give an "unreadable" note or a clear error with
+  exit status 2, never a crash. A duplicate entry path is counted once.
 
 ## Documentation
 

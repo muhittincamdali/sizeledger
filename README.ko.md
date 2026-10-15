@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
+<!-- i18n-source: README.md@7fb9152ffe1777b8105bf26644733ed905545b6d status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -189,13 +189,13 @@ silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값�
   `..` 구성 요소가 있는 `.ipa`는 추측하지 않고 메시지와 함께 거부합니다.
 - 압축된 `.ipa` 항목 깊숙한 곳의 Mach-O 헤더를 읽기 위해 sizeledger는 그 앞의 모든 내용을 풀지만 32 KiB 창만 유지합니다. 따라서 조작된 항목은
   메모리가 아니라 시간을 소비하며, Mac(Apple silicon)에서 풀린 1 GB당 약 1 s가 걸립니다.
-
 - 입력은 신뢰할 수 없으므로, 조작되었거나 손상된 입력이라도 메모리·시간·스택을 소진시킬 수 없습니다.
-  sizeledger는 파일이 500,000개를 넘거나, 선언된 비압축 바이트가 8 GiB를 넘거나, `.ipa` 항목이 저장
-  크기의 300배를 넘게 풀리거나(zip 폭탄), 경로가 64개 폴더보다 깊게 중첩된 입력을 거부합니다. 이 값들은
-  `--max-files`, `--max-bytes`, `--max-ratio`, `--max-depth`로 높일 수 있습니다. 손상된 Mach-O 또는
-  ZIP 헤더는 "unreadable" 참고나 종료 상태 2의 명확한 오류를 내며 절대 충돌하지 않습니다. 중복된 항목
-  경로는 한 번만 계산됩니다.
+  sizeledger는 파일이 500,000개를 넘거나, 경로가 64개 폴더보다 깊게 중첩되었거나, `.ipa`가 선언한 비압축
+  바이트가 8 GiB를 넘거나, `.ipa` 항목이 저장 크기의 300배를 넘게 풀리는(zip 폭탄) 입력을 거부합니다. 이
+  값들은 `--max-files`, `--max-depth`, `--max-bytes`, `--max-ratio`로 높일 수 있습니다. JSON 보고서를 항상
+  쓸 수 있도록 `--max-depth`는 최대 100이며, 폴더는 압축을 풀지 않으므로 `--max-bytes`는 `.ipa`에만
+  적용됩니다. 손상된 Mach-O 또는 ZIP 헤더는 "unreadable" 참고나 종료 상태 2의 명확한 오류를 내며 절대
+  충돌하지 않습니다. 중복된 항목 경로는 한 번만 계산됩니다.
 
 ## 문서
 

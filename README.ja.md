@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
+<!-- i18n-source: README.md@7fb9152ffe1777b8105bf26644733ed905545b6d status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -149,13 +149,13 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 - iOS 形式のバンドル (iOS、iPadOS、tvOS、watchOS、visionOS) は分類されます。`Contents/` フォルダを持つ macOS の `.app` は測定されますが、そのファイルは "Other resources" に入ります。
 - 複数のアプリを含む `.ipa`、暗号化されたエントリを含む `.ipa`、stored と DEFLATE 以外の圧縮を使う `.ipa`、エントリのパスに `..` を含む `.ipa` は、推測で処理せず、メッセージを表示して拒否します。
 - 圧縮された `.ipa` エントリの奥にある Mach-O ヘッダーを読むため、sizeledger はその手前をすべて展開しますが、保持するのは 32 KiB のウィンドウだけです。そのため細工されたエントリが消費するのはメモリではなく時間で、Mac (Apple silicon) では展開 1 GB あたり約 1 s です。
-
 - 入力は信頼できないため、細工または破損した入力でもメモリ・時間・スタックを使い尽くすことはありません。
-  sizeledger は、ファイルが 500,000 を超える、宣言された非圧縮バイトが 8 GiB を超える、`.ipa` エントリが
-  格納サイズの 300 倍を超えて展開される（zip 爆弾）、またはパスが 64 フォルダより深くネストされた入力を
-  拒否します。これらは `--max-files`、`--max-bytes`、`--max-ratio`、`--max-depth` で引き上げられます。
-  壊れた Mach-O や ZIP ヘッダーは "unreadable" の注記か終了ステータス 2 の明確なエラーになり、クラッシュ
-  することはありません。重複するエントリパスは一度だけ数えられます。
+  sizeledger は次の入力を拒否します: ファイルが 500,000 を超える、パスが 64 フォルダより深くネストされている、
+  `.ipa` が宣言する非圧縮バイトが 8 GiB を超える、または `.ipa` エントリが格納サイズの 300 倍を超えて展開される
+  （zip 爆弾）。これらは `--max-files`、`--max-depth`、`--max-bytes`、`--max-ratio` で引き上げられます。
+  JSON レポートを常に書き出せるよう `--max-depth` の上限は 100 で、フォルダは展開しないため `--max-bytes` は
+  `.ipa` にのみ適用されます。壊れた Mach-O や ZIP ヘッダーは "unreadable" の注記か終了ステータス 2 の明確な
+  エラーになり、クラッシュすることはありません。重複するエントリパスは一度だけ数えられます。
 
 ## ドキュメント
 
