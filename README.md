@@ -60,8 +60,7 @@ Simulator. The output is the same on a Mac (Apple silicon) and in the Linux CI i
 brew install muhittincamdali/tap/sizeledger
 ```
 
-The formula is added to the tap by the release workflow when 0.1.0 is published. Without
-Homebrew, use a [release binary or build from source](#installation).
+Without Homebrew, use a [release binary or build from source](#installation).
 
 **2. Measure your app.** Any of these works: an `.ipa` you exported, the `.app` from a build, or
 an `.xcarchive` from **Product › Archive**.
@@ -99,7 +98,7 @@ Until `budget` exists, a limit check in CI is one line of `jq`; see
 
 | Method | Command |
 | --- | --- |
-| Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger` (from the 0.1.0 release on) |
+| Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger` |
 | Release binary | Download `sizeledger-<version>-macos-universal.tar.gz` or `-linux-x86_64` / `-linux-aarch64` from [Releases](https://github.com/muhittincamdali/sizeledger/releases), check it against `SHA256SUMS`, put `sizeledger` on your `PATH` |
 | From source | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (the binary is `.build/release/sizeledger`) |
 | Swift package | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`, product `SizeLedgerKit` |
