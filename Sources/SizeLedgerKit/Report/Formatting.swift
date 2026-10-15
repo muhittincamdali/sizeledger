@@ -44,7 +44,18 @@ public enum ByteFormat {
 }
 
 /// Makes text that comes from the measured app (file names, Info.plist values) safe to print.
-enum Sanitize {
+///
+/// Paths, names and notes in a ``SizeReport`` are the app's own strings, so an app can carry
+/// terminal escape sequences or text-direction controls in them. ``TextReport`` and
+/// ``MarkdownReport`` already clean what they print; pass any value you print yourself through
+/// ``text(_:)``:
+///
+/// ```swift
+/// for component in report.components {
+///     print(Sanitize.text(component.path), ByteFormat.string(component.bytes))
+/// }
+/// ```
+public enum Sanitize {
     /// Replaces control characters, including the escape character that starts terminal
     /// sequences, with U+FFFD, so a file name cannot move the output around or change colours.
     /// The bidirectional embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069)
@@ -55,7 +66,7 @@ enum Sanitize {
     /// the line and paragraph separators U+2028 and U+2029, which some terminals break lines on.
     /// Letters of right-to-left scripts and the joiners U+200C and U+200D, which those scripts
     /// and emoji need, are kept.
-    static func text(_ value: String) -> String {
+    public static func text(_ value: String) -> String {
         var result = String.UnicodeScalarView()
         for scalar in value.unicodeScalars {
             switch scalar.value {
