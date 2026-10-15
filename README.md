@@ -8,6 +8,7 @@
 
 <p align="center">
 <a href="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml"><img src="https://github.com/muhittincamdali/sizeledger/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+<a href="https://github.com/muhittincamdali/sizeledger/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-version-light.svg" alt="Latest version: v0.1.0"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-platforms-light.svg" alt="Supported platforms: macOS 13+"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/Package.swift"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-language-light.svg" alt="Language version: Swift 6.2+ · Swift 6 mode"></picture></a>
 <a href="https://github.com/muhittincamdali/sizeledger/blob/main/LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/badge-license-light.svg" alt="License: MIT"></picture></a>
@@ -59,8 +60,7 @@ Simulator. The output is the same on a Mac (Apple silicon) and in the Linux CI i
 brew install muhittincamdali/tap/sizeledger
 ```
 
-The formula is added to the tap by the release workflow when 0.1.0 is published. Without
-Homebrew, use a [release binary or build from source](#installation).
+Without Homebrew, use a [release binary or build from source](#installation).
 
 **2. Measure your app.** Any of these works: an `.ipa` you exported, the `.app` from a build, or
 an `.xcarchive` from **Product › Archive**.
@@ -98,7 +98,7 @@ Until `budget` exists, a limit check in CI is one line of `jq`; see
 
 | Method | Command |
 | --- | --- |
-| Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger` (from the 0.1.0 release on) |
+| Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger` |
 | Release binary | Download `sizeledger-<version>-macos-universal.tar.gz` or `-linux-x86_64` / `-linux-aarch64` from [Releases](https://github.com/muhittincamdali/sizeledger/releases), check it against `SHA256SUMS`, put `sizeledger` on your `PATH` |
 | From source | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (the binary is `.build/release/sizeledger`) |
 | Swift package | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.0")`, product `SizeLedgerKit` |
