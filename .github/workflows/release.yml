@@ -91,7 +91,7 @@ jobs:
           diff -u Fixtures/snapshots/SampleShop-2.0.txt "$RUNNER_TEMP/report.txt"
           mkdir -p "$RUNNER_TEMP/package" "$RUNNER_TEMP/release"
           cp "$binary" LICENSE README.md CHANGELOG.md "$RUNNER_TEMP/package/"
-          tar -czf "$RUNNER_TEMP/release/sizeledger-$VERSION-macos-universal.tar.gz" -C "$RUNNER_TEMP/package" .
+          tar -czf "$RUNNER_TEMP/release/sizeledger-$VERSION-macos-universal.tar.gz" -C "$RUNNER_TEMP/package" sizeledger LICENSE README.md CHANGELOG.md
           cp "$RUNNER_TEMP/notes.md" "$RUNNER_TEMP/release/notes.md"
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -134,7 +134,7 @@ jobs:
           diff -u Fixtures/snapshots/SampleShop-2.0.txt "$RUNNER_TEMP/report.txt"
           mkdir -p "$RUNNER_TEMP/package" "$RUNNER_TEMP/release"
           cp "$binary" LICENSE README.md CHANGELOG.md "$RUNNER_TEMP/package/"
-          tar -czf "$RUNNER_TEMP/release/sizeledger-$VERSION-linux-$ARCH.tar.gz" -C "$RUNNER_TEMP/package" .
+          tar -czf "$RUNNER_TEMP/release/sizeledger-$VERSION-linux-$ARCH.tar.gz" -C "$RUNNER_TEMP/package" sizeledger LICENSE README.md CHANGELOG.md
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
