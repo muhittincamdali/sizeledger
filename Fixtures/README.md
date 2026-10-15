@@ -10,6 +10,7 @@ comes from a real product.
 | [SampleShop/](SampleShop)                          | The app's Swift sources                                                                                                     |                                                                      |
 | [snapshots/](snapshots)                            | The JSON, text and Markdown reports for both versions; the tests compare against them                                       | `SIZELEDGER_UPDATE_SNAPSHOTS=1 swift test`                           |
 | [archives/](archives)                              | DEFLATE streams from zlib (stored, fixed and dynamic blocks) and a small ZIP with every entry kind an `.ipa` has            | [scripts/make-archive-fixtures.py](scripts/make-archive-fixtures.py) |
+| [markdown/escaping.json](markdown/escaping.json) | Values that tried to break the Markdown report, how sizeledger escapes each and the table row GitHub rendered from it | `SIZELEDGER_UPDATE_SNAPSHOTS=1 swift test`, then [scripts/render-markdown-fixture.py](scripts/render-markdown-fixture.py) |
 
 ## SampleShop
 
