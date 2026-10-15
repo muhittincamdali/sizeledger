@@ -32,6 +32,33 @@ import Testing
         #expect(Array(full.prefix(partial.count)) == partial)
     }
 
+    @Test("returns each range of the output", arguments: ["stored", "fixed", "dynamic", "mixed"])
+    func ranges(name: String) throws {
+        let stream = try Fixtures.data(Fixtures.archive("\(name).deflate"))
+        let full = try Inflate.decompress(stream)
+        let ranges = [100..<200, 0..<10, full.count - 50..<full.count + 50, full.count + 10..<full.count + 20]
+        let pieces = try Inflate.decompress(stream, ranges: ranges)
+        #expect(pieces.map(\.count) == [100, 10, 50, 0])
+        for (piece, range) in zip(pieces, ranges) {
+            #expect(piece == Array(full[min(range.lowerBound, full.count)..<min(range.upperBound, full.count)]))
+        }
+    }
+
+    @Test func readsFarIntoTheOutputWithASmallBuffer() throws {
+        let gap = 16 << 20
+        var builder = DeflateBuilder()
+        builder.literals(Data("head".utf8))
+        builder.zeros(gap)
+        builder.literals(Data("tail".utf8))
+        let stream = builder.finish()
+        #expect(stream.count < 1 << 20)
+
+        let (pieces, largestBuffer) = try Inflate.decode(stream, ranges: [0..<4, (gap + 4)..<(gap + 8), 1_000..<1_010])
+        #expect(pieces == [Array("head".utf8), Array("tail".utf8), [UInt8](repeating: 0, count: 10)])
+        // 16 MiB went through a buffer of the 32 KiB DEFLATE window plus one drop step.
+        #expect(largestBuffer < 512 << 10)
+    }
+
     @Test func truncatedStreamThrows() throws {
         let stream = try Fixtures.data(Fixtures.archive("dynamic.deflate"))
         #expect(throws: InflateError.self) {
