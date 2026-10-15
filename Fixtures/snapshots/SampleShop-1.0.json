@@ -1,0 +1,535 @@
+{
+  "app" : {
+    "build" : "1",
+    "bundleIdentifier" : "com.example.sampleshop",
+    "executable" : "SampleShop",
+    "isAppClip" : false,
+    "minimumOSVersion" : "17.0",
+    "name" : "Sample Shop",
+    "platform" : "iphonesimulator",
+    "version" : "1.0"
+  },
+  "binaries" : [
+    {
+      "bytes" : 231328,
+      "path" : "SampleShop",
+      "slices" : [
+        {
+          "architecture" : "x86_64",
+          "bytes" : 83760,
+          "codeSignatureBytes" : 944,
+          "fileType" : "executable",
+          "offset" : 16384,
+          "segments" : [
+            {
+              "bytes" : 24576,
+              "name" : "__TEXT"
+            },
+            {
+              "bytes" : 4096,
+              "name" : "__DATA_CONST"
+            },
+            {
+              "bytes" : 4096,
+              "name" : "__DATA"
+            },
+            {
+              "bytes" : 50992,
+              "name" : "__LINKEDIT"
+            }
+          ],
+          "swiftMetadataBytes" : 1602
+        },
+        {
+          "architecture" : "arm64",
+          "bytes" : 116640,
+          "codeSignatureBytes" : 528,
+          "fileType" : "executable",
+          "offset" : 114688,
+          "segments" : [
+            {
+              "bytes" : 32768,
+              "name" : "__TEXT"
+            },
+            {
+              "bytes" : 16384,
+              "name" : "__DATA_CONST"
+            },
+            {
+              "bytes" : 16384,
+              "name" : "__DATA"
+            },
+            {
+              "bytes" : 51104,
+              "name" : "__LINKEDIT"
+            }
+          ],
+          "swiftMetadataBytes" : 1602
+        }
+      ]
+    },
+    {
+      "bytes" : 161136,
+      "path" : "Frameworks/ShopCore.framework/ShopCore",
+      "slices" : [
+        {
+          "architecture" : "x86_64",
+          "bytes" : 54720,
+          "codeSignatureBytes" : 736,
+          "fileType" : "dylib",
+          "offset" : 16384,
+          "segments" : [
+            {
+              "bytes" : 16384,
+              "name" : "__TEXT"
+            },
+            {
+              "bytes" : 4096,
+              "name" : "__DATA_CONST"
+            },
+            {
+              "bytes" : 4096,
+              "name" : "__DATA"
+            },
+            {
+              "bytes" : 30144,
+              "name" : "__LINKEDIT"
+            }
+          ],
+          "swiftMetadataBytes" : 648
+        },
+        {
+          "architecture" : "arm64",
+          "bytes" : 79216,
+          "codeSignatureBytes" : 448,
+          "fileType" : "dylib",
+          "offset" : 81920,
+          "segments" : [
+            {
+              "bytes" : 16384,
+              "name" : "__TEXT"
+            },
+            {
+              "bytes" : 16384,
+              "name" : "__DATA_CONST"
+            },
+            {
+              "bytes" : 16384,
+              "name" : "__DATA"
+            },
+            {
+              "bytes" : 30064,
+              "name" : "__LINKEDIT"
+            }
+          ],
+          "swiftMetadataBytes" : 648
+        }
+      ]
+    }
+  ],
+  "categories" : [
+    {
+      "bytes" : 5087688,
+      "category" : "resources",
+      "compressedBytes" : 835244,
+      "files" : 5,
+      "installBytes" : 5099520
+    },
+    {
+      "bytes" : 1022968,
+      "category" : "assetCatalogs",
+      "compressedBytes" : 935497,
+      "files" : 1,
+      "installBytes" : 1024000
+    },
+    {
+      "bytes" : 231328,
+      "category" : "executable",
+      "compressedBytes" : 40674,
+      "files" : 1,
+      "installBytes" : 233472
+    },
+    {
+      "bytes" : 194674,
+      "category" : "localizations",
+      "compressedBytes" : 46998,
+      "files" : 4,
+      "installBytes" : 204800
+    },
+    {
+      "bytes" : 163276,
+      "category" : "frameworks",
+      "compressedBytes" : 28629,
+      "files" : 3,
+      "installBytes" : 172032
+    },
+    {
+      "bytes" : 4985,
+      "category" : "codeSignature",
+      "compressedBytes" : 1346,
+      "files" : 1,
+      "installBytes" : 8192
+    }
+  ],
+  "components" : [
+    {
+      "bytes" : 5053324,
+      "category" : "resources",
+      "compressedBytes" : 801186,
+      "files" : 1,
+      "installBytes" : 5054464,
+      "path" : "catalog.json"
+    },
+    {
+      "bytes" : 1022968,
+      "category" : "assetCatalogs",
+      "compressedBytes" : 935497,
+      "files" : 1,
+      "installBytes" : 1024000,
+      "path" : "Assets.car"
+    },
+    {
+      "bytes" : 231328,
+      "category" : "executable",
+      "compressedBytes" : 40674,
+      "files" : 1,
+      "installBytes" : 233472,
+      "path" : "SampleShop"
+    },
+    {
+      "bytes" : 163276,
+      "category" : "frameworks",
+      "compressedBytes" : 28629,
+      "files" : 3,
+      "installBytes" : 172032,
+      "path" : "Frameworks/ShopCore.framework"
+    },
+    {
+      "bytes" : 62099,
+      "category" : "localizations",
+      "compressedBytes" : 12217,
+      "files" : 1,
+      "installBytes" : 65536,
+      "path" : "tr.lproj"
+    },
+    {
+      "bytes" : 61889,
+      "category" : "localizations",
+      "compressedBytes" : 12289,
+      "files" : 1,
+      "installBytes" : 65536,
+      "path" : "ja.lproj"
+    },
+    {
+      "bytes" : 35372,
+      "category" : "localizations",
+      "compressedBytes" : 11267,
+      "files" : 1,
+      "installBytes" : 36864,
+      "path" : "en.lproj"
+    },
+    {
+      "bytes" : 35314,
+      "category" : "localizations",
+      "compressedBytes" : 11225,
+      "files" : 1,
+      "installBytes" : 36864,
+      "path" : "de.lproj"
+    },
+    {
+      "bytes" : 19883,
+      "category" : "resources",
+      "compressedBytes" : 19864,
+      "files" : 1,
+      "installBytes" : 20480,
+      "path" : "AppIcon76x76@2x~ipad.png"
+    },
+    {
+      "bytes" : 13594,
+      "category" : "resources",
+      "compressedBytes" : 13587,
+      "files" : 1,
+      "installBytes" : 16384,
+      "path" : "AppIcon60x60@2x.png"
+    },
+    {
+      "bytes" : 4985,
+      "category" : "codeSignature",
+      "compressedBytes" : 1346,
+      "files" : 1,
+      "installBytes" : 8192,
+      "path" : "_CodeSignature"
+    },
+    {
+      "bytes" : 879,
+      "category" : "resources",
+      "compressedBytes" : 599,
+      "files" : 1,
+      "installBytes" : 4096,
+      "path" : "Info.plist"
+    },
+    {
+      "bytes" : 8,
+      "category" : "resources",
+      "compressedBytes" : 8,
+      "files" : 1,
+      "installBytes" : 4096,
+      "path" : "PkgInfo"
+    }
+  ],
+  "input" : {
+    "archiveBytes" : 1892440,
+    "bundle" : "SampleShop.app",
+    "kind" : "ipa",
+    "name" : "SampleShop-1.0.ipa"
+  },
+  "languages" : [
+    {
+      "bytes" : 62099,
+      "compressedBytes" : 12217,
+      "files" : 1,
+      "installBytes" : 65536,
+      "language" : "tr"
+    },
+    {
+      "bytes" : 61889,
+      "compressedBytes" : 12289,
+      "files" : 1,
+      "installBytes" : 65536,
+      "language" : "ja"
+    },
+    {
+      "bytes" : 35372,
+      "compressedBytes" : 11267,
+      "files" : 1,
+      "installBytes" : 36864,
+      "language" : "en"
+    },
+    {
+      "bytes" : 35314,
+      "compressedBytes" : 11225,
+      "files" : 1,
+      "installBytes" : 36864,
+      "language" : "de"
+    }
+  ],
+  "notes" : [
+    "Simulator build (iphonesimulator): it has no App Store thinning or encryption, and its binaries are built for the simulator, so a device build of the same app differs in size.",
+    "2 binaries contain more than one architecture. Sizes count every slice; a device keeps one, so after App Store thinning these binaries are smaller."
+  ],
+  "outsideBundle" : [
+
+  ],
+  "schemaVersion" : 0,
+  "tool" : {
+    "name" : "sizeledger",
+    "version" : "<version>"
+  },
+  "totals" : {
+    "bytes" : 6704919,
+    "compressedBytes" : 1888388,
+    "files" : 15,
+    "installBytes" : 6742016
+  },
+  "tree" : {
+    "bytes" : 6704919,
+    "children" : [
+      {
+        "bytes" : 5053324,
+        "category" : "resources",
+        "compressedBytes" : 801186,
+        "files" : 1,
+        "installBytes" : 5054464,
+        "name" : "catalog.json"
+      },
+      {
+        "bytes" : 1022968,
+        "category" : "assetCatalogs",
+        "compressedBytes" : 935497,
+        "files" : 1,
+        "installBytes" : 1024000,
+        "name" : "Assets.car"
+      },
+      {
+        "bytes" : 231328,
+        "category" : "executable",
+        "compressedBytes" : 40674,
+        "files" : 1,
+        "installBytes" : 233472,
+        "name" : "SampleShop"
+      },
+      {
+        "bytes" : 163276,
+        "children" : [
+          {
+            "bytes" : 163276,
+            "children" : [
+              {
+                "bytes" : 161136,
+                "category" : "frameworks",
+                "compressedBytes" : 27952,
+                "files" : 1,
+                "installBytes" : 163840,
+                "name" : "ShopCore"
+              },
+              {
+                "bytes" : 1798,
+                "children" : [
+                  {
+                    "bytes" : 1798,
+                    "category" : "frameworks",
+                    "compressedBytes" : 421,
+                    "files" : 1,
+                    "installBytes" : 4096,
+                    "name" : "CodeResources"
+                  }
+                ],
+                "compressedBytes" : 421,
+                "files" : 1,
+                "installBytes" : 4096,
+                "name" : "_CodeSignature"
+              },
+              {
+                "bytes" : 342,
+                "category" : "frameworks",
+                "compressedBytes" : 256,
+                "files" : 1,
+                "installBytes" : 4096,
+                "name" : "Info.plist"
+              }
+            ],
+            "compressedBytes" : 28629,
+            "files" : 3,
+            "installBytes" : 172032,
+            "name" : "ShopCore.framework"
+          }
+        ],
+        "compressedBytes" : 28629,
+        "files" : 3,
+        "installBytes" : 172032,
+        "name" : "Frameworks"
+      },
+      {
+        "bytes" : 62099,
+        "children" : [
+          {
+            "bytes" : 62099,
+            "category" : "localizations",
+            "compressedBytes" : 12217,
+            "files" : 1,
+            "installBytes" : 65536,
+            "name" : "Localizable.strings"
+          }
+        ],
+        "compressedBytes" : 12217,
+        "files" : 1,
+        "installBytes" : 65536,
+        "name" : "tr.lproj"
+      },
+      {
+        "bytes" : 61889,
+        "children" : [
+          {
+            "bytes" : 61889,
+            "category" : "localizations",
+            "compressedBytes" : 12289,
+            "files" : 1,
+            "installBytes" : 65536,
+            "name" : "Localizable.strings"
+          }
+        ],
+        "compressedBytes" : 12289,
+        "files" : 1,
+        "installBytes" : 65536,
+        "name" : "ja.lproj"
+      },
+      {
+        "bytes" : 35372,
+        "children" : [
+          {
+            "bytes" : 35372,
+            "category" : "localizations",
+            "compressedBytes" : 11267,
+            "files" : 1,
+            "installBytes" : 36864,
+            "name" : "Localizable.strings"
+          }
+        ],
+        "compressedBytes" : 11267,
+        "files" : 1,
+        "installBytes" : 36864,
+        "name" : "en.lproj"
+      },
+      {
+        "bytes" : 35314,
+        "children" : [
+          {
+            "bytes" : 35314,
+            "category" : "localizations",
+            "compressedBytes" : 11225,
+            "files" : 1,
+            "installBytes" : 36864,
+            "name" : "Localizable.strings"
+          }
+        ],
+        "compressedBytes" : 11225,
+        "files" : 1,
+        "installBytes" : 36864,
+        "name" : "de.lproj"
+      },
+      {
+        "bytes" : 19883,
+        "category" : "resources",
+        "compressedBytes" : 19864,
+        "files" : 1,
+        "installBytes" : 20480,
+        "name" : "AppIcon76x76@2x~ipad.png"
+      },
+      {
+        "bytes" : 13594,
+        "category" : "resources",
+        "compressedBytes" : 13587,
+        "files" : 1,
+        "installBytes" : 16384,
+        "name" : "AppIcon60x60@2x.png"
+      },
+      {
+        "bytes" : 4985,
+        "children" : [
+          {
+            "bytes" : 4985,
+            "category" : "codeSignature",
+            "compressedBytes" : 1346,
+            "files" : 1,
+            "installBytes" : 8192,
+            "name" : "CodeResources"
+          }
+        ],
+        "compressedBytes" : 1346,
+        "files" : 1,
+        "installBytes" : 8192,
+        "name" : "_CodeSignature"
+      },
+      {
+        "bytes" : 879,
+        "category" : "resources",
+        "compressedBytes" : 599,
+        "files" : 1,
+        "installBytes" : 4096,
+        "name" : "Info.plist"
+      },
+      {
+        "bytes" : 8,
+        "category" : "resources",
+        "compressedBytes" : 8,
+        "files" : 1,
+        "installBytes" : 4096,
+        "name" : "PkgInfo"
+      }
+    ],
+    "compressedBytes" : 1888388,
+    "files" : 15,
+    "installBytes" : 6742016,
+    "name" : "SampleShop.app"
+  }
+}
