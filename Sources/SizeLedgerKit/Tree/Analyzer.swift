@@ -90,8 +90,8 @@ struct Analyzer {
                 continue
             }
             do {
-                let slices = try MachO.slices(fileSize: entry.bytes) { limit in
-                    try source.contents(of: entry.path, limit: limit)
+                let slices = try MachO.slices(fileSize: entry.bytes) { ranges in
+                    try source.contents(of: entry.path, ranges: ranges)
                 }
                 binaries.append(.init(path: entry.path, bytes: entry.bytes, slices: slices))
             } catch {

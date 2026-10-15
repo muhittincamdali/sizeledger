@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -182,8 +182,8 @@ App Clips.
   fat64 ; ainsi que ZIP64, les archives endommagées et les noms de fichiers qui contiennent des séquences
   d'échappement de terminal.
 
-Au total, 87 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
-prend une médiane de 14.4 ms sur 21 exécutions, sur un Mac (Apple silicon) avec le build release.
+Au total, 95 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
+prend une médiane de 11.4 ms sur 21 exécutions, sur un Mac (Apple silicon) avec le build release.
 
 ## Limites
 
@@ -198,6 +198,9 @@ prend une médiane de 14.4 ms sur 21 exécutions, sur un Mac (Apple silicon) ave
   dossier `Contents/` est mesurée, mais ses fichiers sont rangés sous « Other resources ».
 - Un `.ipa` contenant plusieurs apps, des entrées chiffrées, une compression autre que stored et DEFLATE
   ou un chemin d'entrée avec un composant `..` est refusé avec un message, sans deviner.
+- Pour atteindre un en-tête Mach-O situé loin dans une entrée compressée d'un `.ipa`, sizeledger
+  décompresse tout ce qui le précède et ne garde qu'une fenêtre de 32 KiB ; une entrée forgée coûte
+  donc du temps, pas de la mémoire : environ 1 s par GB décompressé sur un Mac (Apple silicon).
 
 ## Documentation
 

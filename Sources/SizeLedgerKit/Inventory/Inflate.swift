@@ -4,16 +4,28 @@ import Foundation
 /// files, use for most entries.
 ///
 /// sizeledger only decompresses what it has to read: the app's Info.plist and the headers of its
-/// Mach-O binaries. A `limit` stops decoding as soon as enough bytes are out, so reading the
-/// first kilobytes of a 100 MB binary does not decompress the rest. Written in Swift instead of
-/// linking zlib so that the same code runs on macOS and Linux without system libraries.
+/// Mach-O binaries. Decoding stops once the last requested byte is out, so reading the first
+/// kilobytes of a 100 MB binary does not decompress the rest. Bytes before a requested range are
+/// decoded and dropped, keeping only the 32 KiB that later back-references can reach, so reading
+/// a header deep inside a file costs time but not memory. Written in Swift instead of linking zlib
+/// so that the same code runs on macOS and Linux without system libraries.
 enum Inflate {
     /// Decompresses `input`, stopping once at least `limit` bytes are produced.
     static func decompress(_ input: Data, limit: Int = .max) throws(InflateError) -> [UInt8] {
-        var inflater = Inflater(input: [UInt8](input), limit: limit)
-        if limit == .max { inflater.output.reserveCapacity(input.count * 3) }
+        try decompress(input, ranges: [0..<limit])[0]
+    }
+
+    /// The bytes of the decompressed stream in each of `ranges`, cut short where the stream ends.
+    static func decompress(_ input: Data, ranges: [Range<Int>]) throws(InflateError) -> [[UInt8]] {
+        try decode(input, ranges: ranges).pieces
+    }
+
+    /// Like ``decompress(_:ranges:)``, also returning the largest size the decoding buffer reached.
+    static func decode(_ input: Data, ranges: [Range<Int>]) throws(InflateError) -> (pieces: [[UInt8]], largestBuffer: Int) {
+        var inflater = Inflater(input: [UInt8](input), ranges: ranges)
         try inflater.run()
-        return inflater.output
+        inflater.collect(upTo: inflater.produced)
+        return (inflater.pieces, inflater.largestBuffer)
     }
 }
 
@@ -88,21 +100,39 @@ private struct Huffman {
 }
 
 private struct Inflater {
+    /// The farthest back a DEFLATE length/distance pair can reach.
+    static let history = 32_768
+    /// Decoded bytes are dropped from the front of `output` in steps of this size.
+    static let dropStep = 256 << 10
+
     let input: [UInt8]
+    let ranges: [Range<Int>]
     let limit: Int
-    var output: [UInt8] = []
+    /// The bytes of each range, filled as decoding passes them.
+    private(set) var pieces: [[UInt8]]
+    /// The last decoded bytes: at least `history` of them, at most `history + dropStep` plus one
+    /// block's worth.
+    private var output: [UInt8] = []
+    /// Decoded bytes no longer in `output`.
+    private var dropped = 0
+    private(set) var largestBuffer = 0
     private var position = 0
     private var bitBuffer: UInt64 = 0
     private var bitCount = 0
 
-    init(input: [UInt8], limit: Int) {
+    init(input: [UInt8], ranges: [Range<Int>]) {
         self.input = input
-        self.limit = limit
+        self.ranges = ranges
+        limit = ranges.map(\.upperBound).max() ?? 0
+        pieces = Array(repeating: [], count: ranges.count)
     }
+
+    /// Bytes decoded so far.
+    var produced: Int { dropped + output.count }
 
     mutating func run() throws(InflateError) {
         var isFinal = false
-        while !isFinal, output.count < limit {
+        while !isFinal, produced < limit {
             isFinal = try bits(1) == 1
             switch try bits(2) {
             case 0: try storedBlock()
@@ -113,6 +143,29 @@ private struct Inflater {
             default: throw .invalidBlockType
             }
         }
+    }
+
+    // MARK: Output
+
+    /// Copies the decoded bytes before `end` that fall in a range into that range's piece.
+    mutating func collect(upTo end: Int) {
+        for (index, range) in ranges.enumerated() {
+            let lower = max(range.lowerBound, dropped)
+            let upper = min(range.upperBound, end)
+            guard lower < upper else { continue }
+            pieces[index].append(contentsOf: output[(lower - dropped)..<(upper - dropped)])
+        }
+    }
+
+    /// Keeps `output` from growing with the stream: once it holds `dropStep` bytes more than
+    /// back-references need, those bytes go to the pieces that want them and leave the buffer.
+    private mutating func dropOldOutput() {
+        largestBuffer = max(largestBuffer, output.count)
+        guard output.count >= Self.history + Self.dropStep else { return }
+        let count = output.count - Self.history
+        collect(upTo: dropped + count)
+        output.removeFirst(count)
+        dropped += count
     }
 
     // MARK: Bits
@@ -186,10 +239,12 @@ private struct Inflater {
         guard position + remaining <= input.count else { throw .truncated }
         output.append(contentsOf: input[position..<(position + remaining)])
         position += remaining
+        dropOldOutput()
     }
 
     private mutating func compressedBlock(literals: Huffman, distances: Huffman) throws(InflateError) {
-        while output.count < limit {
+        while produced < limit {
+            dropOldOutput()
             let symbol = try decode(literals)
             if symbol < 256 {
                 output.append(UInt8(symbol))

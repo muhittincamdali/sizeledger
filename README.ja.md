@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -138,7 +138,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 87 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 14.4 ms です。
+テストは全部で 95 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 11.4 ms です。
 
 ## 制限事項
 
@@ -147,6 +147,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 - Swift metadata は `__swift5_*` セクションのサイズで、下限値です。一部の metadata は `__const` にあります。
 - iOS 形式のバンドル (iOS、iPadOS、tvOS、watchOS、visionOS) は分類されます。`Contents/` フォルダを持つ macOS の `.app` は測定されますが、そのファイルは "Other resources" に入ります。
 - 複数のアプリを含む `.ipa`、暗号化されたエントリを含む `.ipa`、stored と DEFLATE 以外の圧縮を使う `.ipa`、エントリのパスに `..` を含む `.ipa` は、推測で処理せず、メッセージを表示して拒否します。
+- 圧縮された `.ipa` エントリの奥にある Mach-O ヘッダーを読むため、sizeledger はその手前をすべて展開しますが、保持するのは 32 KiB のウィンドウだけです。そのため細工されたエントリが消費するのはメモリではなく時間で、Mac (Apple silicon) では展開 1 GB あたり約 1 s です。
 
 ## ドキュメント
 

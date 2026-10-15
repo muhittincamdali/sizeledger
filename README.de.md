@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -178,8 +178,8 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   Fixed- und Dynamic-Blöcke; der Mach-O-Parser an Thin-, 32-Bit-, Fat- und Fat64-Dateien; außerdem
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
-Insgesamt sind es 87 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
-von SampleShop 2.0 dauert im Median 14.4 ms über 21 Läufe auf einem Mac (Apple silicon) mit dem
+Insgesamt sind es 95 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
+von SampleShop 2.0 dauert im Median 11.4 ms über 21 Läufe auf einem Mac (Apple silicon) mit dem
 Release-Build.
 
 ## Grenzen
@@ -196,6 +196,9 @@ Release-Build.
 - Eine `.ipa` mit mehr als einer App, verschlüsselten Einträgen, einer anderen Komprimierung als
   Stored und DEFLATE oder einem Eintragspfad mit einer `..`-Komponente wird mit einer Meldung
   abgelehnt, nicht erraten.
+- Um einen Mach-O-Header weit hinten in einem komprimierten `.ipa`-Eintrag zu erreichen, entpackt
+  sizeledger alles davor und behält nur ein Fenster von 32 KiB; ein präparierter Eintrag kostet also
+  Zeit, keinen Speicher: etwa 1 s pro entpacktem GB auf einem Mac (Apple silicon).
 
 ## Dokumentation
 

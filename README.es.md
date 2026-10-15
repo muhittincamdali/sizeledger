@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -180,8 +180,8 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 87 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
-tarda una mediana de 14.4 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release.
+En total son 95 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
+tarda una mediana de 11.4 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release.
 
 ## Límites
 
@@ -196,6 +196,10 @@ tarda una mediana de 14.4 ms en 21 ejecuciones, en un Mac (Apple silicon) con la
   una carpeta `Contents/` se mide, pero sus archivos van a "Other resources".
 - Un `.ipa` con más de una app, entradas cifradas, una compresión distinta de stored y DEFLATE o una
   ruta de entrada con un componente `..` se rechaza con un mensaje, sin adivinar.
+- Para llegar a una cabecera Mach-O situada muy adentro de una entrada comprimida de un `.ipa`,
+  sizeledger descomprime todo lo anterior y solo conserva una ventana de 32 KiB, así que una entrada
+  manipulada cuesta tiempo, no memoria: alrededor de 1 s por GB descomprimido en un Mac (Apple
+  silicon).
 
 ## Documentación
 

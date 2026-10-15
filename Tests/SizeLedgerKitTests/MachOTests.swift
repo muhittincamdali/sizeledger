@@ -19,7 +19,12 @@ import Testing
     )
 
     static func slices(_ data: Data) throws -> [MachOSlice] {
-        try MachO.slices(fileSize: UInt64(data.count)) { limit in data.prefix(limit) }
+        try MachO.slices(fileSize: UInt64(data.count)) { ranges in read(data, ranges) }
+    }
+
+    /// The bytes of `data` in each range, cut short at its end, as a bundle source returns them.
+    static func read(_ data: Data, _ ranges: [Range<Int>]) -> [Data] {
+        ranges.map { range in data[min(range.lowerBound, data.count)..<min(range.upperBound, data.count)] }
     }
 
     @Test func recognizesMagicNumbers() {
@@ -70,16 +75,56 @@ import Testing
         #expect(slices.allSatisfy { $0.swiftMetadataBytes == 168 })
     }
 
-    @Test func readsOnlyAsFarAsTheHeadersReach() throws {
+    @Test func readsOnlyTheHeaders() throws {
         let data = MachOBuilder.fat([Self.app, Self.app])
-        var limits: [Int] = []
-        _ = try MachO.slices(fileSize: UInt64(data.count)) { limit in
-            limits.append(limit)
-            return data.prefix(limit)
+        var requests: [[Range<Int>]] = []
+        _ = try MachO.slices(fileSize: UInt64(data.count)) { ranges in
+            requests.append(ranges)
+            return Self.read(data, ranges)
         }
-        // The second slice starts at 32,768; its load commands end well before the file does.
-        #expect(limits.max()! < data.count)
-        #expect(limits.max()! > 32_768)
+        // The fat table, then the start of both slices (at 4,096 and 32,768) in one request.
+        #expect(requests == [[0..<4_096], [4_096..<8_192, 32_768..<36_864]])
+    }
+
+    @Test func readsLongLoadCommandsAsFarAsTheyReach() throws {
+        var builder = Self.app
+        builder.segments += (0..<60).map { .init(name: "__SEG\($0)", fileSize: 16) }
+        builder.totalSize = 65_536
+        let data = builder.build()
+        var requests: [[Range<Int>]] = []
+        let slices = try MachO.slices(fileSize: UInt64(data.count)) { ranges in
+            requests.append(ranges)
+            return Self.read(data, ranges)
+        }
+        #expect(slices.first?.segments.count == 63)
+        let commandEnd = 32 + Int(try ByteReader(data).uint32LE(at: 20))
+        #expect(commandEnd > 4_096)
+        #expect(requests == [[0..<4_096], [0..<commandEnd]])
+    }
+
+    @Test func keepsReadsSmallWhenAFatHeaderPointsFarIntoTheFile() throws {
+        // A universal binary whose only slice claims to start 1 GB in, as in a crafted .ipa where
+        // the gap is a few kilobytes of DEFLATE data that decompresses to zeros.
+        let gigabyte = 1 << 30
+        var head = Data([0xCA, 0xFE, 0xBA, 0xBE]) + be32(1)
+        head += be32(0x0100_000C) + be32(0) + be32(UInt32(gigabyte)) + be32(4_096) + be32(12)
+        var requests: [[Range<Int>]] = []
+        #expect(throws: MachO.ParseError.self) {
+            _ = try MachO.slices(fileSize: UInt64(gigabyte + 4_096)) { ranges in
+                requests.append(ranges)
+                // Everything past the fat table reads as zeros, so the slice has no Mach-O magic.
+                return ranges.map { $0.lowerBound == 0 ? head : Data(count: $0.count) }
+            }
+        }
+        #expect(requests == [[0..<4_096], [gigabyte..<(gigabyte + 4_096)]])
+    }
+
+    @Test func refusesSliceRangesThatOverflow() {
+        var head = Data([0xCA, 0xFE, 0xBA, 0xBF]) + be32(1)
+        head += be32(0x0100_000C) + be32(0) + be64(UInt64.max - 10) + be64(4_096) + be32(12) + be32(0)
+        #expect(throws: MachO.ParseError.malformed("slice 1 ends past the end of the file")) {
+            _ = try MachO.slices(fileSize: 1 << 20) { ranges in Self.read(head, ranges) }
+        }
     }
 
     @Test func rejectsAJavaClassFile() {
@@ -91,7 +136,7 @@ import Testing
     @Test func rejectsASliceBeyondTheFile() {
         let data = MachOBuilder.fat([Self.app])
         #expect(throws: MachO.ParseError.self) {
-            _ = try MachO.slices(fileSize: 5_000) { limit in data.prefix(limit) }
+            _ = try MachO.slices(fileSize: 5_000) { ranges in Self.read(data, ranges) }
         }
     }
 
@@ -99,7 +144,7 @@ import Testing
         // The directory says the file is complete, but its data ends after 100 bytes.
         let data = Self.app.build()
         #expect(throws: MachO.ParseError.truncated) {
-            _ = try MachO.slices(fileSize: UInt64(data.count)) { limit in data.prefix(min(limit, 100)) }
+            _ = try MachO.slices(fileSize: UInt64(data.count)) { ranges in Self.read(data.prefix(100), ranges) }
         }
     }
 
@@ -132,12 +177,12 @@ import Testing
         data.replaceSubrange(20..<24, with: le32(0x7FFF_FFFF))
         var largest = 0
         #expect(throws: MachO.ParseError.self) {
-            _ = try MachO.slices(fileSize: UInt64(data.count)) { limit in
-                largest = max(largest, limit)
-                return data.prefix(limit)
+            _ = try MachO.slices(fileSize: UInt64(data.count)) { ranges in
+                largest = max(largest, ranges.map(\.upperBound).max() ?? 0)
+                return Self.read(data, ranges)
             }
         }
-        // Nothing past the first read was asked for.
+        // Nothing past the start of the file was asked for.
         #expect(largest <= 4_096)
     }
 }

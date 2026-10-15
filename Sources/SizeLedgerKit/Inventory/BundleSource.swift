@@ -41,8 +41,16 @@ protocol BundleSource: Sendable {
     var outsideEntries: [BundleEntry] { get }
     /// Size of the `.ipa` file itself.
     var archiveBytes: UInt64? { get }
-    /// The first `limit` bytes of the file at `path` (relative to the bundle root), or all of it.
-    func contents(of path: String, limit: Int) throws -> Data
+    /// The bytes of the file at `path` (relative to the bundle root) in each of `ranges`, cut
+    /// short where the file ends. Memory use follows the ranges' lengths, not their offsets.
+    func contents(of path: String, ranges: [Range<Int>]) throws -> [Data]
+}
+
+extension BundleSource {
+    /// The first `limit` bytes of the file at `path`, or all of it.
+    func contents(of path: String, limit: Int) throws -> Data {
+        try contents(of: path, ranges: [0..<limit])[0]
+    }
 }
 
 extension Array where Element == BundleEntry {

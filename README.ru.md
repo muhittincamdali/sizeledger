@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -176,8 +176,8 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   парсер Mach-O — на thin-, 32-битных, fat- и fat64-файлах; кроме того, ZIP64, повреждённые архивы и имена
   файлов с управляющими последовательностями терминала.
 
-Всего 87 теста, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0 занимает
-в медиане 14.4 ms по 21 запуску на Mac (Apple silicon) в release-сборке.
+Всего 95 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0 занимает
+в медиане 11.4 ms по 21 запуску на Mac (Apple silicon) в release-сборке.
 
 ## Ограничения
 
@@ -192,6 +192,9 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   `Contents/` измеряется, но её файлы попадают в «Other resources».
 - `.ipa` с несколькими приложениями, зашифрованными записями, со сжатием, отличным от stored и DEFLATE,
   или с путём записи, содержащим компонент `..`, отклоняется с сообщением, а не угадывается.
+- Чтобы добраться до заголовка Mach-O глубоко внутри сжатой записи `.ipa`, sizeledger распаковывает
+  всё, что идёт перед ним, но хранит только окно в 32 KiB, поэтому специально подготовленная запись
+  стоит времени, а не памяти: около 1 s на распакованный GB на Mac (Apple silicon).
 
 ## Документация
 

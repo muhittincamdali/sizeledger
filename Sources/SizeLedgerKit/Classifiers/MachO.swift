@@ -43,9 +43,12 @@ enum MachO {
         case malformed(String)
     }
 
-    /// Real binaries have well under 1 MB of load commands; more than this is a damaged or
+    /// Real binaries have tens of kilobytes of load commands; more than this is a damaged or
     /// crafted file.
-    static let maximumLoadCommandBytes = 16 << 20
+    static let maximumLoadCommandBytes = 1 << 20
+    /// Bytes read at the start of the file and of each slice: enough for the fat table and, in
+    /// most binaries, for the header and every load command.
+    static let headerProbe = 4_096
 
     /// Recognizes a Mach-O file from its first four bytes.
     static func format(of prefix: Data) -> Format? {
@@ -59,83 +62,98 @@ enum MachO {
         }
     }
 
-    /// Parses every slice. `read(limit)` returns at least the first `limit` bytes of the file (or
-    /// the whole file when it is shorter); it is called a few times with growing limits, so a
-    /// compressed file is only decompressed as far as the headers reach.
-    static func slices(fileSize: UInt64, read: (Int) throws -> Data) throws -> [MachOSlice] {
-        let headerProbe = 4_096
-        var data = try read(headerProbe)
-        guard let format = format(of: data) else { throw ParseError.notMachO }
+    /// Parses every slice. `read(ranges)` returns the bytes of the file in each range, cut short
+    /// where the file ends. It is called at most three times (twice for a thin binary), with one
+    /// range per slice of at most `headerProbe` or `headerSize + maximumLoadCommandBytes` bytes,
+    /// so what is held in memory follows the size of the headers, never the offsets a fat header
+    /// claims.
+    static func slices(fileSize: UInt64, read: ([Range<Int>]) throws -> [Data]) throws -> [MachOSlice] {
+        let head = try read([0..<headerProbe])[0]
+        guard let format = format(of: head) else { throw ParseError.notMachO }
 
-        func ensure(_ length: Int) throws {
-            if data.count < length {
-                data = try read(length)
-                if data.count < length { throw ParseError.truncated }
-            }
-        }
-
+        // The start of each slice (for a thin binary, the bytes already read), then, for slices
+        // whose load commands go past it, exactly as far as the commands reach.
         let ranges: [(offset: Int, size: UInt64)]
+        var windows: [Data]
         switch format {
         case .thin:
             ranges = [(0, fileSize)]
+            windows = [head]
         case .fat(let is64):
-            try ensure(8)
-            let count = Int(try ByteReader(data).uint32BE(at: 4))
-            // 0xCAFEBABE is also the magic of Java class files, where these bytes are a version
-            // number in the forties or higher.
-            guard (1...32).contains(count) else { throw ParseError.notMachO }
-            let entrySize = is64 ? 32 : 20
-            try ensure(8 + count * entrySize)
-            let reader = ByteReader(data)
-            ranges = try (0..<count).map { index in
-                let entry = 8 + index * entrySize
-                let offset = is64 ? try reader.uint64BE(at: entry + 8) : UInt64(try reader.uint32BE(at: entry + 8))
-                let size = is64 ? try reader.uint64BE(at: entry + 16) : UInt64(try reader.uint32BE(at: entry + 12))
-                guard offset + size <= fileSize else {
-                    throw ParseError.malformed("slice \(index + 1) ends past the end of the file")
-                }
-                return (Int(offset), size)
+            ranges = try fatRanges(ByteReader(head), is64: is64, fileSize: fileSize)
+            windows = try read(ranges.map { $0.offset..<($0.offset + Int(min($0.size, UInt64(headerProbe)))) })
+        }
+        let commandEnds = try zip(ranges, windows).map { range, window in
+            try loadCommandsEnd(ByteReader(window), size: range.size)
+        }
+        let longer = windows.indices.filter { commandEnds[$0] > windows[$0].count }
+        if !longer.isEmpty {
+            let more = try read(longer.map { ranges[$0].offset..<(ranges[$0].offset + commandEnds[$0]) })
+            for (index, window) in zip(longer, more) {
+                windows[index] = window
             }
         }
-
-        // Headers first, then load commands, each with one read covering every slice.
-        try ensure(ranges.map { $0.offset + 32 }.max() ?? 32)
-        let commandEnds = try ranges.map { range in
-            let header = ByteReader(data)
-            let headerSize = try header.uint32LE(at: range.offset) == 0xFEED_FACF ? 32 : 28
-            let commandBytes = Int(try header.uint32LE(at: range.offset + 20))
-            // The header's size field decides how much is read (and, in an .ipa, decompressed),
-            // so a value larger than the slice or than any real binary uses is refused.
-            guard commandBytes <= maximumLoadCommandBytes, UInt64(headerSize + commandBytes) <= range.size else {
-                throw ParseError.malformed("load commands of \(commandBytes) bytes do not fit the slice")
-            }
-            return range.offset + headerSize + commandBytes
-        }
-        try ensure(commandEnds.max() ?? 0)
-        let reader = ByteReader(data)
-        return try ranges.map { range in
-            try slice(reader, at: range.offset, size: range.size)
+        return try ranges.indices.map { index in
+            guard windows[index].count >= commandEnds[index] else { throw ParseError.truncated }
+            return try slice(ByteReader(windows[index]), offset: ranges[index].offset, size: ranges[index].size)
         }
     }
 
-    private static func slice(_ reader: ByteReader, at base: Int, size: UInt64) throws -> MachOSlice {
-        let magic = try reader.uint32LE(at: base)
+    /// Where each slice of a universal binary starts and how long it is.
+    private static func fatRanges(_ reader: ByteReader, is64: Bool, fileSize: UInt64) throws -> [(offset: Int, size: UInt64)] {
+        guard reader.count >= 8 else { throw ParseError.truncated }
+        let count = Int(try reader.uint32BE(at: 4))
+        // 0xCAFEBABE is also the magic of Java class files, where these bytes are a version
+        // number in the forties or higher.
+        guard (1...32).contains(count) else { throw ParseError.notMachO }
+        let entrySize = is64 ? 32 : 20
+        // At most 8 + 32 * 32 bytes, so a file the size of `headerProbe` holds the whole table.
+        guard reader.count >= 8 + count * entrySize else { throw ParseError.truncated }
+        return try (0..<count).map { index in
+            let entry = 8 + index * entrySize
+            let offset = is64 ? try reader.uint64BE(at: entry + 8) : UInt64(try reader.uint32BE(at: entry + 8))
+            let size = is64 ? try reader.uint64BE(at: entry + 16) : UInt64(try reader.uint32BE(at: entry + 12))
+            let (end, overflow) = offset.addingReportingOverflow(size)
+            guard !overflow, end <= fileSize, let start = Int(exactly: offset) else {
+                throw ParseError.malformed("slice \(index + 1) ends past the end of the file")
+            }
+            return (start, size)
+        }
+    }
+
+    /// Where a slice's load commands end, from the header at the start of `reader`.
+    private static func loadCommandsEnd(_ reader: ByteReader, size: UInt64) throws -> Int {
+        guard reader.count >= 24 else { throw ParseError.truncated }
+        let headerSize = try reader.uint32LE(at: 0) == 0xFEED_FACF ? 32 : 28
+        let commandBytes = Int(try reader.uint32LE(at: 20))
+        // The header's size field decides how much is read (and, in an .ipa, decompressed), so a
+        // value larger than the slice or than any real binary uses is refused.
+        guard commandBytes <= maximumLoadCommandBytes, UInt64(headerSize + commandBytes) <= size else {
+            throw ParseError.malformed("load commands of \(commandBytes) bytes do not fit the slice")
+        }
+        return headerSize + commandBytes
+    }
+
+    /// Reads one slice whose header starts at the start of `reader`; `offset` is where the slice
+    /// starts in the file.
+    private static func slice(_ reader: ByteReader, offset: Int, size: UInt64) throws -> MachOSlice {
+        let magic = try reader.uint32LE(at: 0)
         let is64: Bool
         switch magic {
         case 0xFEED_FACF: is64 = true
         case 0xFEED_FACE: is64 = false
-        default: throw ParseError.malformed("slice at offset \(base) has no Mach-O header")
+        default: throw ParseError.malformed("slice at offset \(offset) has no Mach-O header")
         }
-        let cpuType = try reader.uint32LE(at: base + 4)
-        let cpuSubtype = try reader.uint32LE(at: base + 8)
-        let fileType = try reader.uint32LE(at: base + 12)
+        let cpuType = try reader.uint32LE(at: 4)
+        let cpuSubtype = try reader.uint32LE(at: 8)
+        let fileType = try reader.uint32LE(at: 12)
         // No loader accepts CPU type 0 or file type 0; a header that is zero after the magic would
         // otherwise be listed as a "cpu0" slice of "type0".
         guard cpuType != 0, fileType != 0 else {
-            throw ParseError.malformed("slice at offset \(base) has no CPU type or file type")
+            throw ParseError.malformed("slice at offset \(offset) has no CPU type or file type")
         }
-        let commandCount = Int(try reader.uint32LE(at: base + 16))
-        var command = base + (is64 ? 32 : 28)
+        let commandCount = Int(try reader.uint32LE(at: 16))
+        var command = is64 ? 32 : 28
 
         var segments: [MachOSegment] = []
         var swiftBytes: UInt64 = 0
@@ -168,7 +186,7 @@ enum MachO {
         }
         return MachOSlice(
             architecture: architectureName(cpuType: cpuType, cpuSubtype: cpuSubtype),
-            offset: UInt64(base),
+            offset: UInt64(offset),
             bytes: size,
             fileType: fileTypeName(fileType),
             segments: segments,

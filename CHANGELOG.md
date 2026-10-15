@@ -12,6 +12,24 @@ All notable changes to sizeledger are listed here. The format follows
 - README translations: Türkçe, 简体中文, 日本語, 한국어, Español, Deutsch, Français, Português (Brasil)
   and Русский, linked from the language selector.
 
+### Changed
+
+- Load commands of more than 1 MiB in one Mach-O slice (was 16 MiB) are reported as damaged; real
+  binaries have tens of kilobytes.
+
+### Fixed
+
+- A ZIP64 entry whose offset or size is above `Int.max`, and a universal binary whose slice offset
+  plus size overflows, are reported as damaged instead of stopping sizeledger.
+
+### Security
+
+- A crafted `.ipa` could make sizeledger use unbounded memory: a universal binary whose fat header
+  put a slice 1 GB into a DEFLATE entry made it keep every decompressed byte in front of that
+  slice (3.77 GB resident for a 1 MB file). Mach-O headers are now read as ranges of at most
+  4 KiB, or as far as a slice's load commands reach, and decompression keeps only the 32 KiB that
+  DEFLATE back-references need; the same file now takes 11.5 MB on a Mac (Apple silicon).
+
 ## [0.1.0] - 2026-10-15
 
 First release: `sizeledger analyze` and the SizeLedgerKit library.

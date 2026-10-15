@@ -24,6 +24,7 @@ import Testing
         #expect(source.entries.allSatisfy { $0.compressedBytes == nil })
         #expect(try source.contents(of: "Demo", limit: 10).count == 10)
         #expect(try source.contents(of: "Info.plist", limit: 10_000).count == 700)
+        #expect(try source.contents(of: "Demo", ranges: [4_990..<5_010, 100..<104, 6_000..<6_010]).map(\.count) == [10, 4, 0])
     }
 
     @Test func readsTheAppInsideAnIPA() throws {
@@ -46,6 +47,7 @@ import Testing
         #expect(source.outsideEntries.map(\.path) == ["SwiftSupport/iphoneos/libswiftCore.dylib", "iTunesMetadata.plist"])
         #expect(source.archiveBytes == UInt64(try Data(contentsOf: url).count))
         #expect(try source.contents(of: "Info.plist", limit: 100) == Data("plist".utf8))
+        #expect(try source.contents(of: "Info.plist", ranges: [1..<3, 4..<9]) == [Data("li".utf8), Data("t".utf8)])
     }
 
     @Test func refusesAnIPAWithoutAnApp() throws {

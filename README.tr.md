@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@85ce8fad88d320af362e23781db053ee7a1a157f status=reviewed -->
+<!-- i18n-source: README.md@d34ab8fdec18f1e45ffb90e0891f12e2d438f1f4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -182,9 +182,9 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 87 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
+Toplam 95 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
 2.0'ı ölçmek, release derlemesiyle bir Mac'te (Apple silicon) 21 çalıştırmanın medyanı olarak
-14.4 ms sürer.
+11.4 ms sürer.
 
 ## Sınırlar
 
@@ -200,6 +200,9 @@ Toplam 87 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çal�
 - Birden fazla uygulama içeren, şifreli girdili, stored ve DEFLATE dışında bir sıkıştırma kullanan
   ya da bir girdi yolunda `..` bileşeni bulunan bir `.ipa`, tahmin yürütülmeden bir mesajla
   reddedilir.
+- Sıkıştırılmış bir `.ipa` girdisinin derinlerindeki bir Mach-O başlığına ulaşmak için sizeledger
+  ondan önceki her şeyi açar ve yalnızca 32 KiB'lık bir pencere tutar; bu yüzden hazırlanmış bir
+  girdi bellek değil zaman harcatır: bir Mac'te (Apple silicon) açılan her GB için yaklaşık 1 s.
 
 ## Dokümantasyon
 
