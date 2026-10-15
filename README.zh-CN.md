@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@86241f9d9912ea2e04310ab24fdf65fdcd6b9f9b status=reviewed -->
+<!-- i18n-source: README.md@efa35653f46d9bfdc19d7e576b15066b782b349c status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -95,7 +95,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew（macOS、Linux） | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                             |
 | 发布的二进制文件         | 从 [Releases](https://github.com/muhittincamdali/sizeledger/releases) 下载 `sizeledger-<version>-macos-universal.tar.gz`，或 `-linux-x86_64` / `-linux-aarch64`，用 `SHA256SUMS` 校验，然后把 `sizeledger` 放到 `PATH` 中 |
 | 从源码构建               | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release`（二进制文件位于 `.build/release/sizeledger`）                                                                    |
-| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.2")`，product 为 `SizeLedgerKit`                                                                                                               |
+| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`，product 为 `SizeLedgerKit`                                                                                                               |
 
 构建需要 Swift 6.2 或更高版本（Mac 上需要 Xcode 26 或更高版本）。Linux 的发布二进制文件已包含 Swift
 运行时，需要 glibc 2.35 或更高版本（Ubuntu 22.04、Debian 12 或更新的系统）。
