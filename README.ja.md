@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
+<!-- i18n-source: README.md@584a4f9d67905d87722c78bf71d83e2bef4d8198 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -92,6 +92,7 @@ sizeledger analyze path/to/MyApp.ipa
 
 ```text
 sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+                    [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
 | オプション         | 動作                                                                           |
@@ -138,7 +139,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 101 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 10.5 ms です (プロセスの起動を含みます)。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
+テストは全部で 117 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 10.5 ms です (プロセスの起動を含みます)。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
 
 ## 制限事項
 
@@ -148,6 +149,13 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 - iOS 形式のバンドル (iOS、iPadOS、tvOS、watchOS、visionOS) は分類されます。`Contents/` フォルダを持つ macOS の `.app` は測定されますが、そのファイルは "Other resources" に入ります。
 - 複数のアプリを含む `.ipa`、暗号化されたエントリを含む `.ipa`、stored と DEFLATE 以外の圧縮を使う `.ipa`、エントリのパスに `..` を含む `.ipa` は、推測で処理せず、メッセージを表示して拒否します。
 - 圧縮された `.ipa` エントリの奥にある Mach-O ヘッダーを読むため、sizeledger はその手前をすべて展開しますが、保持するのは 32 KiB のウィンドウだけです。そのため細工されたエントリが消費するのはメモリではなく時間で、Mac (Apple silicon) では展開 1 GB あたり約 1 s です。
+
+- 入力は信頼できないため、細工または破損した入力でもメモリ・時間・スタックを使い尽くすことはありません。
+  sizeledger は、ファイルが 500,000 を超える、宣言された非圧縮バイトが 8 GiB を超える、`.ipa` エントリが
+  格納サイズの 300 倍を超えて展開される（zip 爆弾）、またはパスが 64 フォルダより深くネストされた入力を
+  拒否します。これらは `--max-files`、`--max-bytes`、`--max-ratio`、`--max-depth` で引き上げられます。
+  壊れた Mach-O や ZIP ヘッダーは "unreadable" の注記か終了ステータス 2 の明確なエラーになり、クラッシュ
+  することはありません。重複するエントリパスは一度だけ数えられます。
 
 ## ドキュメント
 
