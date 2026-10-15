@@ -103,6 +103,20 @@ import Testing
         }
     }
 
+    @Test("refuses a header without a CPU type or file type", arguments: [(UInt32(0), UInt32(2)), (0x0100_000C, 0), (0, 0)])
+    func refusesAnEmptyHeader(cpuType: UInt32, fileType: UInt32) {
+        var builder = Self.app
+        builder.cpuType = cpuType
+        builder.fileType = fileType
+        #expect(throws: MachO.ParseError.malformed("slice at offset 0 has no CPU type or file type")) {
+            _ = try Self.slices(builder.build())
+        }
+        // In a universal binary the second slice starts at 32,768.
+        #expect(throws: MachO.ParseError.malformed("slice at offset 32768 has no CPU type or file type")) {
+            _ = try Self.slices(MachOBuilder.fat([Self.app, builder]))
+        }
+    }
+
     @Test func namesArchitectures() {
         #expect(MachO.architectureName(cpuType: 0x0200_000C, cpuSubtype: 1) == "arm64_32")
         #expect(MachO.architectureName(cpuType: 0x0100_0007, cpuSubtype: 8) == "x86_64h")

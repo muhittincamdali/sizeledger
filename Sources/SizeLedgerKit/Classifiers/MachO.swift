@@ -129,6 +129,11 @@ enum MachO {
         let cpuType = try reader.uint32LE(at: base + 4)
         let cpuSubtype = try reader.uint32LE(at: base + 8)
         let fileType = try reader.uint32LE(at: base + 12)
+        // No loader accepts CPU type 0 or file type 0; a header that is zero after the magic would
+        // otherwise be listed as a "cpu0" slice of "type0".
+        guard cpuType != 0, fileType != 0 else {
+            throw ParseError.malformed("slice at offset \(base) has no CPU type or file type")
+        }
         let commandCount = Int(try reader.uint32LE(at: base + 16))
         var command = base + (is64 ? 32 : 28)
 
