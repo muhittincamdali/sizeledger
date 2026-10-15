@@ -66,6 +66,14 @@ import SizeLedgerKit
     }
 
     @Test(.enabled(if: built, "run `swift build` first"))
+    func suggestsAnalyzeForAnAppWithoutASubcommand() throws {
+        let result = try Self.run(["MyApp.ipa", "--top", "5"])
+        #expect(result.status == 64)
+        #expect(result.output.isEmpty)
+        #expect(result.errors.hasPrefix("Error: MyApp.ipa is not a subcommand. To measure it, run:\n  sizeledger analyze MyApp.ipa --top 5\n"))
+    }
+
+    @Test(.enabled(if: built, "run `swift build` first"))
     func printsTheVersion() throws {
         let result = try Self.run(["--version"])
         #expect(result.output == SizeLedger.version + "\n")
