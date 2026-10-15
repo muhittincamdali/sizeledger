@@ -20,3 +20,4 @@ _work/
 
 # macOS
 .DS_Store
+Examples/*/Package.resolved

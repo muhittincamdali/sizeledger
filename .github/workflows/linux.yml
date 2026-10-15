@@ -54,3 +54,13 @@ jobs:
         run: |
           .build/debug/sizeledger analyze Fixtures/apps/SampleShop-2.0.ipa > "$RUNNER_TEMP/report.txt"
           diff -u Fixtures/snapshots/SampleShop-2.0.txt "$RUNNER_TEMP/report.txt"
+
+      - name: Build and run the library example
+        working-directory: Examples/LibraryUsage
+        run: |
+          swift build
+          swift run SizeCheck ../../Fixtures/apps/SampleShop-2.0.ipa 15
+          if swift run SizeCheck ../../Fixtures/apps/SampleShop-2.0.ipa 5; then
+            echo "::error::SizeCheck did not fail on a 5 MB limit"
+            exit 1
+          fi

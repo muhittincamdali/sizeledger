@@ -1,0 +1,63 @@
+# Example workflow: measure the app on every pull request, show the breakdown in the job summary
+# and keep the JSON report as an artifact. Copy it to .github/workflows/ in your app's repository
+# and replace the build step with yours.
+#
+# sizeledger 0.1 measures one build. Comparing two builds (diff) and failing a pull request on a
+# budget (budget) are planned; until then the last step shows how to fail on a limit with jq.
+name: App size
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  size:
+    runs-on: macos-26
+    timeout-minutes: 30
+    env:
+      SIZELEDGER_VERSION: 0.1.0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Replace with your own build. Any of these works as input: the .app from a simulator or
+      # device build, an .xcarchive, or an .ipa exported from it.
+      - name: Build
+        run: |
+          xcodebuild archive -scheme MyApp -destination 'generic/platform=iOS' \
+            -archivePath build/MyApp.xcarchive CODE_SIGNING_ALLOWED=NO
+
+      - name: Install sizeledger
+        run: |
+          base="https://github.com/muhittincamdali/sizeledger/releases/download/v$SIZELEDGER_VERSION"
+          curl -fsSLO "$base/sizeledger-$SIZELEDGER_VERSION-macos-universal.tar.gz"
+          curl -fsSLO "$base/SHA256SUMS"
+          grep "macos-universal" SHA256SUMS | shasum -a 256 -c -
+          mkdir -p "$RUNNER_TEMP/sizeledger"
+          tar -xzf "sizeledger-$SIZELEDGER_VERSION-macos-universal.tar.gz" -C "$RUNNER_TEMP/sizeledger"
+          echo "$RUNNER_TEMP/sizeledger" >> "$GITHUB_PATH"
+
+      - name: Measure
+        run: sizeledger analyze build/MyApp.xcarchive --out size/app.json --format markdown >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: app-size
+          path: size/app.json
+
+      # A limit of your own on the install size estimate (decimal MB).
+      - name: Check the install size
+        env:
+          LIMIT_MB: 80
+        run: |
+          install_bytes="$(jq '.totals.installBytes' size/app.json)"
+          limit_bytes=$((LIMIT_MB * 1000000))
+          echo "install size (estimate): $install_bytes bytes, limit: $limit_bytes bytes"
+          if [ "$install_bytes" -gt "$limit_bytes" ]; then
+            echo "::error::The install size estimate is over $LIMIT_MB MB"
+            exit 1
+          fi
