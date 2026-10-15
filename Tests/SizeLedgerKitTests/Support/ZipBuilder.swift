@@ -14,6 +14,8 @@ struct ZipBuilder {
         var zip64 = false
         /// The size once decompressed, for a DEFLATE entry; a stored entry's is its length.
         var uncompressedSize: Int?
+        /// A different uncompressed size to put in the ZIP64 extra field, for crafted archives.
+        var declaredSize: UInt64?
 
         var size: Int { uncompressedSize ?? contents.count }
     }
@@ -55,7 +57,7 @@ struct ZipBuilder {
             if entry.zip64 {
                 extra.append(le16(0x0001))
                 extra.append(le16(24))
-                extra.append(le64(UInt64(entry.size)))
+                extra.append(le64(entry.declaredSize ?? UInt64(entry.size)))
                 extra.append(le64(UInt64(entry.contents.count)))
                 extra.append(le64(UInt64(offset)))
             }

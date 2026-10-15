@@ -159,6 +159,26 @@ import Testing
         #expect(binary.slices.first?.codeSignatureBytes == 2_345)
     }
 
+    @Test func survivesSizesNear2To64() throws {
+        // Three ZIP64 entries that each claim almost 2^64 bytes: adding them up, rounding them to
+        // 4 KiB blocks and printing them used to overflow and stop sizeledger.
+        var builder = ZipBuilder()
+        for name in ["a.bin", "b.bin", "c.bin"] {
+            builder.add("Payload/Huge.app/" + name, Data("x".utf8), zip64: true)
+            builder.entries[builder.entries.count - 1].declaredSize = .max - 15
+        }
+        let temp = try TemporaryDirectory()
+        let url = try temp.file("Huge.ipa", contents: builder.build())
+
+        let report = try SizeLedger.analyze(url)
+        #expect(report.totals.files == 3)
+        #expect(report.totals.bytes == .max)
+        #expect(report.totals.installBytes == .max)
+        #expect(report.tree.bytes == .max)
+        #expect(TextReport.render(report).contains("18446744073.71 GB   3 files"))
+        #expect(MarkdownReport.render(report).contains("| **Total** (3 files) | **18446744073.71 GB** |"))
+    }
+
     @Test func roundTripsThroughJSON() throws {
         let report = try Self.analyzeFolder()
         let data = try report.jsonData()
