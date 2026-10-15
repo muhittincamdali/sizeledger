@@ -16,6 +16,11 @@ struct IPASource: BundleSource {
 
     init(url: URL) throws {
         let archive = try ZipArchive(url: url)
+        // Xcode never writes a ".." component, and unzip tools refuse or strip it. Counting such an
+        // entry would put its bytes in a ".." folder of the bundle that does not exist on a device.
+        if let entry = archive.entries.first(where: { $0.path.split(separator: "/").contains("..") }) {
+            throw InputError.unreadable(url.path, "entry \(entry.path) has a \"..\" path component")
+        }
         let apps = Set(archive.entries.compactMap { Self.appName(in: $0.path) }).sorted()
         guard let app = apps.first else { throw InputError.noApp(url.lastPathComponent) }
         guard apps.count == 1 else { throw InputError.severalApps(url.lastPathComponent, apps) }

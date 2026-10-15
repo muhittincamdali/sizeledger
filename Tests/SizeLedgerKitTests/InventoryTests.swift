@@ -66,6 +66,18 @@ import Testing
         #expect(throws: InputError.severalApps("Two.ipa", ["A.app", "B.app"])) { _ = try IPASource(url: url) }
     }
 
+    @Test("refuses an .ipa with a .. path component", arguments: ["Payload/Demo.app/../escape.bin", "../Payload/Demo.app/x"])
+    func refusesParentPathComponents(name: String) throws {
+        var builder = ZipBuilder()
+        builder.add("Payload/Demo.app/Demo", Data(repeating: 1, count: 300))
+        builder.add(name, Data(repeating: 2, count: 500))
+        let temp = try TemporaryDirectory()
+        let url = try temp.file("Escape.ipa", contents: builder.build())
+        let error = InputError.unreadable(url.path, "entry \(name) has a \"..\" path component")
+        #expect(throws: error) { _ = try IPASource(url: url) }
+        #expect(throws: error) { _ = try InputLocator.open(url) }
+    }
+
     @Test func findsTheAppInAnXcodeArchive() throws {
         let temp = try TemporaryDirectory()
         try temp.file("Demo.xcarchive/Info.plist", size: 10)
