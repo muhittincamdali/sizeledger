@@ -55,9 +55,9 @@ struct IPASource: BundleSource {
         archiveBytes = (attributes?[.size] as? NSNumber)?.uint64Value
     }
 
-    func contents(of path: String, limit: Int) throws -> Data {
+    func contents(of path: String, ranges: [Range<Int>]) throws -> [Data] {
         guard let entry = entryByPath[path] else { throw CocoaError(.fileNoSuchFile) }
-        return try archive.contents(of: entry, limit: limit)
+        return try archive.contents(of: entry, ranges: ranges)
     }
 
     /// `MyApp.app` for paths under `Payload/MyApp.app/`.

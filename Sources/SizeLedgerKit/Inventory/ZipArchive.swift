@@ -54,18 +54,28 @@ struct ZipArchive: Sendable {
         }
     }
 
-    /// The entry's uncompressed bytes, or at least the first `limit` of them.
+    /// The entry's uncompressed bytes, or the first `limit` of them.
     func contents(of entry: ZipEntry, limit: Int = .max) throws(ZipError) -> Data {
+        try contents(of: entry, ranges: [0..<limit])[0]
+    }
+
+    /// The entry's uncompressed bytes in each of `ranges`, cut short where the entry ends.
+    ///
+    /// A DEFLATE entry is decoded from its start up to the end of the last range, but only the
+    /// bytes in the ranges are kept, so memory follows the ranges' lengths, not their offsets.
+    func contents(of entry: ZipEntry, ranges: [Range<Int>]) throws(ZipError) -> [Data] {
         guard !entry.isEncrypted else { throw .encrypted(entry.path) }
         let compressed: Data
         do {
-            let offset = Int(entry.localHeaderOffset)
+            guard let offset = Int(exactly: entry.localHeaderOffset), let size = Int(exactly: entry.compressedSize) else {
+                throw ZipError.malformed("\(entry.path) extends past the end of the archive")
+            }
             guard try reader.uint32LE(at: offset) == 0x0403_4B50 else {
                 throw ZipError.malformed("no local header for \(entry.path)")
             }
             let nameLength = Int(try reader.uint16LE(at: offset + 26))
             let extraLength = Int(try reader.uint16LE(at: offset + 28))
-            compressed = try reader.bytes(at: offset + 30 + nameLength + extraLength, length: Int(entry.compressedSize))
+            compressed = try reader.bytes(at: offset + 30 + nameLength + extraLength, length: size)
         } catch let error as ZipError {
             throw error
         } catch {
@@ -73,11 +83,14 @@ struct ZipArchive: Sendable {
         }
         switch entry.method {
         case Self.storedMethod:
-            return limit < compressed.count ? compressed.prefix(limit) : compressed
+            return ranges.map { range in
+                let lower = min(range.lowerBound, compressed.count)
+                let upper = min(range.upperBound, compressed.count)
+                return compressed[(compressed.startIndex + lower)..<(compressed.startIndex + upper)]
+            }
         case Self.deflateMethod:
             do {
-                let bytes = try Inflate.decompress(compressed, limit: limit)
-                return Data(limit < bytes.count ? bytes[0..<limit] : bytes[...])
+                return try Inflate.decompress(compressed, ranges: ranges).map { Data($0) }
             } catch {
                 throw .malformed("\(entry.path) is not valid DEFLATE data (\(error))")
             }

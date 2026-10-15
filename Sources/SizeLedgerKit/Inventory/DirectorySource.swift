@@ -21,10 +21,13 @@ struct DirectorySource: BundleSource {
         entries = found.sortedByPath()
     }
 
-    func contents(of path: String, limit: Int) throws -> Data {
+    func contents(of path: String, ranges: [Range<Int>]) throws -> [Data] {
         let handle = try FileHandle(forReadingFrom: root.appendingPathComponent(path))
         defer { try? handle.close() }
-        return try handle.read(upToCount: limit) ?? Data()
+        return try ranges.map { range in
+            try handle.seek(toOffset: UInt64(range.lowerBound))
+            return try handle.read(upToCount: range.count) ?? Data()
+        }
     }
 
     private static func walk(_ directory: String, prefix: String, into entries: inout [BundleEntry]) throws {

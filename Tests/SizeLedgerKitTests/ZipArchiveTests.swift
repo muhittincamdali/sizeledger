@@ -45,6 +45,29 @@ import Testing
         #expect(try archive.contents(of: archive.entries[2], limit: 10).count == 10)
     }
 
+    @Test func rangesReturnPartsOfAnEntry() throws {
+        let archive = try ZipArchive(url: Fixtures.archive("kinds.zip"))
+        for entry in archive.entries[1...2] {
+            // A stored entry comes back as a slice of the archive; index it from zero.
+            let full = [UInt8](try archive.contents(of: entry))
+            let parts = try archive.contents(of: entry, ranges: [10..<20, 0..<4, full.count - 5..<full.count + 5])
+            #expect(parts.map { [UInt8]($0) } == [Array(full[10..<20]), Array(full[0..<4]), Array(full[(full.count - 5)...])])
+        }
+    }
+
+    @Test func readsADeflatedEntryFarFromItsStart() throws {
+        let gap = 4 << 20
+        var stream = DeflateBuilder()
+        stream.zeros(gap)
+        stream.literals(Data("header".utf8))
+        var builder = ZipBuilder()
+        builder.addDeflated("Payload/Gap.bin", stream: stream.finish(), size: gap + 6)
+        let archive = try ZipArchive(data: builder.build())
+        let entry = archive.entries[0]
+        #expect(entry.uncompressedSize == UInt64(gap + 6))
+        #expect(try archive.contents(of: entry, ranges: [gap..<(gap + 100)]) == [Data("header".utf8)])
+    }
+
     @Test func readsZip64Fields() throws {
         var builder = ZipBuilder()
         builder.add("Payload/Big.bin", Data(repeating: 7, count: 300), zip64: true)
