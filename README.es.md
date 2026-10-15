@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@7f4c432f5c820db76fe9fecc7cfb01b98b1a3c98 status=reviewed -->
+<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -180,7 +180,7 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 100 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
+En total son 101 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
 tarda una mediana de 10.5 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release,
 incluido el arranque del proceso; [scripts/bench.sh](scripts/bench.sh) repite la medición.
 

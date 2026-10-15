@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@7f4c432f5c820db76fe9fecc7cfb01b98b1a3c98 status=reviewed -->
+<!-- i18n-source: README.md@a4d3150df235da968d668f00c54205da58a41ea4 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -178,7 +178,7 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   Fixed- und Dynamic-Blöcke; der Mach-O-Parser an Thin-, 32-Bit-, Fat- und Fat64-Dateien; außerdem
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
-Insgesamt sind es 100 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
+Insgesamt sind es 101 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
 von SampleShop 2.0 dauert im Median 10.5 ms über 21 Läufe auf einem Mac (Apple silicon) mit dem
 Release-Build, einschließlich Prozessstart; [scripts/bench.sh](scripts/bench.sh) wiederholt die Messung.
 
