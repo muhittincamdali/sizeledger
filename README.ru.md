@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -177,7 +177,7 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   парсер Mach-O — на thin-, 32-битных, fat- и fat64-файлах; кроме того, ZIP64, повреждённые архивы и имена
   файлов с управляющими последовательностями терминала.
 
-Всего 130 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0
+Всего 140 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0
 в release-сборке, включая запуск процесса, заняло в медиане от 14.4 до 17.4 ms в трёх сериях по 21
 запуску на Mac (Apple silicon), занятом другой работой (средняя нагрузка от 41 до 136); время зависит
 от того, что ещё выполняется на машине. [scripts/bench.sh](scripts/bench.sh) повторяет это измерение.
@@ -195,6 +195,9 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   `Contents/` измеряется, но её файлы попадают в «Other resources».
 - `.ipa` с несколькими приложениями, зашифрованными записями, со сжатием, отличным от stored и DEFLATE,
   или с путём записи, содержащим компонент `..`, отклоняется с сообщением, а не угадывается.
+- Пути сравниваются побайтно, так же как их видят распаковщик и файловая система: два имени,
+  которые различаются только нормализацией Unicode (NFC и NFD), — это два файла, а `/`, за которым
+  следует комбинируемый знак, по-прежнему разделяет две папки.
 - Чтобы добраться до заголовка Mach-O глубоко внутри сжатой записи `.ipa`, sizeledger распаковывает
   всё, что идёт перед ним, но хранит только окно в 32 KiB, поэтому специально подготовленная запись
   стоит времени, а не памяти: около 1 s на распакованный GB на Mac (Apple silicon).

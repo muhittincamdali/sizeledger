@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -181,7 +181,7 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 130 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
+En total son 140 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
 con la compilación release, incluido el arranque del proceso, tardó una mediana de 14.4 a 17.4 ms en
 tres series de 21 ejecuciones, en un Mac (Apple silicon) ocupado con otro trabajo (carga media entre
 41 y 136); el tiempo depende de lo que más ejecute la máquina. [scripts/bench.sh](scripts/bench.sh)
@@ -200,6 +200,9 @@ repite la medición.
   una carpeta `Contents/` se mide, pero sus archivos van a "Other resources".
 - Un `.ipa` con más de una app, entradas cifradas, una compresión distinta de stored y DEFLATE o una
   ruta de entrada con un componente `..` se rechaza con un mensaje, sin adivinar.
+- Las rutas se comparan byte a byte, como las ven una herramienta de descompresión y un sistema de
+  archivos: dos nombres que solo difieren en la normalización Unicode (NFC y NFD) son dos archivos,
+  y una `/` seguida de una marca combinante sigue separando dos carpetas.
 - Para llegar a una cabecera Mach-O situada muy adentro de una entrada comprimida de un `.ipa`,
   sizeledger descomprime todo lo anterior y solo conserva una ventana de 32 KiB, así que una entrada
   manipulada cuesta tiempo, no memoria: alrededor de 1 s por GB descomprimido en un Mac (Apple

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -183,7 +183,7 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 130 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
+Toplam 140 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
 2.0'ı release derlemesiyle ölçmek (süreç başlatma dahil), başka işlerle meşgul bir Mac'te (Apple
 silicon, yük ortalaması 41 ile 136 arası) 21 çalıştırmalık üç seride medyan olarak 14.4 ile 17.4 ms
 sürdü; süre makinede başka neyin çalıştığına bağlıdır. Ölçüm [scripts/bench.sh](scripts/bench.sh)
@@ -203,6 +203,9 @@ ile tekrarlanabilir.
 - Birden fazla uygulama içeren, şifreli girdili, stored ve DEFLATE dışında bir sıkıştırma kullanan
   ya da bir girdi yolunda `..` bileşeni bulunan bir `.ipa`, tahmin yürütülmeden bir mesajla
   reddedilir.
+- Yollar, bir arşiv açma aracının ve dosya sisteminin gördüğü gibi bayt bayt karşılaştırılır:
+  yalnızca Unicode normalleştirmesinde (NFC ve NFD) ayrılan iki ad iki dosyadır ve ardından
+  birleşen bir işaret gelen `/` de iki klasörü ayırır.
 - Sıkıştırılmış bir `.ipa` girdisinin derinlerindeki bir Mach-O başlığına ulaşmak için sizeledger
   ondan önceki her şeyi açar ve yalnızca 32 KiB'lık bir pencere tutar; bu yüzden hazırlanmış bir
   girdi bellek değil zaman harcatır: bir Mac'te (Apple silicon) açılan her GB için yaklaşık 1 s.

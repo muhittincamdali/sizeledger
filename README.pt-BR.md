@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -179,7 +179,7 @@ os detalhes, e [Limites de tamanho de App Clips](docs/guides/app-clip-size.md) o
   stored, fixed e dynamic; o parser de Mach-O em arquivos thin, de 32 bits, fat e fat64; além de ZIP64,
   arquivos danificados e nomes de arquivo que contêm sequências de escape de terminal.
 
-No total são 130 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64). Medir o SampleShop 2.0
+No total são 140 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64). Medir o SampleShop 2.0
 com o build release, incluindo a inicialização do processo, levou uma mediana de 14.4 a 17.4 ms em três
 séries de 21 execuções, em um Mac (Apple silicon) ocupado com outro trabalho (carga média entre 41 e
 136); o tempo depende do que mais a máquina está executando. [scripts/bench.sh](scripts/bench.sh)
@@ -198,6 +198,9 @@ repete a medição.
   uma pasta `Contents/` é medido, mas seus arquivos caem em "Other resources".
 - Um `.ipa` com mais de um app, entradas criptografadas, compressão diferente de stored e DEFLATE ou
   um caminho de entrada com um componente `..` é recusado com uma mensagem, sem adivinhação.
+- Os caminhos são comparados byte a byte, como uma ferramenta de descompactação e um sistema de
+  arquivos os veem: dois nomes que diferem só na normalização Unicode (NFC e NFD) são dois arquivos,
+  e uma `/` seguida de uma marca combinante continua separando duas pastas.
 - Para chegar a um cabeçalho Mach-O no fundo de uma entrada comprimida de um `.ipa`, o sizeledger
   descomprime tudo o que vem antes e mantém só uma janela de 32 KiB; assim, uma entrada forjada
   custa tempo, não memória: cerca de 1 s por GB descomprimido em um Mac (Apple silicon).

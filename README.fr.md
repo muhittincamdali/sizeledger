@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -183,7 +183,7 @@ App Clips.
   fat64 ; ainsi que ZIP64, les archives endommagées et les noms de fichiers qui contiennent des séquences
   d'échappement de terminal.
 
-Au total, 130 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
+Au total, 140 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
 avec le build release, démarrage du processus compris, a pris une médiane de 14.4 à 17.4 ms sur trois
 séries de 21 exécutions, sur un Mac (Apple silicon) occupé par d'autres travaux (charge moyenne entre
 41 et 136) ; le temps dépend de ce que la machine exécute par ailleurs. [scripts/bench.sh](scripts/bench.sh)
@@ -202,6 +202,9 @@ refait la mesure.
   dossier `Contents/` est mesurée, mais ses fichiers sont rangés sous « Other resources ».
 - Un `.ipa` contenant plusieurs apps, des entrées chiffrées, une compression autre que stored et DEFLATE
   ou un chemin d'entrée avec un composant `..` est refusé avec un message, sans deviner.
+- Les chemins sont comparés octet par octet, comme les voient un outil de décompression et un
+  système de fichiers : deux noms qui ne diffèrent que par la normalisation Unicode (NFC et NFD) sont
+  deux fichiers, et un `/` suivi d'un caractère combinant sépare toujours deux dossiers.
 - Pour atteindre un en-tête Mach-O situé loin dans une entrée compressée d'un `.ipa`, sizeledger
   décompresse tout ce qui le précède et ne garde qu'une fenêtre de 32 KiB ; une entrée forgée coûte
   donc du temps, pas de la mémoire : environ 1 s par GB décompressé sur un Mac (Apple silicon).

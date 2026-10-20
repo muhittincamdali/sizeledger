@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -159,7 +159,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - **对照参考实现检验的读取器**：DEFLATE 解码器对照 zlib 的输出，覆盖 stored、fixed 和 dynamic 块；
   Mach-O 解析器覆盖 thin、32 位、fat 和 fat64 文件；还有 ZIP64、损坏的归档，以及包含终端转义序列的文件名。
 
-共有 130 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建测量 SampleShop 2.0（包括进程启动），在一台正忙于其他工作的 Mac（Apple silicon，负载平均值 41 到 136）上，三组各 21 次运行的中位数为 14.4 到 17.4 ms；耗时取决于机器上同时运行的其他任务。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
+共有 140 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建测量 SampleShop 2.0（包括进程启动），在一台正忙于其他工作的 Mac（Apple silicon，负载平均值 41 到 136）上，三组各 21 次运行的中位数为 14.4 到 17.4 ms；耗时取决于机器上同时运行的其他任务。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
 
 ## 局限
 
@@ -171,6 +171,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - iOS 风格的 bundle（iOS、iPadOS、tvOS、watchOS、visionOS）会被分类。带有 `Contents/` 文件夹的 macOS
   `.app` 会被测量，但其中的文件会归入 "Other resources"。
 - 包含多个应用、带加密条目、使用 stored 和 DEFLATE 以外压缩方式，或条目路径中含有 `..` 的 `.ipa`，会被拒绝并给出提示信息，而不是靠猜测处理。
+- 路径按字节比较，与解压工具和文件系统看到的一致：只在 Unicode 规范化（NFC 与 NFD）上不同的两个名称是两个文件，后面跟着组合字符的 `/` 仍然分隔两个文件夹。
 - 为了读取压缩的 `.ipa` 条目中靠后的 Mach-O 头，sizeledger 会解压它之前的全部内容，但只保留 32 KiB 的窗口，因此恶意构造的条目只会耗费时间，而不会耗费内存：在 Mac（Apple silicon）上每解压 1 GB 约需 1 s。
 - 输入不可信，因此精心构造或损坏的输入不会耗尽内存、时间或栈。sizeledger 会拒绝以下输入：文件超过
   500,000 个、路径嵌套深度超过 64 层、`.ipa` 声明的未压缩字节超过 8 GiB，或某个 `.ipa` 条目解压后超过其
