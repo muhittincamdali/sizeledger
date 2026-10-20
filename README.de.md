@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@efa35653f46d9bfdc19d7e576b15066b782b349c status=reviewed -->
+<!-- i18n-source: README.md@0a2f8e8474c42f106d43a8a704350fc608661e3b status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
