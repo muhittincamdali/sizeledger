@@ -17,9 +17,10 @@ public enum InputError: Error, Equatable, Sendable {
 
 extension InputError: CustomStringConvertible {
     /// A sentence for the user that names the path. Paths and entry names come from the input, so
-    /// control characters in them are replaced before the sentence reaches a terminal.
+    /// control characters in them are replaced before the sentence reaches a terminal, and a
+    /// sentence longer than 400 characters loses its middle.
     public var description: String {
-        Sanitize.text(message)
+        Sanitize.message(message)
     }
 
     private var message: String {

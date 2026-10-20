@@ -238,9 +238,10 @@ public enum ZipError: Error, Equatable, Sendable {
 }
 
 extension ZipError: CustomStringConvertible {
-    /// A sentence for the user, with control characters in entry names replaced.
+    /// A sentence for the user, with control characters in entry names replaced and the middle
+    /// of a sentence longer than 400 characters cut out.
     public var description: String {
-        Sanitize.text(message)
+        Sanitize.message(message)
     }
 
     private var message: String {

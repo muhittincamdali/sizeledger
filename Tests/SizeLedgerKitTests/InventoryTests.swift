@@ -200,6 +200,20 @@ import Testing
         #expect(InputError.severalApps("x.ipa", ["A.app", "B.app"]).description.contains("A.app, B.app"))
     }
 
+    @Test func messagesCutTheMiddleOfALongName() {
+        let deep = "Payload/A.app/" + String(repeating: "a/", count: 5_000) + "file"
+        let reason = "entry \(deep) is nested deeper than 64 folders (raise --max-depth)"
+        let message = InputError.unreadable("Deep.ipa", reason).description
+        #expect(message.unicodeScalars.count == Sanitize.longestMessage)
+        #expect(message.hasPrefix("Deep.ipa cannot be read: entry Payload/A.app/a/"))
+        #expect(message.hasSuffix("a/file is nested deeper than 64 folders (raise --max-depth)"))
+        #expect(message.contains("…"))
+
+        let zalgo = "A" + String(repeating: "\u{0301}", count: 10_000) + ".app"
+        #expect(InputError.notFound(zalgo).description.unicodeScalars.count == Sanitize.longestMessage)
+        #expect(InputError.notFound("a.ipa").description == "a.ipa does not exist")
+    }
+
     @Test func messagesReplaceControlCharacters() {
         let name = "Payload/A.app/\u{1B}]0;title\u{07}\n.bin"
         #expect(ZipError.encrypted(name).description == "Payload/A.app/\u{FFFD}]0;title\u{FFFD}\u{FFFD}.bin is encrypted")
