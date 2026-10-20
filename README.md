@@ -173,7 +173,7 @@ details, and [App Clip size limits](docs/guides/app-clip-size.md) applies them t
   fixed and dynamic blocks; the Mach-O parser on thin, 32-bit, fat and fat64 files; ZIP64,
   damaged archives and file names that carry terminal escape sequences.
 
-130 tests in total, run by CI on macOS and on Linux (x86_64 and arm64). Measuring SampleShop 2.0
+140 tests in total, run by CI on macOS and on Linux (x86_64 and arm64). Measuring SampleShop 2.0
 with the release build, process start included, took a median of 14.4 to 17.4 ms in three sets of
 21 runs on a Mac (Apple silicon) that was busy with other work (load average between 41 and 136);
 the time depends on what else the machine runs. [scripts/bench.sh](scripts/bench.sh) repeats the
@@ -192,6 +192,9 @@ measurement.
   `Contents/` folder is measured, but its files land under "Other resources".
 - An `.ipa` with more than one app, encrypted entries, compression other than stored and
   DEFLATE, or an entry path with a `..` component is refused with a message, not guessed at.
+- Paths are compared byte for byte, the way an unzip tool and a file system see them: two names
+  that differ only in Unicode normalization (NFC and NFD) are two files, and a `/` followed by a
+  combining mark still separates two folders.
 - To reach a Mach-O header far into a compressed `.ipa` entry, sizeledger decompresses everything
   before it and keeps only a 32 KiB window, so a crafted entry costs time, not memory: about 1 s per
   decompressed GB on a Mac (Apple silicon).
