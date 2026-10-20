@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@efa35653f46d9bfdc19d7e576b15066b782b349c status=reviewed -->
+<!-- i18n-source: README.md@0a2f8e8474c42f106d43a8a704350fc608661e3b status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -183,9 +183,11 @@ App Clips.
   fat64 ; ainsi que ZIP64, les archives endommagées et les noms de fichiers qui contiennent des séquences
   d'échappement de terminal.
 
-Au total, 124 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
-prend une médiane de 10.5 ms sur 21 exécutions, sur un Mac (Apple silicon) avec le build release,
-démarrage du processus compris ; [scripts/bench.sh](scripts/bench.sh) refait la mesure.
+Au total, 130 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
+avec le build release, démarrage du processus compris, a pris une médiane de 14.4 à 17.4 ms sur trois
+séries de 21 exécutions, sur un Mac (Apple silicon) occupé par d'autres travaux (charge moyenne entre
+41 et 136) ; le temps dépend de ce que la machine exécute par ailleurs. [scripts/bench.sh](scripts/bench.sh)
+refait la mesure.
 
 ## Limites
 

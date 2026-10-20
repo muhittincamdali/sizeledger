@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@efa35653f46d9bfdc19d7e576b15066b782b349c status=reviewed -->
+<!-- i18n-source: README.md@0a2f8e8474c42f106d43a8a704350fc608661e3b status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -159,7 +159,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - **对照参考实现检验的读取器**：DEFLATE 解码器对照 zlib 的输出，覆盖 stored、fixed 和 dynamic 块；
   Mach-O 解析器覆盖 thin、32 位、fat 和 fat64 文件；还有 ZIP64、损坏的归档，以及包含终端转义序列的文件名。
 
-共有 124 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建在 Mac（Apple silicon）上测量 SampleShop 2.0，21 次运行的中位数为 10.5 ms（包括进程启动）。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
+共有 130 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行。使用 release 构建测量 SampleShop 2.0（包括进程启动），在一台正忙于其他工作的 Mac（Apple silicon，负载平均值 41 到 136）上，三组各 21 次运行的中位数为 14.4 到 17.4 ms；耗时取决于机器上同时运行的其他任务。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
 
 ## 局限
 
