@@ -141,7 +141,13 @@ import Testing
         let report = try SizeLedger.analyze(temp.url.appendingPathComponent("Odd.app"))
         #expect(report.totals.files == 1)
         #expect(report.binaries.isEmpty)
-        #expect(report.notes.contains { $0.hasPrefix("Odd starts like a Mach-O file") })
+        #expect(report.notes.first { $0.hasPrefix("Odd ") } == "Odd starts like a Mach-O file but its headers could not be read (load commands of 65535 bytes do not fit the slice); its size is counted, its architectures are not.")
+    }
+
+    @Test func parseErrorsReadAsWords() {
+        #expect(MachO.ParseError.truncated.description == "the file ends inside its headers")
+        #expect(MachO.ParseError.malformed("slice 1 ends past the end of the file").description == "slice 1 ends past the end of the file")
+        #expect(ZipError.malformed("a is not valid DEFLATE data (\(InflateError.truncated))").description == "damaged ZIP archive: a is not valid DEFLATE data (the data ends early)")
     }
 
     @Test func readsASliceFarIntoACompressedBinary() throws {

@@ -29,13 +29,25 @@ enum Inflate {
     }
 }
 
-enum InflateError: Error, Equatable {
+enum InflateError: Error, Equatable, CustomStringConvertible {
     case truncated
     case invalidBlockType
     case storedLengthMismatch
     case invalidCodeLengths
     case invalidSymbol
     case distanceTooFar
+
+    /// Words for the "not valid DEFLATE data" error, which quotes this reason.
+    var description: String {
+        switch self {
+        case .truncated: "the data ends early"
+        case .invalidBlockType: "a block has an unknown type"
+        case .storedLengthMismatch: "a stored block's length and its check do not match"
+        case .invalidCodeLengths: "a Huffman table is invalid"
+        case .invalidSymbol: "a code is not in its Huffman table"
+        case .distanceTooFar: "a back-reference points before the start of the data"
+        }
+    }
 }
 
 private let lengthBase: [Int] = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258]
