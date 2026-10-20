@@ -7,6 +7,29 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Two files whose names differ only in Unicode normalization, such as `café.bin` in NFC and in
+  NFD, were counted as one: the second replaced the first in the totals without a note. Folders,
+  components and languages spelled both ways were merged the same way. Paths are now compared
+  byte for byte, the way an unzip tool and a file system see them.
+- A file inside `Payload/<name>.app` whose name starts with a combining mark, such as
+  `Payload/G.app/\u{301}big.bin`, was listed outside the bundle and left out of the totals, and
+  `Frameworks/\u{301}X.framework/X` counted as a resource instead of a framework.
+
+### Security
+
+- An `.ipa` entry path such as `Payload/G.app/../\u{301}evil` was accepted although the README
+  says a `..` component is refused: the combining mark joined the `/` before it into one Swift
+  `Character`, so the path never split at that `/`. The same kept such separators out of the
+  `--max-depth` count. Entry paths are now split on their bytes.
+- The table, the Markdown report and messages kept more characters that draw nothing and let two
+  names that look the same differ: the soft hyphen U+00AD, the Hangul fillers U+115F, U+1160,
+  U+3164 and U+FFA0, U+17B4, U+17B5, U+180E, U+2061 to U+2064, the variation selectors U+FE00 to
+  U+FE0F and U+E0100 to U+E01EF, and the tag characters U+E0000 to U+E007F. They are now replaced
+  with U+FFFD. An emoji keeps its presentation selector, and a flag such as Scotland's keeps its
+  tags.
+
 ## [0.1.6] - 2026-10-21
 
 ### Added

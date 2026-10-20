@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -139,7 +139,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 130 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
+テストは全部で 140 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
 
 ## 制限事項
 
@@ -148,6 +148,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 - Swift metadata は `__swift5_*` セクションのサイズで、下限値です。一部の metadata は `__const` にあります。
 - iOS 形式のバンドル (iOS、iPadOS、tvOS、watchOS、visionOS) は分類されます。`Contents/` フォルダを持つ macOS の `.app` は測定されますが、そのファイルは "Other resources" に入ります。
 - 複数のアプリを含む `.ipa`、暗号化されたエントリを含む `.ipa`、stored と DEFLATE 以外の圧縮を使う `.ipa`、エントリのパスに `..` を含む `.ipa` は、推測で処理せず、メッセージを表示して拒否します。
+- パスは展開ツールやファイルシステムと同じくバイト単位で比較します。Unicode の正規化 (NFC と NFD) だけが異なる 2 つの名前は 2 つのファイルとして数え、結合文字が後に続く `/` もフォルダの区切りとして扱います。
 - 圧縮された `.ipa` エントリの奥にある Mach-O ヘッダーを読むため、sizeledger はその手前をすべて展開しますが、保持するのは 32 KiB のウィンドウだけです。そのため細工されたエントリが消費するのはメモリではなく時間で、Mac (Apple silicon) では展開 1 GB あたり約 1 s です。
 - 入力は信頼できないため、細工または破損した入力でもメモリ・時間・スタックを使い尽くすことはありません。
   sizeledger は次の入力を拒否します: ファイルが 500,000 を超える、パスが 64 フォルダより深くネストされている、

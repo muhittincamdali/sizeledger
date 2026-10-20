@@ -88,8 +88,8 @@ enum InputLocator {
             }
         }
         let apps = ((try? FileManager.default.contentsOfDirectory(atPath: applications.path)) ?? [])
-            .filter { $0.hasSuffix(".app") }
-            .sorted()
+            .filter { BundlePath.hasSuffix($0, ".app") }
+            .sorted { $0.utf8.lexicographicallyPrecedes($1.utf8) }
         guard let app = apps.first else { throw InputError.noApp(name) }
         guard apps.count == 1 else { throw InputError.severalApps(name, apps) }
         let bundle = applications.appendingPathComponent(app)

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@9e9ba3f749ee71e6cb673e657441f82c3ff40440 status=reviewed -->
+<!-- i18n-source: README.md@846195cbbc1e3d77cf7d6f4f342a13558602fce2 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -179,7 +179,7 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   Fixed- und Dynamic-Blöcke; der Mach-O-Parser an Thin-, 32-Bit-, Fat- und Fat64-Dateien; außerdem
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
-Insgesamt sind es 130 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
+Insgesamt sind es 140 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
 von SampleShop 2.0 mit dem Release-Build, einschließlich Prozessstart, dauerte in drei Serien von 21
 Läufen im Median 14.4 bis 17.4 ms auf einem Mac (Apple silicon), der mit anderer Arbeit ausgelastet war
 (Load Average zwischen 41 und 136); die Zeit hängt davon ab, was sonst auf dem Rechner läuft.
@@ -199,6 +199,9 @@ Läufen im Median 14.4 bis 17.4 ms auf einem Mac (Apple silicon), der mit andere
 - Eine `.ipa` mit mehr als einer App, verschlüsselten Einträgen, einer anderen Komprimierung als
   Stored und DEFLATE oder einem Eintragspfad mit einer `..`-Komponente wird mit einer Meldung
   abgelehnt, nicht erraten.
+- Pfade werden Byte für Byte verglichen, so wie ein Entpackprogramm und ein Dateisystem sie sehen:
+  Zwei Namen, die sich nur in der Unicode-Normalisierung (NFC und NFD) unterscheiden, sind zwei
+  Dateien, und ein `/` mit nachfolgendem kombinierendem Zeichen trennt weiterhin zwei Ordner.
 - Um einen Mach-O-Header weit hinten in einem komprimierten `.ipa`-Eintrag zu erreichen, entpackt
   sizeledger alles davor und behält nur ein Fenster von 32 KiB; ein präparierter Eintrag kostet also
   Zeit, keinen Speicher: etwa 1 s pro entpacktem GB auf einem Mac (Apple silicon).

@@ -61,21 +61,67 @@ public enum Sanitize {
     /// The bidirectional embeddings, overrides and isolates (U+202A to U+202E, U+2066 to U+2069)
     /// go too: an override can make `gpj.exe` display as `exe.jpg` and reorder the rest of a
     /// table row. The marks U+200E, U+200F and U+061C go as well: they are invisible and still
-    /// move neutral characters such as `.` and `/` to the other side of a name. So do the
-    /// invisible U+200B, U+2060 and U+FEFF, which make two names that look the same differ, and
-    /// the line and paragraph separators U+2028 and U+2029, which some terminals break lines on.
-    /// Letters of right-to-left scripts and the joiners U+200C and U+200D, which those scripts
-    /// and emoji need, are kept.
+    /// move neutral characters such as `.` and `/` to the other side of a name. So does every
+    /// character that draws nothing and would let two names that look the same differ: U+200B,
+    /// U+2060 and U+FEFF, the soft hyphen U+00AD, the Hangul fillers U+115F, U+1160, U+3164 and
+    /// U+FFA0, the Khmer vowels U+17B4 and U+17B5, the Mongolian vowel separator U+180E, the
+    /// invisible operators U+2061 to U+2064, the variation selectors U+FE00 to U+FE0F and U+E0100
+    /// to U+E01EF, and the tag characters U+E0000 to U+E007F. The line and paragraph separators
+    /// U+2028 and U+2029, which some terminals break lines on, go as well.
+    ///
+    /// What emoji need is kept: the joiners U+200C and U+200D (right-to-left scripts need them
+    /// too), U+FE0E or U+FE0F right after an emoji (`❤️`, or a keycap such as `1️⃣`), and the tags
+    /// of a complete flag sequence such as the flag of Scotland. Letters of right-to-left
+    /// scripts are kept.
     public static func text(_ value: String) -> String {
+        let scalars = Array(value.unicodeScalars)
         var result = String.UnicodeScalarView()
-        for scalar in value.unicodeScalars {
-            switch scalar.value {
-            case 0x00...0x1F, 0x7F...0x9F, 0x202A...0x202E, 0x2066...0x2069: result.append("\u{FFFD}")
-            case 0x061C, 0x200B, 0x200E, 0x200F, 0x2028, 0x2029, 0x2060, 0xFEFF: result.append("\u{FFFD}")
-            default: result.append(scalar)
+        var flagTags = 0
+        for (index, scalar) in scalars.enumerated() {
+            if flagTags > 0 {
+                result.append(scalar)
+                flagTags -= 1
+                continue
             }
+            if scalar.value == blackFlag { flagTags = flagTagCount(in: scalars, after: index) }
+            let previous = index > 0 ? scalars[index - 1] : nil
+            let next = index + 1 < scalars.count ? scalars[index + 1] : nil
+            result.append(isHidden(scalar, after: previous, before: next) ? "\u{FFFD}" : scalar)
         }
         return String(result)
+    }
+
+    private static let blackFlag: UInt32 = 0x1F3F4
+    private static let combiningKeycap: UInt32 = 0x20E3
+    private static let tagCharacters: ClosedRange<UInt32> = 0xE0020...0xE007E
+    private static let cancelTag: UInt32 = 0xE007F
+
+    /// Whether ``text(_:)`` replaces `scalar`, given its neighbours.
+    private static func isHidden(_ scalar: Unicode.Scalar, after previous: Unicode.Scalar?, before next: Unicode.Scalar?) -> Bool {
+        switch scalar.value {
+        case 0x00...0x1F, 0x7F...0x9F, 0x202A...0x202E, 0x2066...0x2069: return true
+        case 0x061C, 0x200B, 0x200E, 0x200F, 0x2028, 0x2029, 0x2060, 0xFEFF: return true
+        case 0x00AD, 0x115F, 0x1160, 0x17B4, 0x17B5, 0x180E, 0x2061...0x2064, 0x3164, 0xFFA0: return true
+        case 0xFE00...0xFE0D, 0xE0100...0xE01EF, 0xE0000...0xE007F: return true
+        case 0xFE0E, 0xFE0F:
+            // An emoji's text or emoji presentation selector. An ASCII digit, "#" or "*" is an
+            // emoji only as a keycap, so its selector must be followed by U+20E3.
+            guard let previous, previous.properties.isEmoji else { return true }
+            return previous.isASCII && next?.value != combiningKeycap
+        default: return false
+        }
+    }
+
+    /// The number of scalars after the black flag at `index` that form its tag sequence (tags
+    /// ending in U+E007F, as in the flag of Scotland), or 0 when they do not form a complete one.
+    private static func flagTagCount(in scalars: [Unicode.Scalar], after index: Int) -> Int {
+        var count = 0
+        for scalar in scalars[(index + 1)...] {
+            count += 1
+            if scalar.value == cancelTag { return count > 1 ? count : 0 }
+            guard tagCharacters.contains(scalar.value) else { return 0 }
+        }
+        return 0
     }
 
     /// Escapes DEL and the C1 controls in already-encoded JSON as `\u00XX`, so a control character

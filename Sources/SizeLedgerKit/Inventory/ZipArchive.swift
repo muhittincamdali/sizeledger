@@ -12,7 +12,9 @@ struct ZipEntry: Sendable, Equatable {
     var unixMode: UInt32?
 
     var isDirectory: Bool {
-        path.hasSuffix("/") || unixMode.map { $0 & 0o170000 == 0o040000 } == true
+        // The last byte, not the last Character: a prepended mark such as U+0600 joins the "/"
+        // after it into one Character, and unzip still makes that entry a folder.
+        path.utf8.last == BundlePath.separator || unixMode.map { $0 & 0o170000 == 0o040000 } == true
     }
 
     var isSymbolicLink: Bool {

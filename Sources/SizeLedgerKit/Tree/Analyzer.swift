@@ -30,16 +30,17 @@ struct Analyzer {
 
         var total = Tally()
         var categories: [SizeCategory: Tally] = [:]
-        var components: [String: (category: SizeCategory, tally: Tally)] = [:]
-        var languages: [String: Tally] = [:]
+        // Keyed by bytes (see BundlePath), so NFC and NFD spellings of a name stay apart.
+        var components: [PathKey: (path: String, category: SizeCategory, tally: Tally)] = [:]
+        var languages: [PathKey: (language: String, tally: Tally)] = [:]
         for entry in source.entries {
             let category = Classifier.category(of: entry.path, executable: info.executable)
             total.add(entry)
             categories[category, default: Tally()].add(entry)
             let component = Classifier.component(of: entry.path)
-            components[component, default: (category, Tally())].tally.add(entry)
+            components[PathKey(component), default: (component, category, Tally())].tally.add(entry)
             if let language = Classifier.language(of: entry.path) {
-                languages[language, default: Tally()].add(entry)
+                languages[PathKey(language), default: (language, Tally())].tally.add(entry)
             }
         }
 
@@ -55,11 +56,11 @@ struct Analyzer {
             categories: categories
                 .map { .init(category: $0.key, files: $0.value.files, bytes: $0.value.bytes, installBytes: $0.value.installBytes, compressedBytes: $0.value.compressedBytes) }
                 .sorted { $0.bytes != $1.bytes ? $0.bytes > $1.bytes : $0.category < $1.category },
-            components: components
-                .map { .init(path: $0.key, category: $0.value.category, files: $0.value.tally.files, bytes: $0.value.tally.bytes, installBytes: $0.value.tally.installBytes, compressedBytes: $0.value.tally.compressedBytes) }
+            components: components.values
+                .map { .init(path: $0.path, category: $0.category, files: $0.tally.files, bytes: $0.tally.bytes, installBytes: $0.tally.installBytes, compressedBytes: $0.tally.compressedBytes) }
                 .sorted { $0.bytes != $1.bytes ? $0.bytes > $1.bytes : $0.path.utf8.lexicographicallyPrecedes($1.path.utf8) },
-            languages: languages
-                .map { .init(language: $0.key, files: $0.value.files, bytes: $0.value.bytes, installBytes: $0.value.installBytes, compressedBytes: $0.value.compressedBytes) }
+            languages: languages.values
+                .map { .init(language: $0.language, files: $0.tally.files, bytes: $0.tally.bytes, installBytes: $0.tally.installBytes, compressedBytes: $0.tally.compressedBytes) }
                 .sorted { $0.bytes != $1.bytes ? $0.bytes > $1.bytes : $0.language.utf8.lexicographicallyPrecedes($1.language.utf8) },
             binaries: binaries,
             outsideBundle: source.outsideEntries.map { .init(path: $0.path, bytes: $0.bytes, compressedBytes: $0.compressedBytes) },
@@ -72,7 +73,7 @@ struct Analyzer {
 
     private func readInfo(notes: inout [String]) -> AppInfo {
         let unknown = "the app's name, version and main executable are unknown, so the executable is counted under other resources."
-        guard let plist = source.entries.first(where: { $0.path == "Info.plist" }) else {
+        guard let plist = source.entries.first(where: { BundlePath.same($0.path, "Info.plist") }) else {
             notes.append("No Info.plist at the top of \(source.bundleName): \(unknown)")
             return AppInfo()
         }
