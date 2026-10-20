@@ -4,7 +4,8 @@ import SizeLedgerKit
 // swift run SizeCheck <app.ipa | App.app | App.xcarchive> [limit in MB]
 //
 // Prints the totals and the five largest items, then compares the install size estimate with
-// the limit (decimal megabytes, as App Store Connect counts them).
+// the limit (decimal megabytes, as App Store Connect counts them). Names, paths and notes come
+// from the app, so they go through Sanitize.text before they reach the terminal.
 
 let arguments = CommandLine.arguments.dropFirst()
 guard let path = arguments.first else {
@@ -17,12 +18,12 @@ let report: SizeReport
 do {
     report = try SizeLedger.analyze(URL(fileURLWithPath: path))
 } catch {
-    print("error: \(error)")
+    print("error: \(Sanitize.text(String(describing: error)))")
     exit(2)
 }
 
 let totals = report.totals
-print("\(report.app.name ?? report.input.bundle): \(totals.files) files")
+print("\(Sanitize.text(report.app.name ?? report.input.bundle)): \(totals.files) files")
 print("  bytes:                   \(ByteFormat.string(totals.bytes))")
 print("  install size (estimate): \(ByteFormat.string(totals.installBytes))")
 if let compressed = totals.compressedBytes {
@@ -32,11 +33,11 @@ if let compressed = totals.compressedBytes {
 print("Largest items:")
 for component in report.components.prefix(5) {
     let share = ByteFormat.share(component.bytes, of: totals.bytes)
-    print("  \(component.path): \(ByteFormat.string(component.bytes)) (\(share))")
+    print("  \(Sanitize.text(component.path)): \(ByteFormat.string(component.bytes)) (\(share))")
 }
 
 for note in report.notes {
-    print("note: \(note)")
+    print("note: \(Sanitize.text(note))")
 }
 
 if let limitMB {

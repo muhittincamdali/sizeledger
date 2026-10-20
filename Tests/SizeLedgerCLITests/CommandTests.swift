@@ -161,6 +161,7 @@ final class TinyApp {
         ) == true)
         #expect(SizeLedgerCommand.subcommandHint(for: ["it's.APP"])?.hasSuffix(#"analyze 'it'\''s.APP'"#) == true)
         #expect(SizeLedgerCommand.subcommandHint(for: ["\u{1B}[2J.ipa"])?.contains("\u{1B}") == false)
+        #expect(SizeLedgerCommand.subcommandHint(for: ["a\u{202E}ppa.ipa"])?.contains("\u{202E}") == false)
         // Subcommands, options and words that are not apps get ArgumentParser's own messages.
         for arguments in [["analyze", "x.ipa"], ["help"], ["--version"], ["anlyze", "x.ipa"], []] {
             #expect(SizeLedgerCommand.subcommandHint(for: arguments) == nil)
