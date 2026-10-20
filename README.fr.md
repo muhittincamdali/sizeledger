@@ -184,8 +184,10 @@ App Clips.
   d'échappement de terminal.
 
 Au total, 130 tests, exécutés par la CI sous macOS et sous Linux (x86_64 et arm64). Mesurer SampleShop 2.0
-prend une médiane de 10.5 ms sur 21 exécutions, sur un Mac (Apple silicon) avec le build release,
-démarrage du processus compris ; [scripts/bench.sh](scripts/bench.sh) refait la mesure.
+avec le build release, démarrage du processus compris, a pris une médiane de 14.4 à 17.4 ms sur trois
+séries de 21 exécutions, sur un Mac (Apple silicon) occupé par d'autres travaux (charge moyenne entre
+41 et 136) ; le temps dépend de ce que la machine exécute par ailleurs. [scripts/bench.sh](scripts/bench.sh)
+refait la mesure.
 
 ## Limites
 

@@ -180,8 +180,10 @@ os detalhes, e [Limites de tamanho de App Clips](docs/guides/app-clip-size.md) o
   arquivos danificados e nomes de arquivo que contêm sequências de escape de terminal.
 
 No total são 130 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64). Medir o SampleShop 2.0
-leva uma mediana de 10.5 ms em 21 execuções, em um Mac (Apple silicon) com o build release,
-incluindo a inicialização do processo; [scripts/bench.sh](scripts/bench.sh) repete a medição.
+com o build release, incluindo a inicialização do processo, levou uma mediana de 14.4 a 17.4 ms em três
+séries de 21 execuções, em um Mac (Apple silicon) ocupado com outro trabalho (carga média entre 41 e
+136); o tempo depende do que mais a máquina está executando. [scripts/bench.sh](scripts/bench.sh)
+repete a medição.
 
 ## Limites
 

@@ -184,8 +184,10 @@ App Clip'lere uygular.
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
 Toplam 130 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
-2.0'ı ölçmek, release derlemesiyle bir Mac'te (Apple silicon) 21 çalıştırmanın medyanı olarak
-10.5 ms sürer (süreç başlatma dahil). Ölçüm [scripts/bench.sh](scripts/bench.sh) ile tekrarlanabilir.
+2.0'ı release derlemesiyle ölçmek (süreç başlatma dahil), başka işlerle meşgul bir Mac'te (Apple
+silicon, yük ortalaması 41 ile 136 arası) 21 çalıştırmalık üç seride medyan olarak 14.4 ile 17.4 ms
+sürdü; süre makinede başka neyin çalıştığına bağlıdır. Ölçüm [scripts/bench.sh](scripts/bench.sh)
+ile tekrarlanabilir.
 
 ## Sınırlar
 

@@ -139,7 +139,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 130 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。SampleShop 2.0 の測定にかかる時間は、release ビルドを使った Mac (Apple silicon) で、21 回の実行の中央値が 10.5 ms です (プロセスの起動を含みます)。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
+テストは全部で 130 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
 
 ## 制限事項
 

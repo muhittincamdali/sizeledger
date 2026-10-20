@@ -180,8 +180,10 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
 Insgesamt sind es 130 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
-von SampleShop 2.0 dauert im Median 10.5 ms über 21 Läufe auf einem Mac (Apple silicon) mit dem
-Release-Build, einschließlich Prozessstart; [scripts/bench.sh](scripts/bench.sh) wiederholt die Messung.
+von SampleShop 2.0 mit dem Release-Build, einschließlich Prozessstart, dauerte in drei Serien von 21
+Läufen im Median 14.4 bis 17.4 ms auf einem Mac (Apple silicon), der mit anderer Arbeit ausgelastet war
+(Load Average zwischen 41 und 136); die Zeit hängt davon ab, was sonst auf dem Rechner läuft.
+[scripts/bench.sh](scripts/bench.sh) wiederholt die Messung.
 
 ## Grenzen
 
