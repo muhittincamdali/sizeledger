@@ -172,7 +172,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 124개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
+테스트는 모두 130개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 Mac(Apple
 silicon)에서 SampleShop 2.0을 측정하는 데는 21회 실행의 중앙값으로 10.5 ms가 걸립니다(프로세스 시작 포함).
 [scripts/bench.sh](scripts/bench.sh)로 같은 측정을 반복할 수 있습니다.
 

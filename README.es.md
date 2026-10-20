@@ -181,7 +181,7 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 124 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
+En total son 130 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
 tarda una mediana de 10.5 ms en 21 ejecuciones, en un Mac (Apple silicon) con la compilación release,
 incluido el arranque del proceso; [scripts/bench.sh](scripts/bench.sh) repite la medición.
 

@@ -183,7 +183,7 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 124 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
+Toplam 130 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
 2.0'ı ölçmek, release derlemesiyle bir Mac'te (Apple silicon) 21 çalıştırmanın medyanı olarak
 10.5 ms sürer (süreç başlatma dahil). Ölçüm [scripts/bench.sh](scripts/bench.sh) ile tekrarlanabilir.
 

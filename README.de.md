@@ -179,7 +179,7 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   Fixed- und Dynamic-Blöcke; der Mach-O-Parser an Thin-, 32-Bit-, Fat- und Fat64-Dateien; außerdem
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
-Insgesamt sind es 124 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
+Insgesamt sind es 130 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt. Das Messen
 von SampleShop 2.0 dauert im Median 10.5 ms über 21 Läufe auf einem Mac (Apple silicon) mit dem
 Release-Build, einschließlich Prozessstart; [scripts/bench.sh](scripts/bench.sh) wiederholt die Messung.
 

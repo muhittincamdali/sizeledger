@@ -179,7 +179,7 @@ os detalhes, e [Limites de tamanho de App Clips](docs/guides/app-clip-size.md) o
   stored, fixed e dynamic; o parser de Mach-O em arquivos thin, de 32 bits, fat e fat64; além de ZIP64,
   arquivos danificados e nomes de arquivo que contêm sequências de escape de terminal.
 
-No total são 124 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64). Medir o SampleShop 2.0
+No total são 130 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64). Medir o SampleShop 2.0
 leva uma mediana de 10.5 ms em 21 execuções, em um Mac (Apple silicon) com o build release,
 incluindo a inicialização do processo; [scripts/bench.sh](scripts/bench.sh) repete a medição.
 
