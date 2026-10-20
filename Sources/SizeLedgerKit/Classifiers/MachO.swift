@@ -37,10 +37,19 @@ enum MachO {
         case fat(is64: Bool)
     }
 
-    enum ParseError: Error, Equatable {
+    enum ParseError: Error, Equatable, CustomStringConvertible {
         case notMachO
         case truncated
         case malformed(String)
+
+        /// Words for the report's notes, which quote the reason a binary's headers were skipped.
+        var description: String {
+            switch self {
+            case .notMachO: "it has no Mach-O or universal header"
+            case .truncated: "the file ends inside its headers"
+            case .malformed(let reason): reason
+            }
+        }
     }
 
     /// Real binaries have tens of kilobytes of load commands; more than this is a damaged or

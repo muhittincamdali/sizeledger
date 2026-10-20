@@ -12,8 +12,20 @@ All notable changes to sizeledger are listed here. The format follows
 - `Sanitize.text(_:)` is public, so a program that prints report values itself can clean them the
   way the table and the Markdown report do. The DocC articles and `Examples/LibraryUsage` use it.
 
+### Fixed
+
+- An `.ipa` cut short by an interrupted download or copy was reported as "not an .app bundle, an
+  .ipa or an .xcarchive". It is now a damaged ZIP archive ("it has no end of central directory
+  record; the file may be cut short"), and a file named `.ipa` that is not a ZIP archive says so.
+- The note for a binary whose headers cannot be read quoted Swift's debug text, such as
+  `malformed("...")`; it now gives the reason in words. So does the DEFLATE part of a
+  damaged-ZIP error.
+
 ### Security
 
+- An error message that names an entry of a crafted archive could be any length: a path nested
+  5,000 folders deep printed about 10,000 characters to stderr. Messages longer than 400
+  characters now lose their middle and keep the input's name and the reason.
 - GitHub typesets `$...$` (and `$$...$$`, `` $`...`$ ``) as math, even when the dollars are
   backslash-escaped, so an app name, Info.plist value or file name such as
   `$\color{green}{\textsf{Size check passed}}$` printed coloured or oversized LaTeX into a pull

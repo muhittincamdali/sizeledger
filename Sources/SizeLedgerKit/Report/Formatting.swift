@@ -116,6 +116,24 @@ public enum Sanitize {
         return indent + middleTruncated(String(parts.last ?? Substring(body)), width: room)
     }
 
+    /// Longest error message printed, in Unicode scalars. Paths and entry names in a message come
+    /// from the input, and a crafted archive can hold a name thousands of characters long.
+    static let longestMessage = 400
+
+    /// `value` cleaned by ``text(_:)`` and, when it is longer than ``longestMessage`` scalars, with
+    /// its middle cut out, so the start (which input) and the end (what went wrong, and which
+    /// option to raise) stay. Scalars are counted rather than characters so that one letter
+    /// carrying thousands of combining marks is bounded too.
+    static func message(_ value: String) -> String {
+        let scalars = text(value).unicodeScalars
+        guard scalars.count > longestMessage else { return String(scalars) }
+        let head = (longestMessage - 1) / 2
+        var result = String.UnicodeScalarView(scalars.prefix(head))
+        result.append("…")
+        result.append(contentsOf: scalars.suffix(longestMessage - 1 - head))
+        return String(result)
+    }
+
     /// Shortens `value` to `width` characters by cutting out the middle.
     static func middleTruncated(_ value: String, width: Int) -> String {
         guard value.count > width, width > 1 else { return value }

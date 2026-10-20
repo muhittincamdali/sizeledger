@@ -106,6 +106,19 @@ import Testing
         }
     }
 
+    @Test func callsAnArchiveCutShortDamaged() {
+        var builder = ZipBuilder()
+        builder.add("Payload/A.app/A", Data(repeating: 1, count: 64))
+        let whole = builder.build()
+        let reason = "it has no end of central directory record; the file may be cut short"
+        #expect(throws: ZipError.malformed(reason)) {
+            _ = try ZipArchive(data: whole.prefix(whole.count / 2))
+        }
+        #expect(throws: ZipError.malformed(reason)) {
+            _ = try ZipArchive(data: whole.prefix(10))
+        }
+    }
+
     @Test func rejectsADirectoryOutsideTheFile() {
         var builder = ZipBuilder()
         builder.add("a.txt", Data("a".utf8))
