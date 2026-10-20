@@ -32,6 +32,7 @@ struct ZipArchive: Sendable {
 
     static let storedMethod: UInt16 = 0
     static let deflateMethod: UInt16 = 8
+    static let localHeaderSignature: UInt32 = 0x0403_4B50
 
     init(url: URL, limits: AnalysisLimits = .default) throws(ZipError) {
         let data: Data
@@ -70,7 +71,7 @@ struct ZipArchive: Sendable {
             guard let offset = Int(exactly: entry.localHeaderOffset), let size = Int(exactly: entry.compressedSize) else {
                 throw ZipError.malformed("\(entry.path) extends past the end of the archive")
             }
-            guard try reader.uint32LE(at: offset) == 0x0403_4B50 else {
+            guard try reader.uint32LE(at: offset) == Self.localHeaderSignature else {
                 throw ZipError.malformed("no local header for \(entry.path)")
             }
             let nameLength = Int(try reader.uint16LE(at: offset + 26))
@@ -193,17 +194,23 @@ struct ZipArchive: Sendable {
     }
 
     /// The end-of-central-directory record sits in the last 22 bytes plus an optional comment of
-    /// up to 65,535 bytes; search backwards for its signature.
+    /// up to 65,535 bytes; search backwards for its signature. A file that starts with a local
+    /// file header but has no such record is an archive whose end is missing, most often one cut
+    /// short by an interrupted download or copy, so it is reported as damaged rather than as
+    /// something other than a ZIP archive.
     private static func findEndOfCentralDirectory(_ reader: ByteReader) throws -> Int {
         let minimumSize = 22
-        guard reader.count >= minimumSize else { throw ZipError.notAZipArchive }
+        let missing = (try? reader.uint32LE(at: 0)) == localHeaderSignature
+            ? ZipError.malformed("it has no end of central directory record; the file may be cut short")
+            : ZipError.notAZipArchive
+        guard reader.count >= minimumSize else { throw missing }
         let lowest = max(0, reader.count - minimumSize - 0xFFFF)
         var offset = reader.count - minimumSize
         while offset >= lowest {
             if try reader.uint32LE(at: offset) == 0x0605_4B50 { return offset }
             offset -= 1
         }
-        throw ZipError.notAZipArchive
+        throw missing
     }
 
     /// Names are UTF-8 when the archive says so (flag bit 11) and, in practice, also when it does

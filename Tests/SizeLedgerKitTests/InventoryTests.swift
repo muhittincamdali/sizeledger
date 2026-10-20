@@ -177,6 +177,24 @@ import Testing
         }
     }
 
+    @Test func explainsAnIPAThatIsNotAWholeArchive() throws {
+        let temp = try TemporaryDirectory()
+        var builder = ZipBuilder()
+        builder.add("Payload/A.app/A", Data(repeating: 1, count: 64))
+        let whole = builder.build()
+        try temp.file("Cut.ipa", contents: whole.prefix(whole.count / 2))
+        try temp.file("Noise.ipa", contents: Data(repeating: 0x2C, count: 100))
+
+        let cut = temp.url.appendingPathComponent("Cut.ipa")
+        #expect(throws: InputError.unreadable(cut.path, ZipError.malformed("it has no end of central directory record; the file may be cut short").description)) {
+            _ = try InputLocator.open(cut)
+        }
+        let noise = temp.url.appendingPathComponent("Noise.ipa")
+        #expect(throws: InputError.unreadable(noise.path, "not a ZIP archive (an .ipa is one)")) {
+            _ = try InputLocator.open(noise)
+        }
+    }
+
     @Test func messagesNameThePath() {
         #expect(InputError.notFound("a.ipa").description == "a.ipa does not exist")
         #expect(InputError.severalApps("x.ipa", ["A.app", "B.app"]).description.contains("A.app, B.app"))
