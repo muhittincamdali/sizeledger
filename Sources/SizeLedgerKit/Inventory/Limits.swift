@@ -49,9 +49,10 @@ public struct AnalysisLimits: Sendable, Equatable {
         return limits
     }
 
-    /// The number of `/`-separated components in a bundle path.
+    /// The number of `/`-separated components in a bundle path, counted on bytes so that a "/"
+    /// followed by a combining mark still counts (see ``BundlePath``).
     static func depth(of path: String) -> Int {
-        path.split(separator: "/", omittingEmptySubsequences: true).count
+        BundlePath.components(of: path).count
     }
 }
 

@@ -10,7 +10,7 @@ struct IPASource: BundleSource {
     let entries: [BundleEntry]
     let outsideEntries: [BundleEntry]
     let archiveBytes: UInt64?
-    private let entryByPath: [String: ZipEntry]
+    private let entryByPath: [PathKey: ZipEntry]
 
     var kind: InputKind { .ipa }
 
@@ -18,25 +18,31 @@ struct IPASource: BundleSource {
         let archive = try ZipArchive(url: url, limits: limits)
         // Xcode never writes a ".." component, and unzip tools refuse or strip it. Counting such an
         // entry would put its bytes in a ".." folder of the bundle that does not exist on a device.
-        if let entry = archive.entries.first(where: { $0.path.split(separator: "/").contains("..") }) {
+        // Components are split on bytes (see BundlePath), so "../\u{301}x" is caught too.
+        if let entry = archive.entries.first(where: { BundlePath.components(of: $0.path).contains { BundlePath.same($0, "..") } }) {
             throw InputError.unreadable(url.path, "entry \(entry.path) has a \"..\" path component")
         }
         try Self.check(archive.entries, url: url, limits: limits)
-        let apps = Set(archive.entries.compactMap { Self.appName(in: $0.path) }).sorted()
+        // Keyed by bytes, so two bundles whose names differ only in Unicode normalization are two.
+        var appsByKey: [PathKey: String] = [:]
+        for name in archive.entries.compactMap({ Self.appName(in: $0.path) }) { appsByKey[PathKey(name)] = name }
+        let apps = appsByKey.values.sorted { $0.utf8.lexicographicallyPrecedes($1.utf8) }
         guard let app = apps.first else { throw InputError.noApp(url.lastPathComponent) }
         guard apps.count == 1 else { throw InputError.severalApps(url.lastPathComponent, apps) }
 
         let prefix = "Payload/\(app)/"
         // A ZIP may list the same path twice; extraction keeps the last one, so measure that one
         // once rather than adding both. Insertion order is preserved so the report is stable.
-        var insideOrder: [String] = []
-        var inside: [String: BundleEntry] = [:]
-        var outsideOrder: [String] = []
-        var outside: [String: BundleEntry] = [:]
-        var byPath: [String: ZipEntry] = [:]
+        // Paths are keyed by their bytes: NFC and NFD spellings of a name are two files on disk.
+        var insideOrder: [PathKey] = []
+        var inside: [PathKey: BundleEntry] = [:]
+        var outsideOrder: [PathKey] = []
+        var outside: [PathKey: BundleEntry] = [:]
+        var byPath: [PathKey: ZipEntry] = [:]
         for entry in archive.entries where !entry.isDirectory {
-            let inBundle = entry.path.hasPrefix(prefix)
-            let path = inBundle ? String(entry.path.dropFirst(prefix.count)) : entry.path
+            let inBundle = BundlePath.hasPrefix(entry.path, prefix)
+            let path = inBundle ? BundlePath.dropping(prefix, from: entry.path) : entry.path
+            let key = PathKey(path)
             let record = BundleEntry(
                 path: path,
                 bytes: entry.uncompressedSize,
@@ -44,12 +50,12 @@ struct IPASource: BundleSource {
                 isSymbolicLink: entry.isSymbolicLink
             )
             if inBundle {
-                if inside[path] == nil { insideOrder.append(path) }
-                inside[path] = record
-                byPath[path] = entry
+                if inside[key] == nil { insideOrder.append(key) }
+                inside[key] = record
+                byPath[key] = entry
             } else {
-                if outside[path] == nil { outsideOrder.append(path) }
-                outside[path] = record
+                if outside[key] == nil { outsideOrder.append(key) }
+                outside[key] = record
             }
         }
 
@@ -83,16 +89,17 @@ struct IPASource: BundleSource {
     }
 
     func contents(of path: String, ranges: [Range<Int>]) throws -> [Data] {
-        guard let entry = entryByPath[path] else { throw CocoaError(.fileNoSuchFile) }
+        guard let entry = entryByPath[PathKey(path)] else { throw CocoaError(.fileNoSuchFile) }
         return try archive.contents(of: entry, ranges: ranges)
     }
 
     /// `MyApp.app` for paths under `Payload/MyApp.app/`.
     private static func appName(in path: String) -> String? {
-        let parts = path.split(separator: "/", maxSplits: 2, omittingEmptySubsequences: false)
-        guard parts.count >= 2, parts[0] == "Payload", parts[1].hasSuffix(".app"), parts[1].count > 4 else { return nil }
+        let parts = path.utf8.split(separator: BundlePath.separator, maxSplits: 2, omittingEmptySubsequences: false)
         // "Payload/MyApp.app" without a trailing slash is a file named like a bundle, not a bundle.
-        guard parts.count == 3 else { return nil }
-        return String(parts[1])
+        guard parts.count == 3, parts[0].elementsEqual("Payload".utf8) else { return nil }
+        let name = String(decoding: parts[1], as: UTF8.self)
+        guard BundlePath.hasSuffix(name, ".app"), name.utf8.count > ".app".utf8.count else { return nil }
+        return name
     }
 }
