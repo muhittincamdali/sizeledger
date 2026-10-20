@@ -43,6 +43,17 @@ import Testing
         let report = try SizeLedger.analyze(url)
         #expect(report.totals.files == 2)
         #expect(report.totals.bytes == 6_000)
+        #expect(report.components.count == 2)
+    }
+
+    @Test func keepsNFCAndNFDFoldersApartInTheTree() {
+        let entries = [
+            BundleEntry(path: "caf\u{E9}/a", bytes: 1),
+            BundleEntry(path: "cafe\u{301}/b", bytes: 2),
+        ]
+        let tree = TreeBuilder.build(rootName: "G.app", entries: entries) { _ in .resources }
+        #expect(tree.children?.count == 2)
+        #expect(tree.bytes == 3)
     }
 
     @Test func refusesTwoAppsThatDifferOnlyInNormalization() throws {
@@ -61,6 +72,14 @@ import Testing
         // U+0600 is a prepended concatenation mark: it joins the "/" after it into one Character.
         let entry = ZipEntry(path: "Payload/G.app/x\u{600}/", compressedSize: 0, uncompressedSize: 0, method: 0, flags: 0, localHeaderOffset: 0)
         #expect(entry.isDirectory)
+    }
+
+    @Test func classifiesPathsWhoseComponentsStartWithACombiningMark() {
+        let framework = "Frameworks/\u{301}X.framework/X"
+        #expect(Classifier.category(of: framework, executable: nil) == .frameworks)
+        #expect(Classifier.component(of: framework).utf8.elementsEqual("Frameworks/\u{301}X.framework".utf8))
+        #expect(Classifier.language(of: "Base.lproj/\u{301}x.strings") == "Base")
+        #expect(Classifier.language(of: "x\u{600}.lproj/a.strings")?.utf8.elementsEqual("x\u{600}".utf8) == true)
     }
 
     /// An `.ipa` with one stored file of `size` bytes per path, in this test's own directory.

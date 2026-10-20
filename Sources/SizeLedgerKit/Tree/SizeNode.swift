@@ -58,22 +58,29 @@ struct Tally: Equatable {
 
 /// Builds the tree from flat paths.
 enum TreeBuilder {
+    /// Folders are keyed by the bytes of their names, so NFC and NFD spellings stay two folders.
     private final class Folder {
-        var folders: [String: Folder] = [:]
+        let name: String
+        var folders: [PathKey: Folder] = [:]
         var files: [SizeNode] = []
+
+        init(name: String) {
+            self.name = name
+        }
     }
 
     static func build(rootName: String, entries: [BundleEntry], category: (BundleEntry) -> SizeCategory) -> SizeNode {
-        let root = Folder()
+        let root = Folder(name: rootName)
         for entry in entries {
-            let parts = entry.path.split(separator: "/").map(String.init)
+            let parts = BundlePath.components(of: entry.path)
             var folder = root
             for part in parts.dropLast() {
-                if let next = folder.folders[part] {
+                let key = PathKey(part)
+                if let next = folder.folders[key] {
                     folder = next
                 } else {
-                    let next = Folder()
-                    folder.folders[part] = next
+                    let next = Folder(name: part)
+                    folder.folders[key] = next
                     folder = next
                 }
             }
@@ -89,27 +96,27 @@ enum TreeBuilder {
                 children: nil
             ))
         }
-        return node(named: rootName, from: root)
+        return node(from: root)
     }
 
     /// Builds every folder's node from the leaves up with an explicit stack, so a bundle nested
     /// thousands of folders deep does not grow the call stack and crash.
-    private static func node(named rootName: String, from rootFolder: Folder) -> SizeNode {
+    private static func node(from rootFolder: Folder) -> SizeNode {
         var done: [ObjectIdentifier: SizeNode] = [:]
-        var stack: [(name: String, folder: Folder)] = [(rootName, rootFolder)]
+        var stack: [Folder] = [rootFolder]
         while let top = stack.last {
-            let pending = top.folder.folders.filter { done[ObjectIdentifier($0.value)] == nil }
+            let pending = top.folders.values.filter { done[ObjectIdentifier($0)] == nil }
             guard pending.isEmpty else {
-                for (name, folder) in pending { stack.append((name, folder)) }
+                stack.append(contentsOf: pending)
                 continue
             }
             stack.removeLast()
-            let children = top.folder.folders.map { done[ObjectIdentifier($0.value)]! } + top.folder.files
+            let children = top.folders.values.map { done[ObjectIdentifier($0)]! } + top.files
             var tally = Tally()
             for child in children {
                 tally = tally + Tally(files: child.files, bytes: child.bytes, installBytes: child.installBytes, compressedBytes: child.compressedBytes)
             }
-            done[ObjectIdentifier(top.folder)] = SizeNode(
+            done[ObjectIdentifier(top)] = SizeNode(
                 name: top.name,
                 files: tally.files,
                 bytes: tally.bytes,

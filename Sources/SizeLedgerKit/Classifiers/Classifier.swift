@@ -60,38 +60,45 @@ enum Classifier {
     static let signatureFiles: Set<String> = ["_CodeSignature", "SC_Info", "embedded.mobileprovision", "CodeResources"]
 
     static func category(of path: String, executable: String?) -> SizeCategory {
-        let parts = path.split(separator: "/", omittingEmptySubsequences: true)
-        guard let first = parts.first.map(String.init) else { return .resources }
-        if parts.count > 1, let container = containers[first] { return container }
-        if signatureFiles.contains(first) { return .codeSignature }
+        let parts = BundlePath.components(of: path)
+        guard let first = parts.first else { return .resources }
+        if parts.count > 1, let container = container(named: first) { return container }
+        if signatureFiles.contains(where: { BundlePath.same($0, first) }) { return .codeSignature }
         if parts.count == 1 {
-            if first == executable { return .executable }
-            if first.hasSuffix(".car") { return .assetCatalogs }
+            if let executable, BundlePath.same(first, executable) { return .executable }
+            if BundlePath.hasSuffix(first, ".car") { return .assetCatalogs }
             return .resources
         }
-        if first.hasSuffix(".lproj") { return .localizations }
+        if BundlePath.hasSuffix(first, ".lproj") { return .localizations }
         return .resources
+    }
+
+    /// The category of a container folder, matched on bytes like every path (see ``BundlePath``).
+    static func container(named name: String) -> SizeCategory? {
+        containers.first { BundlePath.same($0.key, name) }?.value
     }
 
     /// The item a file is reported under: the top-level file or folder, or for containers such
     /// as `Frameworks/`, the framework, dylib or extension inside it.
     static func component(of path: String) -> String {
-        let parts = path.split(separator: "/", omittingEmptySubsequences: true)
+        let parts = BundlePath.components(of: path)
         guard let first = parts.first else { return path }
-        if parts.count > 2, containers[String(first)] != nil {
+        if parts.count > 2, container(named: first) != nil {
             return "\(first)/\(parts[1])"
         }
-        if parts.count == 2, containers[String(first)] != nil {
+        if parts.count == 2, container(named: first) != nil {
             return path
         }
-        return String(first)
+        return first
     }
 
     /// The language of a file inside an `.lproj` folder anywhere in the bundle: `en` for
     /// `en.lproj/Main.strings`, `Base` for `Base.lproj`.
     static func language(of path: String) -> String? {
-        for part in path.split(separator: "/").dropLast() where part.hasSuffix(".lproj") && part.count > 6 {
-            return String(part.dropLast(6))
+        let suffix = ".lproj"
+        for part in BundlePath.components(of: path).dropLast()
+        where BundlePath.hasSuffix(part, suffix) && part.utf8.count > suffix.utf8.count {
+            return BundlePath.droppingSuffix(suffix, from: part)
         }
         return nil
     }
