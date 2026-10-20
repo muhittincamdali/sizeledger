@@ -54,6 +54,34 @@ import Testing
         }
     }
 
+    @Test func replacesCharactersThatDrawNothing() {
+        let invisible: [UInt32] = [
+            0x00AD, 0x115F, 0x1160, 0x17B4, 0x17B5, 0x180E, 0x2061, 0x2064, 0x3164, 0xFFA0,
+            0xFE00, 0xFE0E, 0xFE0F, 0xE0001, 0xE0020, 0xE007F, 0xE0100, 0xE01EF,
+        ]
+        for value in invisible {
+            let scalar = Unicode.Scalar(value)!
+            #expect(Sanitize.text("a\(Character(scalar))b") == "a\u{FFFD}b", "U+\(String(value, radix: 16))")
+        }
+        // A selector after an ASCII digit is a keycap only when U+20E3 follows.
+        #expect(Sanitize.text("1\u{FE0F}") == "1\u{FFFD}")
+        // A flag's tags without the cancel tag that ends them draw nothing either.
+        #expect(Sanitize.text("\u{1F3F4}\u{E0067}\u{E0062}") == "\u{1F3F4}\u{FFFD}\u{FFFD}")
+    }
+
+    @Test func keepsWhatEmojiNeed() {
+        let emoji = [
+            "\u{2764}\u{FE0F}",
+            "\u{2764}\u{FE0E}",
+            "1\u{FE0F}\u{20E3}",
+            "\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}",
+            "\u{1F3F3}\u{FE0F}\u{200D}\u{1F308}",
+        ]
+        for value in emoji {
+            #expect(Sanitize.text("a" + value + "b") == "a" + value + "b")
+        }
+    }
+
     @Test func shortensPathsFromTheLeft() {
         #expect(Sanitize.shortened("  Frameworks/ShopCore.framework/ShopCore", width: 33) == "  …/ShopCore.framework/ShopCore")
         #expect(Sanitize.shortened("  Frameworks/A.framework/A", width: 33) == "  Frameworks/A.framework/A")
