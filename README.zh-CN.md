@@ -95,7 +95,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew（macOS、Linux） | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                             |
 | 发布的二进制文件         | 从 [Releases](https://github.com/muhittincamdali/sizeledger/releases) 下载 `sizeledger-<version>-macos-universal.tar.gz`，或 `-linux-x86_64` / `-linux-aarch64`，用 `SHA256SUMS` 校验，然后把 `sizeledger` 放到 `PATH` 中 |
 | 从源码构建               | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release`（二进制文件位于 `.build/release/sizeledger`）                                                                    |
-| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`，product 为 `SizeLedgerKit`                                                                                                               |
+| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.6")`，product 为 `SizeLedgerKit`                                                                                                               |
 
 构建需要 Swift 6.2 或更高版本（Mac 上需要 Xcode 26 或更高版本）。Linux 的发布二进制文件已包含 Swift
 运行时，需要 glibc 2.35 或更高版本（Ubuntu 22.04、Debian 12 或更新的系统）。

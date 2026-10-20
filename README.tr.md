@@ -107,7 +107,7 @@ satır anlatır.
 | Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                                           |
 | Yayın ikili dosyası     | [Releases](https://github.com/muhittincamdali/sizeledger/releases) sayfasından `sizeledger-<version>-macos-universal.tar.gz` ya da `-linux-x86_64` / `-linux-aarch64` dosyasını indirin, `SHA256SUMS` ile doğrulayın, `sizeledger`'ı `PATH` içine koyun |
 | Kaynaktan               | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (ikili dosya `.build/release/sizeledger` yolundadır)                                                                                           |
-| Swift paketi            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`, ürün `SizeLedgerKit`                                                                                                                                                   |
+| Swift paketi            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.6")`, ürün `SizeLedgerKit`                                                                                                                                                   |
 
 Derlemek için Swift 6.2 veya üzeri gerekir (Mac'te Xcode 26 veya üzeri). Linux yayın ikili
 dosyaları Swift çalışma zamanını içerir ve glibc 2.35 veya üzerini gerektirir (Ubuntu 22.04,

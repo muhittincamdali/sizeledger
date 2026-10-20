@@ -102,7 +102,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew(macOS, Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                   |
 | 릴리스 바이너리        | [Releases](https://github.com/muhittincamdali/sizeledger/releases)에서 `sizeledger-<version>-macos-universal.tar.gz` 또는 `-linux-x86_64` / `-linux-aarch64`를 내려받아 `SHA256SUMS`로 확인한 뒤 `sizeledger`를 `PATH`에 두세요 |
 | 소스에서               | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release`(바이너리는 `.build/release/sizeledger`입니다)                                                                          |
-| Swift package          | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`, product는 `SizeLedgerKit`                                                                                                                      |
+| Swift package          | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.6")`, product는 `SizeLedgerKit`                                                                                                                      |
 
 빌드에는 Swift 6.2 이상이 필요합니다(Mac에서는 Xcode 26 이상). Linux 릴리스 바이너리에는 Swift 런타임이
 들어 있으며 glibc 2.35 이상(Ubuntu 22.04, Debian 12 또는 그 이후 버전)이 필요합니다.

@@ -104,7 +104,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew (macOS, Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                         |
 | Бинарник из релиза      | Скачайте `sizeledger-<version>-macos-universal.tar.gz` или `-linux-x86_64` / `-linux-aarch64` со страницы [Releases](https://github.com/muhittincamdali/sizeledger/releases), сверьте с `SHA256SUMS` и положите `sizeledger` в `PATH` |
 | Из исходников           | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (бинарник будет в `.build/release/sizeledger`)                                                                               |
-| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`, product `SizeLedgerKit`                                                                                                                              |
+| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.6")`, product `SizeLedgerKit`                                                                                                                              |
 
 Для сборки нужен Swift 6.2 или новее (на Mac — Xcode 26 или новее). Бинарники для Linux содержат
 рантайм Swift и требуют glibc 2.35 или новее (Ubuntu 22.04, Debian 12 или новее).

@@ -106,7 +106,7 @@ Enquanto o `budget` não existe, checar um limite no CI é uma linha de `jq`; ve
 | Homebrew (macOS, Linux)  | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                    |
 | Binário da release       | Baixe `sizeledger-<version>-macos-universal.tar.gz` ou `-linux-x86_64` / `-linux-aarch64` em [Releases](https://github.com/muhittincamdali/sizeledger/releases), confira com `SHA256SUMS` e coloque o `sizeledger` no seu `PATH` |
 | A partir do código-fonte | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (o binário fica em `.build/release/sizeledger`)                                                                         |
-| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`, product `SizeLedgerKit`                                                                                                                         |
+| Swift package            | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.6")`, product `SizeLedgerKit`                                                                                                                         |
 
 Para compilar, é preciso Swift 6.2 ou mais recente (Xcode 26 ou mais recente em um Mac). Os binários de
 release para Linux trazem o runtime do Swift e exigem glibc 2.35 ou mais recente (Ubuntu 22.04,

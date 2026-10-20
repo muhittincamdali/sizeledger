@@ -84,7 +84,7 @@ sizeledger analyze path/to/MyApp.ipa
 | Homebrew (macOS、Linux) | `brew install muhittincamdali/tap/sizeledger`                                                                                                                                                                                                 |
 | リリースのバイナリ      | [Releases](https://github.com/muhittincamdali/sizeledger/releases) から `sizeledger-<version>-macos-universal.tar.gz`、または `-linux-x86_64` / `-linux-aarch64` をダウンロードし、`SHA256SUMS` で検証して、`sizeledger` を `PATH` に置きます |
 | ソースから              | `git clone https://github.com/muhittincamdali/sizeledger.git && cd sizeledger && swift build -c release` (バイナリは `.build/release/sizeledger` です)                                                                                        |
-| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.5")`、product は `SizeLedgerKit`                                                                                                                                   |
+| Swift package           | `.package(url: "https://github.com/muhittincamdali/sizeledger", from: "0.1.6")`、product は `SizeLedgerKit`                                                                                                                                   |
 
 ビルドには Swift 6.2 以降が必要です (Mac では Xcode 26 以降)。Linux 向けのリリースバイナリには Swift ランタイムが含まれており、glibc 2.35 以降 (Ubuntu 22.04、Debian 12 以降) が必要です。
 
