@@ -118,9 +118,7 @@ public struct Analyze: ParsableCommand {
 
         if let out {
             do {
-                let url = URL(fileURLWithPath: out)
-                try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-                try json.write(to: url, options: .atomic)
+                try Self.write(json, to: out)
             } catch {
                 errors.write("sizeledger: cannot write \(out): \(error.localizedDescription)\n")
                 return ExitStatus.failure
@@ -138,5 +136,25 @@ public struct Analyze: ParsableCommand {
             output.write(String(decoding: json, as: UTF8.self))
         }
         return ExitStatus.success
+    }
+
+    /// Writes the report to `path`. A new or regular file is replaced atomically, so nothing
+    /// ever reads half a report. A device, pipe or symbolic link, such as `/dev/stdout`,
+    /// `/dev/null` or Linux's `/dev/stdout` link to `/proc/self/fd/1`, cannot be replaced that
+    /// way: the temporary file would go in `/dev` or `/proc`. It is written to where it points.
+    static func write(_ json: Data, to path: String) throws {
+        let url = URL(fileURLWithPath: path)
+        let type = (try? FileManager.default.attributesOfItem(atPath: path))?[.type] as? FileAttributeType
+        if let type, type != .typeRegular, type != .typeDirectory {
+            let handle = try FileHandle(forWritingTo: url)
+            defer { try? handle.close() }
+            // A link to a regular file is emptied first, as `>` in a shell does; a pipe or a
+            // terminal cannot be truncated, and has nothing to empty.
+            try? handle.truncate(atOffset: 0)
+            try handle.write(contentsOf: json)
+            return
+        }
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try json.write(to: url, options: .atomic)
     }
 }

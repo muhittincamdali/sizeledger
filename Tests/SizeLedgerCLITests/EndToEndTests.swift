@@ -51,6 +51,21 @@ import SizeLedgerKit
     }
 
     @Test(.enabled(if: built, "run `swift build` first"))
+    func writesTheReportToStandardOutputAndNull() throws {
+        // `--out /dev/stdout` used to end with status 2 and "cannot write": the report was
+        // written to a temporary file in /dev and moved over the device.
+        let ipa = Self.repository.appendingPathComponent("Fixtures/apps/SampleShop-1.0.ipa").path
+        let json = try Self.run(["analyze", ipa, "--format", "json"])
+        let stdout = try Self.run(["analyze", ipa, "--out", "/dev/stdout", "--quiet"])
+        #expect(stdout.status == 0)
+        #expect(stdout.errors.isEmpty)
+        #expect(stdout.output == json.output)
+        let null = try Self.run(["analyze", ipa, "--out", "/dev/null", "--quiet"])
+        #expect(null.status == 0)
+        #expect(null.errors.isEmpty)
+    }
+
+    @Test(.enabled(if: built, "run `swift build` first"))
     func exitsWith2ForAMissingInput() throws {
         let result = try Self.run(["analyze", "/nonexistent/App.ipa"])
         #expect(result.status == 2)

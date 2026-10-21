@@ -89,6 +89,28 @@ final class TinyApp {
         #expect(json.output == String(decoding: try Data(contentsOf: target), as: UTF8.self))
     }
 
+    @Test func writesThroughASymbolicLink() throws {
+        let tiny = try TinyApp()
+        let target = tiny.folder.appendingPathComponent("target.json")
+        let link = tiny.folder.appendingPathComponent("link.json")
+        try Data(repeating: 0x20, count: 100_000).write(to: target)
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
+        let run = try Run([tiny.app, "--out", link.path, "--quiet"])
+        #expect(run.status == 0)
+        #expect(run.errors.isEmpty)
+        // The link stays a link, and the longer old contents are gone from the file it names.
+        #expect(try FileManager.default.destinationOfSymbolicLink(atPath: link.path) == target.path)
+        let json = try Run([tiny.app, "--format", "json"])
+        #expect(String(decoding: try Data(contentsOf: target), as: UTF8.self) == json.output)
+    }
+
+    @Test func writesToADevice() throws {
+        let tiny = try TinyApp()
+        let run = try Run([tiny.app, "--out", "/dev/null", "--quiet"])
+        #expect(run.status == 0)
+        #expect(run.errors.isEmpty)
+    }
+
     @Test func failsWithStatus2AndAMessage() throws {
         let missing = try Run(["/nonexistent/App.ipa"])
         #expect(missing.status == 2)
