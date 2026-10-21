@@ -7,6 +7,24 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- An `.ipa` whose central directory points many entries at the same stored data passed every
+  limit, and each entry decoded that data again: a 100 MB file with 20,000 such entries ran for
+  64.8 s and ended with status 0, and the time grew with the entry count up to the 500,000-file
+  limit. An archive in which two entries' local headers and data overlap is now refused as
+  damaged, naming both entries, before anything is decompressed.
+- Every read of a compressed `.ipa` entry copied all of its stored bytes first, so checking the
+  first 4 bytes of a 100 MB entry copied 100 MB. Entries are now decoded where they lie in the
+  mapped archive.
+- `--out /dev/stdout`, `--out /dev/null` and `--out` to a pipe ended with exit status 2 and
+  "cannot write", because the report was written to a temporary file next to the target and moved
+  over it. A path that exists as a device, a pipe or a symbolic link is now written where it
+  points; a new or regular file is still replaced atomically.
+- The README said a crafted input cannot exhaust time. The limits bound the time instead, and the
+  Limits section now gives the slowest crafted `.ipa` found within the defaults: 15 to 24 s on a
+  Mac (Apple silicon).
+
 ## [0.1.8] - 2026-10-21
 
 ### Fixed
