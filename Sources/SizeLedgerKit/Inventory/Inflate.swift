@@ -21,11 +21,21 @@ enum Inflate {
     }
 
     /// Like ``decompress(_:ranges:)``, also returning the largest size the decoding buffer reached.
+    ///
+    /// The stream is read where it lies, a slice of the mapped archive, and never copied: reading
+    /// a 4-byte prefix of a 100 MB entry costs a few bytes of input, not 100 MB.
     static func decode(_ input: Data, ranges: [Range<Int>]) throws(InflateError) -> (pieces: [[UInt8]], largestBuffer: Int) {
-        var inflater = Inflater(input: [UInt8](input), ranges: ranges)
-        try inflater.run()
-        inflater.collect(upTo: inflater.produced)
-        return (inflater.pieces, inflater.largestBuffer)
+        let result = input.withUnsafeBytes { bytes -> Result<(pieces: [[UInt8]], largestBuffer: Int), InflateError> in
+            var inflater = Inflater(input: bytes, ranges: ranges)
+            do throws(InflateError) {
+                try inflater.run()
+            } catch {
+                return .failure(error)
+            }
+            inflater.collect(upTo: inflater.produced)
+            return .success((inflater.pieces, inflater.largestBuffer))
+        }
+        return try result.get()
     }
 }
 
@@ -63,7 +73,8 @@ private struct Inflater {
     /// Decoded bytes are dropped from the front of `output` in steps of this size.
     static let dropStep = 256 << 10
 
-    let input: [UInt8]
+    /// Valid only inside the `withUnsafeBytes` call that made this decoder.
+    let input: UnsafeRawBufferPointer
     let ranges: [Range<Int>]
     let limit: Int
     /// The bytes of each range, filled as decoding passes them.
@@ -78,7 +89,7 @@ private struct Inflater {
     private var bitBuffer: UInt64 = 0
     private var bitCount = 0
 
-    init(input: [UInt8], ranges: [Range<Int>]) {
+    init(input: UnsafeRawBufferPointer, ranges: [Range<Int>]) {
         self.input = input
         self.ranges = ranges
         limit = ranges.map(\.upperBound).max() ?? 0

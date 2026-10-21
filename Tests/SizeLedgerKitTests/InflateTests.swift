@@ -59,6 +59,30 @@ import Testing
         #expect(largestBuffer < 512 << 10)
     }
 
+    @Test func readsAPrefixWithoutCopyingTheStream() throws {
+        // 64 MiB of stored blocks inside a larger buffer, the way an entry lies in a mapped
+        // archive. Copying the stream on every read made 10,000 reads of its first bytes move
+        // 640 GiB (10.5 s on a Mac with Apple silicon); reading in place makes them cost a few bytes each.
+        let block = 65_535
+        var buffer = Data("before".utf8)
+        for index in 0..<1_024 {
+            buffer.append(index == 1_023 ? 1 : 0) // BFINAL on the last block, BTYPE 00: stored
+            buffer.append(le16(UInt16(block)))
+            buffer.append(le16(~UInt16(block)))
+            buffer.append(Data(repeating: UInt8(truncatingIfNeeded: index), count: block))
+        }
+        buffer.append(Data("after".utf8))
+        let stream = buffer[6..<(buffer.count - 5)]
+        let elapsed = try ContinuousClock().measure {
+            for _ in 0..<10_000 {
+                let head = try Inflate.decompress(stream, limit: 4)
+                #expect(head.prefix(4) == [0, 0, 0, 0])
+            }
+        }
+        #expect(try Inflate.decompress(stream, ranges: [(1_023 * block)..<(1_023 * block + 2)]) == [[0xFF, 0xFF]])
+        #expect(elapsed < .seconds(2))
+    }
+
     @Test func truncatedStreamThrows() throws {
         let stream = try Fixtures.data(Fixtures.archive("dynamic.deflate"))
         #expect(throws: InflateError.self) {
