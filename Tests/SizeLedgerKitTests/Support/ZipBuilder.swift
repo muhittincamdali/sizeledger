@@ -16,6 +16,9 @@ struct ZipBuilder {
         var uncompressedSize: Int?
         /// A different uncompressed size to put in the ZIP64 extra field, for crafted archives.
         var declaredSize: UInt64?
+        /// Write no local record; point the directory at `skip` bytes past entry `entry`'s local
+        /// header instead, the way an overlapping zip bomb reuses one entry's data.
+        var shared: (entry: Int, skip: Int)?
 
         var size: Int { uncompressedSize ?? contents.count }
     }
@@ -40,24 +43,44 @@ struct ZipBuilder {
         entries.append(Entry(name: Array(name.utf8), contents: stream, unixMode: 0o100644, method: 8, uncompressedSize: size))
     }
 
+    /// Adds an entry with no data of its own: the directory points `skip` bytes past the local
+    /// header of entry `index`, and declares `contents`' length as its stored size.
+    mutating func addSharing(_ name: String, with index: Int, skip: Int = 0, contents: Data) {
+        entries.append(Entry(name: Array(name.utf8), contents: contents, unixMode: 0o100644, shared: (index, skip)))
+    }
+
+    /// The local file header and data of `entry`.
+    static func localRecord(_ entry: Entry) -> Data {
+        var out = Data()
+        out.append(le32(0x0403_4B50))
+        out.append(le16(20))
+        out.append(le16(entry.flags))
+        out.append(le16(entry.method))
+        out.append(le16(0))
+        out.append(le16(0))
+        out.append(le32(0))
+        out.append(le32(UInt32(entry.contents.count)))
+        out.append(le32(UInt32(entry.size)))
+        out.append(le16(UInt16(entry.name.count)))
+        out.append(le16(0))
+        out.append(contentsOf: entry.name)
+        out.append(entry.contents)
+        return out
+    }
+
     func build() -> Data {
         var out = Data()
         var central = Data()
+        var offsets: [UInt32] = []
         for entry in entries {
-            let offset = UInt32(out.count)
-            out.append(le32(0x0403_4B50))
-            out.append(le16(20))
-            out.append(le16(entry.flags))
-            out.append(le16(entry.method))
-            out.append(le16(0))
-            out.append(le16(0))
-            out.append(le32(0))
-            out.append(le32(UInt32(entry.contents.count)))
-            out.append(le32(UInt32(entry.size)))
-            out.append(le16(UInt16(entry.name.count)))
-            out.append(le16(0))
-            out.append(contentsOf: entry.name)
-            out.append(entry.contents)
+            let offset: UInt32
+            if let shared = entry.shared {
+                offset = offsets[shared.entry] + UInt32(shared.skip)
+            } else {
+                offset = UInt32(out.count)
+                out.append(Self.localRecord(entry))
+            }
+            offsets.append(offset)
 
             var extra = Data()
             if entry.zip64 {
