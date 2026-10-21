@@ -60,3 +60,8 @@ jq '.totals.installBytes' size/main.json
 jq -r '.components[] | "\(.bytes)\t\(.path)"' size/main.json | head
 jq -r '.binaries[] | .path + ": " + ([.slices[].architecture] | join(", "))' size/main.json
 ```
+
+Names come from the app and can hold any character. The file escapes control characters and
+bidirectional overrides as `\u` sequences (`\u202e`), so printing it with `cat` is safe, but
+`jq -r` decodes them back into raw characters. To print names from an app you do not trust, leave
+out `-r` or pass the output through `cat -v`.
