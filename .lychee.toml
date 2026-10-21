@@ -37,9 +37,6 @@ exclude = [
   # CHANGELOG.md links a version's release page in the pull request that adds the section, before
   # the tag exists.
   '^https://github\.com/muhittincamdali/sizeledger/releases/tag/',
-  # The design notes page on muhittincamdali.com goes live after the site imports this
-  # repository's content pack. Temporary: remove this line once the page answers 200.
-  '^https://muhittincamdali\.com/en/open-source/sizeledger/',
 ]
 
 exclude_path = [
