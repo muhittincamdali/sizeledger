@@ -42,6 +42,27 @@ import Testing
         let report = try SizeLedger.analyze(url)
         #expect(report.totals.files == 4)
         #expect(report.totals.bytes == 5_000_110 + UInt64(Self.plist.count))
+        #expect(report.components.filter { $0.path == "caf\u{E9}.bin" }.map(\.bytes).sorted() == [10, 5_000_000])
+        #expect(report.tree.children?.count == 4)
+        #expect(report.notes == ["1 file has a name that is not valid UTF-8, shown read as Latin-1. Files are told apart by their stored bytes, so two rows can read the same and still be different files."])
+    }
+
+    @Test func keepsLatin1FoldersAndLanguagesApartFromTheirUTF8Reading() {
+        let latin1 = { (text: String) in PathKey(bytes: text.utf8.map { $0 == UInt8(ascii: "#") ? 0xE9 : $0 }) }
+        let entries = [
+            BundleEntry(path: "Frameworks/\u{E9}.framework/a", bytes: 1),
+            BundleEntry(key: latin1("Frameworks/#.framework/b"), bytes: 2),
+            BundleEntry(path: "\u{E9}.lproj/a.strings", bytes: 4),
+            BundleEntry(key: latin1("#.lproj/b.strings"), bytes: 8),
+        ]
+        let tree = TreeBuilder.build(rootName: "G.app", entries: entries) { _ in .resources }
+        #expect(tree.children?.count == 3)
+        #expect(tree.children?.first { $0.name == "Frameworks" }?.children?.count == 2)
+
+        let report = Analyzer(source: ListedSource(entries: entries)).report(inputName: "G.app")
+        #expect(report.components.map(\.bytes).sorted() == [1, 2, 4, 8])
+        #expect(report.languages.map(\.language) == ["\u{E9}", "\u{E9}"])
+        #expect(report.languages.map(\.bytes).sorted() == [4, 8])
     }
 
     @Test func stillMeasuresARepeatedRawNameOnce() throws {
@@ -72,5 +93,18 @@ import Testing
         builder.add(name: Array("Payload/G.app/".utf8) + Self.utf8Name, Data(repeating: 0x7A, count: 5_000_000))
         builder.add(name: Array("Payload/G.app/".utf8) + Self.latin1Name, Data(repeating: 0x79, count: 10))
         return try temp.file("G.ipa", contents: builder.build())
+    }
+}
+
+/// A bundle given as a list of entries, with no file contents.
+private struct ListedSource: BundleSource {
+    let entries: [BundleEntry]
+    var kind: InputKind { .app }
+    var bundleName: String { "G.app" }
+    var outsideEntries: [BundleEntry] { [] }
+    var archiveBytes: UInt64? { nil }
+
+    func contents(of key: PathKey, ranges: [Range<Int>]) throws -> [Data] {
+        throw CocoaError(.fileNoSuchFile)
     }
 }
