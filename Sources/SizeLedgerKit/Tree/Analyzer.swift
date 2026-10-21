@@ -81,7 +81,7 @@ struct Analyzer {
             notes.append("Info.plist at the top of \(source.bundleName) is a symbolic link, and links are not followed: \(unknown)")
             return AppInfo()
         }
-        guard let data = try? source.contents(of: "Info.plist", limit: Self.infoPlistLimit),
+        guard let data = try? source.contents(of: plist, limit: Self.infoPlistLimit),
               let info = AppInfo.parse(data)
         else {
             notes.append("Info.plist could not be read as a property list: the app's name, version and main executable are unknown.")
@@ -93,12 +93,12 @@ struct Analyzer {
     private func readBinaries(notes: inout [String]) -> [SizeReport.Binary] {
         var binaries: [SizeReport.Binary] = []
         for entry in source.entries where !entry.isSymbolicLink && entry.bytes >= Self.smallestBinary {
-            guard let prefix = try? source.contents(of: entry.path, limit: 4), MachO.format(of: prefix) != nil else {
+            guard let prefix = try? source.contents(of: entry, limit: 4), MachO.format(of: prefix) != nil else {
                 continue
             }
             do {
                 let slices = try MachO.slices(fileSize: entry.bytes) { ranges in
-                    try source.contents(of: entry.path, ranges: ranges)
+                    try source.contents(of: entry, ranges: ranges)
                 }
                 binaries.append(.init(path: entry.path, bytes: entry.bytes, slices: slices))
             } catch {

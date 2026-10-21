@@ -29,6 +29,12 @@ struct ZipBuilder {
         entries.append(Entry(name: Array(name.utf8), contents: contents, unixMode: mode, zip64: zip64))
     }
 
+    /// Adds an entry whose name is `name` exactly, such as bytes that are not UTF-8. The UTF-8
+    /// flag is left clear, as an archiver writing a legacy code page leaves it.
+    mutating func add(name: [UInt8], _ contents: Data) {
+        entries.append(Entry(name: name, contents: contents, unixMode: 0o100644, flags: 0))
+    }
+
     /// Adds an entry whose contents are the DEFLATE `stream`, which decompresses to `size` bytes.
     mutating func addDeflated(_ name: String, stream: Data, size: Int) {
         entries.append(Entry(name: Array(name.utf8), contents: stream, unixMode: 0o100644, method: 8, uncompressedSize: size))

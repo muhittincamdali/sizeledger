@@ -20,8 +20,8 @@ struct DirectorySource: BundleSource {
         entries = try Self.walk(root.path, limits: limits).sortedByPath()
     }
 
-    func contents(of path: String, ranges: [Range<Int>]) throws -> [Data] {
-        let handle = try FileHandle(forReadingFrom: root.appendingPathComponent(path))
+    func contents(of key: PathKey, ranges: [Range<Int>]) throws -> [Data] {
+        let handle = try FileHandle(forReadingFrom: root.appendingPathComponent(BundlePath.decode(key.bytes)))
         defer { try? handle.close() }
         return try ranges.map { range in
             try handle.seek(toOffset: UInt64(range.lowerBound))
