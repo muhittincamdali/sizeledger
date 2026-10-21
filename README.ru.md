@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@e5dfa8596b2661f23c0f8a8654192db243132f83 status=reviewed -->
+<!-- i18n-source: README.md@5719633c62056b6b23569d750b2987e2bd114d3e status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -177,7 +177,9 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
   парсер Mach-O — на thin-, 32-битных, fat- и fat64-файлах; кроме того, ZIP64, повреждённые архивы и имена
   файлов с управляющими последовательностями терминала.
 
-Всего 140 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64). Измерение SampleShop 2.0
+Всего 146 тестов, которые CI запускает на macOS и на Linux (x86_64 и arm64); одному из них нужно имя
+файла не в UTF-8, которое APFS не принимает, поэтому он запускается только на Linux. Измерение
+SampleShop 2.0
 в release-сборке, включая запуск процесса, заняло в медиане от 14.4 до 17.4 ms в трёх сериях по 21
 запуску на Mac (Apple silicon), занятом другой работой (средняя нагрузка от 41 до 136); время зависит
 от того, что ещё выполняется на машине. [scripts/bench.sh](scripts/bench.sh) повторяет это измерение.
@@ -198,6 +200,9 @@ Report в Xcode и App Store Connect. sizeledger даёт те числа, ко�
 - Пути сравниваются побайтно, так же как их видят распаковщик и файловая система: два имени,
   которые различаются только нормализацией Unicode (NFC и NFD), — это два файла, а `/`, за которым
   следует комбинируемый знак, по-прежнему разделяет две папки.
+  Имя, которое не является корректным UTF-8, показывается прочитанным как Latin-1, но по-прежнему
+  различается по сохранённым байтам: `caf\xE9.bin` и `café.bin` в UTF-8 — это два файла, которые
+  читаются одинаково; в таком случае отчёт добавляет примечание.
 - Чтобы добраться до заголовка Mach-O глубоко внутри сжатой записи `.ipa`, sizeledger распаковывает
   всё, что идёт перед ним, но хранит только окно в 32 KiB, поэтому специально подготовленная запись
   стоит времени, а не памяти: около 1 s на распакованный GB на Mac (Apple silicon).

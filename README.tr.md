@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@e5dfa8596b2661f23c0f8a8654192db243132f83 status=reviewed -->
+<!-- i18n-source: README.md@5719633c62056b6b23569d750b2987e2bd114d3e status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -183,7 +183,9 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 140 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. SampleShop
+Toplam 146 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. Bunlardan
+biri, APFS'nin kabul etmediği UTF-8 olmayan bir dosya adı gerektirdiği için yalnızca Linux'ta
+çalışır. SampleShop
 2.0'ı release derlemesiyle ölçmek (süreç başlatma dahil), başka işlerle meşgul bir Mac'te (Apple
 silicon, yük ortalaması 41 ile 136 arası) 21 çalıştırmalık üç seride medyan olarak 14.4 ile 17.4 ms
 sürdü; süre makinede başka neyin çalıştığına bağlıdır. Ölçüm [scripts/bench.sh](scripts/bench.sh)
@@ -206,6 +208,9 @@ ile tekrarlanabilir.
 - Yollar, bir arşiv açma aracının ve dosya sisteminin gördüğü gibi bayt bayt karşılaştırılır:
   yalnızca Unicode normalleştirmesinde (NFC ve NFD) ayrılan iki ad iki dosyadır ve ardından
   birleşen bir işaret gelen `/` de iki klasörü ayırır.
+  Geçerli UTF-8 olmayan bir ad Latin-1 olarak okunup gösterilir, ama yine saklanan baytlarıyla
+  ayırt edilir: `caf\xE9.bin` ile UTF-8 `café.bin` aynı okunan iki dosyadır; rapor böyle bir ad
+  listelediğinde bir not ekler.
 - Sıkıştırılmış bir `.ipa` girdisinin derinlerindeki bir Mach-O başlığına ulaşmak için sizeledger
   ondan önceki her şeyi açar ve yalnızca 32 KiB'lık bir pencere tutar; bu yüzden hazırlanmış bir
   girdi bellek değil zaman harcatır: bir Mac'te (Apple silicon) açılan her GB için yaklaşık 1 s.
