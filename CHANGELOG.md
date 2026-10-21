@@ -7,6 +7,8 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-10-21
+
 ### Security
 
 - Since 0.1.9, `--out` wrote through a symbolic link at the given path onto the file it named,
@@ -261,7 +263,8 @@ First release: `sizeledger analyze` and the SizeLedgerKit library.
 - Release binaries for macOS (universal) and Linux (x86_64, aarch64), and a Homebrew formula
   written by the release workflow.
 
-[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.10...HEAD
+[0.1.10]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.9...v0.1.10
 [0.1.9]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.6...v0.1.7
