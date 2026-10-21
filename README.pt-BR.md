@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@56b4b10d9bcadcc0ca427d78448a4c4873ee6f13 status=reviewed -->
+<!-- i18n-source: README.md@b830eb2d181ba4a9637f3e9ab6d51e7b27142d17 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -179,7 +179,7 @@ os detalhes, e [Limites de tamanho de App Clips](docs/guides/app-clip-size.md) o
   stored, fixed e dynamic; o parser de Mach-O em arquivos thin, de 32 bits, fat e fat64; além de ZIP64,
   arquivos danificados e nomes de arquivo que contêm sequências de escape de terminal.
 
-No total são 146 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64); um deles precisa
+No total são 153 testes, executados pelo CI no macOS e no Linux (x86_64 e arm64); um deles precisa
 de um nome de arquivo que não é UTF-8, que o APFS recusa, então só roda no Linux. Medir o
 SampleShop 2.0
 com o build release, incluindo a inicialização do processo, levou uma mediana de 14.4 a 17.4 ms em três
@@ -209,15 +209,19 @@ repete a medição.
 - Para chegar a um cabeçalho Mach-O no fundo de uma entrada comprimida de um `.ipa`, o sizeledger
   descomprime tudo o que vem antes e mantém só uma janela de 32 KiB; assim, uma entrada forjada
   custa tempo, não memória: cerca de 1 s por GB descomprimido em um Mac (Apple silicon).
-- A entrada não é confiável, então uma entrada forjada ou corrompida não pode esgotar memória,
-  tempo nem a pilha. O sizeledger recusa uma entrada com mais de 500.000 arquivos ou com um
-  caminho aninhado além de 64 pastas, um `.ipa` que declara mais de 8 GiB de bytes não comprimidos
-  e uma entrada `.ipa` que se descompacta para mais de 300 vezes o tamanho armazenado (uma bomba
-  zip); aumente esses limites com `--max-files`, `--max-depth`, `--max-bytes` e `--max-ratio`.
-  `--max-depth` vai até no máximo 100 para que o relatório JSON sempre possa ser escrito, e
-  `--max-bytes` vale só para um `.ipa`, já que uma pasta não é descompactada. Cabeçalhos Mach-O ou
-  ZIP malformados geram uma nota "unreadable" ou um erro claro com status de saída 2, nunca uma
-  falha. Um caminho de entrada duplicado é contado uma vez.
+- A entrada não é confiável, então uma entrada forjada ou corrompida não pode esgotar memória nem a
+  pilha, e os limites a seguir restringem o tempo que ela leva. Um `.ipa` cujas entradas
+  compartilham bytes armazenados (uma bomba zip sobreposta) é recusado como corrompido. O `.ipa`
+  forjado mais lento encontrado dentro dos limites padrão, de 28,6 MB com duas entradas que declaram
+  4,29 GB cada e têm os cabeçalhos Mach-O no fim, levou de 15 a 24 s em um Mac (Apple silicon)
+  ocupado com outro trabalho; um `--max-bytes` menor reduz esse limite. O sizeledger recusa uma
+  entrada com mais de 500.000 arquivos ou com um caminho aninhado além de 64 pastas, um `.ipa` que
+  declara mais de 8 GiB de bytes não comprimidos e uma entrada `.ipa` que se descompacta para mais
+  de 300 vezes o tamanho armazenado (uma bomba zip); aumente esses limites com `--max-files`,
+  `--max-depth`, `--max-bytes` e `--max-ratio`. `--max-depth` vai até no máximo 100 para que o
+  relatório JSON sempre possa ser escrito, e `--max-bytes` vale só para um `.ipa`, já que uma pasta
+  não é descompactada. Cabeçalhos Mach-O ou ZIP malformados geram uma nota "unreadable" ou um erro
+  claro com status de saída 2, nunca uma falha. Um caminho de entrada duplicado é contado uma vez.
 
 ## Documentação
 

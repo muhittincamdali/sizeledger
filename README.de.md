@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@56b4b10d9bcadcc0ca427d78448a4c4873ee6f13 status=reviewed -->
+<!-- i18n-source: README.md@b830eb2d181ba4a9637f3e9ab6d51e7b27142d17 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -179,7 +179,7 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   Fixed- und Dynamic-Blöcke; der Mach-O-Parser an Thin-, 32-Bit-, Fat- und Fat64-Dateien; außerdem
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
-Insgesamt sind es 146 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt; einer
+Insgesamt sind es 153 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt; einer
 davon braucht einen Dateinamen, der kein UTF-8 ist und den APFS ablehnt, und läuft daher nur unter
 Linux. Das Messen
 von SampleShop 2.0 mit dem Release-Build, einschließlich Prozessstart, dauerte in drei Serien von 21
@@ -210,16 +210,21 @@ Läufen im Median 14.4 bis 17.4 ms auf einem Mac (Apple silicon), der mit andere
 - Um einen Mach-O-Header weit hinten in einem komprimierten `.ipa`-Eintrag zu erreichen, entpackt
   sizeledger alles davor und behält nur ein Fenster von 32 KiB; ein präparierter Eintrag kostet also
   Zeit, keinen Speicher: etwa 1 s pro entpacktem GB auf einem Mac (Apple silicon).
-- Die Eingabe ist nicht vertrauenswürdig, daher kann eine präparierte oder beschädigte Eingabe
-  weder Speicher noch Zeit noch den Stack erschöpfen. sizeledger lehnt eine Eingabe mit mehr als
+- Die Eingabe ist nicht vertrauenswürdig, daher kann eine präparierte oder beschädigte Eingabe weder
+  Speicher noch den Stack erschöpfen, und die folgenden Grenzen beschränken die Laufzeit. Eine
+  `.ipa`, deren Einträge gespeicherte Bytes teilen (eine überlappende Zip-Bombe), wird als
+  beschädigt abgelehnt. Die langsamste präparierte `.ipa`, die innerhalb der Standardgrenzen
+  gefunden wurde, 28,6 MB mit zwei Einträgen, die je 4,29 GB deklarieren und ihre Mach-O-Header am
+  Ende haben, brauchte auf einem mit anderer Arbeit ausgelasteten Mac (Apple silicon) 15 bis 24 s;
+  ein kleineres `--max-bytes` senkt diese Schranke. sizeledger lehnt eine Eingabe mit mehr als
   500.000 Dateien oder mit einem Pfad, der tiefer als 64 Ordner verschachtelt ist, eine `.ipa`, die
   mehr als 8 GiB unkomprimierte Bytes deklariert, und einen `.ipa`-Eintrag, der sich auf mehr als
   das 300-Fache seiner gespeicherten Größe entpackt (eine Zip-Bombe), ab; mit `--max-files`,
   `--max-depth`, `--max-bytes` und `--max-ratio` lassen sich diese Grenzen anheben. `--max-depth`
-  geht bis 100, damit der JSON-Bericht immer geschrieben werden kann, und `--max-bytes` gilt nur
-  für eine `.ipa`, da ein Ordner nicht entpackt wird. Fehlerhafte Mach-O- oder ZIP-Header ergeben
-  einen "unreadable"-Hinweis oder einen klaren Fehler mit Exit-Status 2, niemals einen Absturz.
-  Ein doppelter Eintragspfad wird einmal gezählt.
+  geht bis 100, damit der JSON-Bericht immer geschrieben werden kann, und `--max-bytes` gilt nur für
+  eine `.ipa`, da ein Ordner nicht entpackt wird. Fehlerhafte Mach-O- oder ZIP-Header ergeben einen
+  "unreadable"-Hinweis oder einen klaren Fehler mit Exit-Status 2, niemals einen Absturz. Ein
+  doppelter Eintragspfad wird einmal gezählt.
 
 ## Dokumentation
 

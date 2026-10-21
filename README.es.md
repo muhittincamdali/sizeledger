@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@56b4b10d9bcadcc0ca427d78448a4c4873ee6f13 status=reviewed -->
+<!-- i18n-source: README.md@b830eb2d181ba4a9637f3e9ab6d51e7b27142d17 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -181,7 +181,7 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 146 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64); una de ellas necesita
+En total son 153 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64); una de ellas necesita
 un nombre de archivo que no es UTF-8, que APFS rechaza, así que solo se ejecuta en Linux. Medir
 SampleShop 2.0
 con la compilación release, incluido el arranque del proceso, tardó una mediana de 14.4 a 17.4 ms en
@@ -212,15 +212,19 @@ repite la medición.
   sizeledger descomprime todo lo anterior y solo conserva una ventana de 32 KiB, así que una entrada
   manipulada cuesta tiempo, no memoria: alrededor de 1 s por GB descomprimido en un Mac (Apple
   silicon).
-- La entrada no es de confianza, así que una entrada manipulada o dañada no puede agotar la
-  memoria, el tiempo ni la pila. sizeledger rechaza una entrada con más de 500 000 archivos o con
-  una ruta anidada a más de 64 carpetas, un `.ipa` que declara más de 8 GiB de bytes sin comprimir
-  y una entrada `.ipa` que se descomprime a más de 300 veces su tamaño almacenado (una bomba zip);
-  súbelos con `--max-files`, `--max-depth`, `--max-bytes` y `--max-ratio`. `--max-depth` llega
-  como máximo a 100 para que el informe JSON siempre pueda escribirse, y `--max-bytes` solo se
-  aplica a un `.ipa`, ya que una carpeta no se descomprime. Las cabeceras Mach-O o ZIP mal
-  formadas dan una nota "unreadable" o un error claro con estado de salida 2, nunca un fallo. Una
-  ruta de entrada duplicada se cuenta una vez.
+- La entrada no es de confianza, así que una entrada manipulada o dañada no puede agotar la memoria
+  ni la pila, y los límites que siguen acotan el tiempo que tarda. Un `.ipa` cuyas entradas
+  comparten bytes almacenados (una bomba zip superpuesta) se rechaza como dañado. El `.ipa`
+  manipulado más lento encontrado dentro de los límites predeterminados, de 28,6 MB con dos entradas
+  que declaran 4,29 GB cada una y sus cabeceras Mach-O al final, tardó de 15 a 24 s en un Mac (Apple
+  silicon) ocupado con otro trabajo; un `--max-bytes` más bajo reduce ese límite. sizeledger rechaza
+  una entrada con más de 500 000 archivos o con una ruta anidada a más de 64 carpetas, un `.ipa` que
+  declara más de 8 GiB de bytes sin comprimir y una entrada `.ipa` que se descomprime a más de 300
+  veces su tamaño almacenado (una bomba zip); súbelos con `--max-files`, `--max-depth`,
+  `--max-bytes` y `--max-ratio`. `--max-depth` llega como máximo a 100 para que el informe JSON
+  siempre pueda escribirse, y `--max-bytes` solo se aplica a un `.ipa`, ya que una carpeta no se
+  descomprime. Las cabeceras Mach-O o ZIP mal formadas dan una nota "unreadable" o un error claro
+  con estado de salida 2, nunca un fallo. Una ruta de entrada duplicada se cuenta una vez.
 
 ## Documentación
 
