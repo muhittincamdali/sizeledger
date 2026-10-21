@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d92b9b17214d5b06aee84556a3f2c08528466f90 status=reviewed -->
+<!-- i18n-source: README.md@a5349ea8a7a67592fa4082d765054bd3f21a4a47 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -103,7 +103,7 @@ sizeledger analyze path/to/MyApp.ipa
 ## 使用方法
 
 ```text
-sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--force] [--top <n>] [--color auto|always|never] [--quiet]
                     [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
@@ -111,7 +111,8 @@ sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n
 | ------------------ | -------------------------------------------------------------- |
 | `<input>`          | 一个 `.app` 文件夹、一个 `.ipa` 文件或一个 `.xcarchive` 文件夹 |
 | `-f, --format`     | 输出什么：`tty`（默认，表格）、`markdown` 或 `json`            |
-| `-o, --out <file>` | 同时把 JSON 报告写入文件；缺少的文件夹会被创建                 |
+| `-o, --out <file>` | 同时把 JSON 报告写入新文件；缺少的文件夹会被创建。只有指向设备或管道（如 `/dev/stdout`）时才会跟随符号链接 |
+| `--force`          | `--out` 文件已存在时替换它；不加此选项时保留已有文件，退出状态为 2 |
 | `--top <n>`        | 列出多少个条目、语言和二进制文件（默认 10）                    |
 | `--color`          | `auto` 仅在终端中使用颜色，并且在设置了 `NO_COLOR` 时不使用    |
 | `-q, --quiet`      | 不输出任何内容（与 `--out` 配合使用）                          |
@@ -128,6 +129,8 @@ sizeledger analyze build/MyApp.xcarchive --format markdown >> "$GITHUB_STEP_SUMM
 # The ten biggest files anywhere in the bundle (bytes and file name)
 jq -r '[.tree | .. | objects | select(has("children") | not)] | sort_by(-.bytes) | .[:10][] | "\(.bytes)\t\(.name)"' size/main.json
 ```
+
+`jq -r` 会原样输出应用中的名称，包括 JSON 文件中转义过的双向控制字符；对于不信任的应用，请去掉 `-r`。
 
 JSON 的结构在 [DocC 文章](https://muhittincamdali.github.io/sizeledger/documentation/sizeledgerkit/jsonlayout)中有说明；
 [Fixtures/snapshots](Fixtures/snapshots) 中有完整的报告。
@@ -159,7 +162,7 @@ sizeledger 给出的是仅凭文件就能在任何机器上、对每一次构建
 - **对照参考实现检验的读取器**：DEFLATE 解码器对照 zlib 的输出，覆盖 stored、fixed 和 dynamic 块；
   Mach-O 解析器覆盖 thin、32 位、fat 和 fat64 文件；还有 ZIP64、损坏的归档，以及包含终端转义序列的文件名。
 
-共有 153 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行；其中一个需要 APFS 不接受的非 UTF-8 文件名，因此只在 Linux 上运行。使用 release 构建测量 SampleShop 2.0（包括进程启动），在一台正忙于其他工作的 Mac（Apple silicon，负载平均值 41 到 136）上，三组各 21 次运行的中位数为 14.4 到 17.4 ms；耗时取决于机器上同时运行的其他任务。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
+共有 159 个测试，由 CI 在 macOS 和 Linux（x86_64 和 arm64）上运行；其中一个需要 APFS 不接受的非 UTF-8 文件名，因此只在 Linux 上运行。使用 release 构建测量 SampleShop 2.0（包括进程启动），在一台正忙于其他工作的 Mac（Apple silicon，负载平均值 41 到 136）上，三组各 21 次运行的中位数为 14.4 到 17.4 ms；耗时取决于机器上同时运行的其他任务。[scripts/bench.sh](scripts/bench.sh) 可以重复这一测量。
 
 ## 局限
 

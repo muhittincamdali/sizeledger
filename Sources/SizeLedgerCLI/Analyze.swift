@@ -33,8 +33,11 @@ public struct Analyze: ParsableCommand {
     @Option(name: .shortAndLong, help: "What to print: tty (a table), markdown or json.")
     var format: Format = .tty
 
-    @Option(name: .shortAndLong, help: ArgumentHelp("Also write the JSON report to this file; missing folders are created.", valueName: "file"))
+    @Option(name: .shortAndLong, help: ArgumentHelp("Also write the JSON report to this file; missing folders are created. An existing file is kept unless --force is given; a symbolic link is followed only to a device or pipe such as /dev/stdout.", valueName: "file"))
     var out: String?
+
+    @Flag(help: "Replace the --out file if it already exists.")
+    var force = false
 
     @Option(help: "How many of the largest items, languages and binaries to list.")
     var top: Int = 10
@@ -65,6 +68,7 @@ public struct Analyze: ParsableCommand {
         guard !quiet || out != nil else {
             throw ValidationError("--quiet prints nothing, so it needs --out <file> to write the report to.")
         }
+        guard !force || out != nil else { throw ValidationError("--force replaces the --out file, so it needs --out <file>.") }
         guard maxFiles >= 1 else { throw ValidationError("--max-files must be 1 or more.") }
         guard maxBytes >= 1 else { throw ValidationError("--max-bytes must be 1 or more.") }
         guard maxRatio >= 1 else { throw ValidationError("--max-ratio must be 1 or more.") }
@@ -118,7 +122,7 @@ public struct Analyze: ParsableCommand {
 
         if let out {
             do {
-                try Self.write(json, to: out)
+                try ReportFile.write(json, to: out, replacing: force)
             } catch {
                 errors.write("sizeledger: cannot write \(out): \(error.localizedDescription)\n")
                 return ExitStatus.failure
@@ -136,25 +140,5 @@ public struct Analyze: ParsableCommand {
             output.write(String(decoding: json, as: UTF8.self))
         }
         return ExitStatus.success
-    }
-
-    /// Writes the report to `path`. A new or regular file is replaced atomically, so nothing
-    /// ever reads half a report. A device, pipe or symbolic link, such as `/dev/stdout`,
-    /// `/dev/null` or Linux's `/dev/stdout` link to `/proc/self/fd/1`, cannot be replaced that
-    /// way: the temporary file would go in `/dev` or `/proc`. It is written to where it points.
-    static func write(_ json: Data, to path: String) throws {
-        let url = URL(fileURLWithPath: path)
-        let type = (try? FileManager.default.attributesOfItem(atPath: path))?[.type] as? FileAttributeType
-        if let type, type != .typeRegular, type != .typeDirectory {
-            let handle = try FileHandle(forWritingTo: url)
-            defer { try? handle.close() }
-            // A link to a regular file is emptied first, as `>` in a shell does; a pipe or a
-            // terminal cannot be truncated, and has nothing to empty.
-            try? handle.truncate(atOffset: 0)
-            try handle.write(contentsOf: json)
-            return
-        }
-        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        try json.write(to: url, options: .atomic)
     }
 }

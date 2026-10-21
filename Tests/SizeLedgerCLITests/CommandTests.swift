@@ -16,6 +16,22 @@ struct Run {
     }
 }
 
+/// Data handed over from another thread.
+final class Received: @unchecked Sendable {
+    private let done = DispatchSemaphore(value: 0)
+    private var data = Data()
+
+    func set(_ value: Data) {
+        data = value
+        done.signal()
+    }
+
+    func wait() -> Data {
+        _ = done.wait(timeout: .now() + 30)
+        return data
+    }
+}
+
 /// A one-file app bundle in a temporary folder.
 final class TinyApp {
     let folder: URL
@@ -89,19 +105,98 @@ final class TinyApp {
         #expect(json.output == String(decoding: try Data(contentsOf: target), as: UTF8.self))
     }
 
-    @Test func writesThroughASymbolicLink() throws {
+    @Test func refusesASymbolicLinkToAFile() throws {
+        // `--out link.json`, with link.json pointing at another file, used to write the report
+        // into that file. The link is refused, even with --force, and the file is left as it was.
         let tiny = try TinyApp()
-        let target = tiny.folder.appendingPathComponent("target.json")
+        let victim = tiny.folder.appendingPathComponent("victim.txt")
         let link = tiny.folder.appendingPathComponent("link.json")
-        try Data(repeating: 0x20, count: 100_000).write(to: target)
-        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: target)
-        let run = try Run([tiny.app, "--out", link.path, "--quiet"])
-        #expect(run.status == 0)
-        #expect(run.errors.isEmpty)
-        // The link stays a link, and the longer old contents are gone from the file it names.
-        #expect(try FileManager.default.destinationOfSymbolicLink(atPath: link.path) == target.path)
+        let original = Data("keep me\n".utf8)
+        try original.write(to: victim)
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: victim)
+        for arguments in [[tiny.app, "--out", link.path, "--quiet"], [tiny.app, "--out", link.path, "--quiet", "--force"]] {
+            let run = try Run(arguments)
+            #expect(run.status == 2)
+            #expect(run.errors.hasPrefix("sizeledger: cannot write \(link.path): it is a symbolic link"))
+            #expect(try Data(contentsOf: victim) == original)
+            #expect(try FileManager.default.destinationOfSymbolicLink(atPath: link.path) == victim.path)
+        }
+    }
+
+    @Test func refusesDanglingAndFolderLinks() throws {
+        // A dangling link must not create the file it names, and a link to a folder is no file.
+        let tiny = try TinyApp()
+        let missing = tiny.folder.appendingPathComponent("missing.json")
+        let dangling = tiny.folder.appendingPathComponent("dangling.json")
+        let folderLink = tiny.folder.appendingPathComponent("folder.json")
+        try FileManager.default.createSymbolicLink(at: dangling, withDestinationURL: missing)
+        try FileManager.default.createSymbolicLink(at: folderLink, withDestinationURL: tiny.folder)
+        for link in [dangling, folderLink] {
+            let run = try Run([tiny.app, "--out", link.path, "--quiet"])
+            #expect(run.status == 2)
+            #expect(run.errors.contains("it is a symbolic link"))
+        }
+        #expect(!FileManager.default.fileExists(atPath: missing.path))
+    }
+
+    @Test func replacesAnExistingFileOnlyWithForce() throws {
+        let tiny = try TinyApp()
+        let target = tiny.folder.appendingPathComponent("size.json")
+        let old = Data("old report\n".utf8)
+        try old.write(to: target)
+        let kept = try Run([tiny.app, "--out", target.path, "--quiet"])
+        #expect(kept.status == 2)
+        #expect(kept.errors == "sizeledger: cannot write \(target.path): it already exists; pass --force to replace it\n")
+        #expect(try Data(contentsOf: target) == old)
+
+        let forced = try Run([tiny.app, "--out", target.path, "--quiet", "--force"])
+        #expect(forced.status == 0)
+        #expect(forced.errors.isEmpty)
         let json = try Run([tiny.app, "--format", "json"])
         #expect(String(decoding: try Data(contentsOf: target), as: UTF8.self) == json.output)
+        // No temporary file is left next to the report.
+        let names = try FileManager.default.contentsOfDirectory(atPath: tiny.folder.path)
+        #expect(names.sorted() == ["Tiny.app", "size.json"])
+    }
+
+    @Test func forceReplacesTheFileNotWhatALinkInItsPlaceNamed() throws {
+        // A hard link shares the file: replacing the name must leave the other name's data.
+        let tiny = try TinyApp()
+        let target = tiny.folder.appendingPathComponent("size.json")
+        let other = tiny.folder.appendingPathComponent("other.json")
+        let old = Data("old report\n".utf8)
+        try old.write(to: other)
+        try FileManager.default.linkItem(at: other, to: target)
+        let run = try Run([tiny.app, "--out", target.path, "--quiet", "--force"])
+        #expect(run.status == 0)
+        #expect(try Data(contentsOf: other) == old)
+        #expect(try SizeReport.decode(from: Data(contentsOf: target)).input.name == "Tiny.app")
+    }
+
+    @Test func refusesAFolder() throws {
+        let tiny = try TinyApp()
+        let run = try Run([tiny.app, "--out", tiny.folder.path, "--quiet", "--force"])
+        #expect(run.status == 2)
+        #expect(run.errors == "sizeledger: cannot write \(tiny.folder.path): it is a folder\n")
+    }
+
+    @Test func writesToAPipe() throws {
+        let tiny = try TinyApp()
+        let fifo = tiny.folder.appendingPathComponent("report.fifo")
+        #expect(mkfifo(fifo.path, 0o600) == 0)
+        // Opening a pipe for writing waits for a reader, so read it on another thread.
+        let received = Received()
+        let reader = Thread {
+            if let handle = FileHandle(forReadingAtPath: fifo.path) {
+                received.set(handle.readDataToEndOfFile())
+            }
+        }
+        reader.start()
+        let run = try Run([tiny.app, "--out", fifo.path, "--quiet"])
+        #expect(run.status == 0)
+        #expect(run.errors.isEmpty)
+        let json = try Run([tiny.app, "--format", "json"])
+        #expect(received.wait() == Data(json.output.utf8))
     }
 
     @Test func writesToADevice() throws {
@@ -169,6 +264,8 @@ final class TinyApp {
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--max-depth", "0"]) }
         #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--max-depth", "101"]) }
         #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "-q", "-o", "size.json"]) }
+        #expect(throws: (any Error).self) { _ = try Analyze.parse(["App.ipa", "--force"]) }
+        #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "--force", "--out", "size.json"]) }
         #expect(throws: Never.self) { _ = try Analyze.parse(["App.ipa", "--max-depth", "100"]) }
     }
 

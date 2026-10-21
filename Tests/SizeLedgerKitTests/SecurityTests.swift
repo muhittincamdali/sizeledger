@@ -198,6 +198,23 @@ import Testing
         #expect(json.contains("\\u007f"))
     }
 
+    @Test func jsonEscapesBidirectionalControlsInNames() throws {
+        // `cat` on the report would otherwise show "Trojan\u{202E}gpj.exe" as "Trojanexe.jpg".
+        let temp = try TemporaryDirectory()
+        try temp.file("App.app/Info.plist", contents: Data("<plist></plist>".utf8))
+        let name = "Trojan\u{202E}gpj\u{2066}x\u{2069}\u{200F}\u{2028}.exe"
+        try temp.file("App.app/\(name)", size: 5_000)
+        let report = try SizeLedger.analyze(temp.url.appendingPathComponent("App.app"))
+        let data = try report.jsonData()
+        let json = String(decoding: data, as: UTF8.self)
+        let escaped: Set<UInt32> = [0x202E, 0x2066, 0x2069, 0x200F, 0x2028]
+        #expect(!json.unicodeScalars.contains { escaped.contains($0.value) })
+        #expect(json.contains("Trojan\\u202egpj\\u2066x\\u2069\\u200f\\u2028.exe"))
+        // The escape is JSON's own, so the name decodes back exactly.
+        let decoded = try SizeReport.decode(from: data)
+        #expect(decoded.tree.children?.contains { $0.name == name } == true)
+    }
+
     @Test func tableAndMarkdownDropBidirectionalOverrides() throws {
         // U+202E (right-to-left override) makes "Trojan\u{202E}gpj.exe" display as
         // "Trojanexe.jpg"; U+2066 to U+2069 isolate and reorder the rest of a row.

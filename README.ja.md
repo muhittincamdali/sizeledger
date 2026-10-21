@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d92b9b17214d5b06aee84556a3f2c08528466f90 status=reviewed -->
+<!-- i18n-source: README.md@a5349ea8a7a67592fa4082d765054bd3f21a4a47 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -91,7 +91,7 @@ sizeledger analyze path/to/MyApp.ipa
 ## 使い方
 
 ```text
-sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--force] [--top <n>] [--color auto|always|never] [--quiet]
                     [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
@@ -99,7 +99,8 @@ sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n
 | ------------------ | ------------------------------------------------------------------------------ |
 | `<input>`          | `.app` フォルダ、`.ipa` ファイル、または `.xcarchive` フォルダ                 |
 | `-f, --format`     | 出力する形式: `tty` (デフォルト、表)、`markdown`、`json`                       |
-| `-o, --out <file>` | JSON レポートをファイルにも書き出します。存在しないフォルダは作成されます      |
+| `-o, --out <file>` | JSON レポートを新しいファイルにも書き出します。存在しないフォルダは作成されます。シンボリックリンクは `/dev/stdout` のようなデバイスやパイプを指す場合にだけたどります |
+| `--force`          | `--out` のファイルがすでにある場合に置き換えます。指定しないと既存のファイルは残り、終了ステータスは 2 になります |
 | `--top <n>`        | 一覧に表示する項目、言語、バイナリの数 (デフォルトは 10)                       |
 | `--color`          | `auto` はターミナルでのみ色を付け、`NO_COLOR` が設定されている場合は付けません |
 | `-q, --quiet`      | 何も出力しません (`--out` と併用)                                              |
@@ -116,6 +117,8 @@ sizeledger analyze build/MyApp.xcarchive --format markdown >> "$GITHUB_STEP_SUMM
 # The ten biggest files anywhere in the bundle (bytes and file name)
 jq -r '[.tree | .. | objects | select(has("children") | not)] | sort_by(-.bytes) | .[:10][] | "\(.bytes)\t\(.name)"' size/main.json
 ```
+
+`jq -r` はアプリ内の名前をそのまま出力するため、JSON ファイルがエスケープしている双方向制御文字なども元の文字に戻ります。信頼できないアプリでは `-r` を付けないでください。
 
 JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/documentation/sizeledgerkit/jsonlayout)で説明しています。完全なレポートは [Fixtures/snapshots](Fixtures/snapshots) にあります。
 
@@ -139,7 +142,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 153 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。そのうち 1 件は APFS が受け付けない UTF-8 ではないファイル名を必要とするため、Linux でのみ実行されます。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
+テストは全部で 159 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。そのうち 1 件は APFS が受け付けない UTF-8 ではないファイル名を必要とするため、Linux でのみ実行されます。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
 
 ## 制限事項
 

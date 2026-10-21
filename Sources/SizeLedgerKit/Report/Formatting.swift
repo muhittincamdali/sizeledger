@@ -124,18 +124,20 @@ public enum Sanitize {
         return 0
     }
 
-    /// Escapes DEL and the C1 controls in already-encoded JSON as `\u00XX`, so a control character
-    /// in a file name cannot act on a terminal that prints the report while the JSON keeps the
-    /// exact codepoint. `JSONEncoder` already escapes the C0 controls. These bytes only ever sit
-    /// inside a JSON string, so the escape keeps the document valid.
+    /// Escapes DEL, the C1 controls and the bidirectional controls in already-encoded JSON as
+    /// `\uXXXX`, so a character in a file name cannot act on a terminal that prints the file, or
+    /// reorder what it shows, while the JSON keeps the exact codepoint. `JSONEncoder` already
+    /// escapes the C0 controls. The bidirectional ones are the embeddings, overrides and isolates
+    /// (U+202A to U+202E, U+2066 to U+2069) and the marks U+200E, U+200F and U+061C; the line and
+    /// paragraph separators U+2028 and U+2029 go as well. These characters only ever sit inside a
+    /// JSON string, so the escape keeps the document valid. A reader that decodes the strings,
+    /// such as `jq -r`, gets them back as they were.
     static func jsonEscapingControlCharacters(_ json: String) -> String {
-        guard json.unicodeScalars.contains(where: { $0.value == 0x7F || (0x80...0x9F).contains($0.value) }) else {
-            return json
-        }
+        guard json.unicodeScalars.contains(where: escapedInJSON) else { return json }
         var result = ""
         result.reserveCapacity(json.count)
         for scalar in json.unicodeScalars {
-            if scalar.value == 0x7F || (0x80...0x9F).contains(scalar.value) {
+            if escapedInJSON(scalar) {
                 let hex = String(scalar.value, radix: 16)
                 result += "\\u" + String(repeating: "0", count: 4 - hex.count) + hex
             } else {
@@ -143,6 +145,13 @@ public enum Sanitize {
             }
         }
         return result
+    }
+
+    private static func escapedInJSON(_ scalar: Unicode.Scalar) -> Bool {
+        switch scalar.value {
+        case 0x7F...0x9F, 0x202A...0x202E, 0x2066...0x2069, 0x061C, 0x200E, 0x200F, 0x2028, 0x2029: true
+        default: false
+        }
     }
 
     /// Shortens a label to `width` characters. Paths lose their leading folders first
