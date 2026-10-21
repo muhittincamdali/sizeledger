@@ -7,6 +7,34 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Security
+
+- Since 0.1.9, `--out` wrote through a symbolic link at the given path onto the file it named,
+  emptying that file first: with `link.json` pointing at another file, `--out link.json` ended
+  with status 0 and the other file held the report, and a dangling link created the file it
+  named. A link is now written through only when what it opens is a character device or a pipe,
+  such as `/dev/stdout` in a pipeline; a link to a file, a folder or nothing is refused with exit
+  status 2, even with `--force`, and the file it names is left as it was. The check is made on the
+  opened file, so a path swapped after it was looked at cannot redirect the write.
+
+### Changed
+
+- `--out` no longer replaces an existing file: it ends with exit status 2 and "it already exists;
+  pass --force to replace it". The new `--force` flag replaces it by renaming the new report over
+  it. A new file is written to a temporary file in the same folder and linked into place, which
+  fails if anything appeared at the path meanwhile.
+- `--out /dev/stdout` with standard output redirected to a file is refused, since the link leads
+  to a regular file; use `--format json > report.json` instead.
+
+### Fixed
+
+- The JSON report kept bidirectional overrides, isolates and marks (such as U+202E) in file names
+  as raw characters, so `cat` on the file could show `Trojan\u202Egpj.exe` as `Trojanexe.jpg`.
+  They are now escaped as `\u202e`; the name still decodes exactly.
+- SECURITY.md said sizeledger writes nowhere but the `--out` file while 0.1.9 followed links
+  from it; it now says what `--out` writes to and that links are followed only to a device or
+  pipe.
+
 ## [0.1.9] - 2026-10-21
 
 ### Fixed
