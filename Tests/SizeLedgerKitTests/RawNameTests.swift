@@ -1,6 +1,11 @@
 import Foundation
 import Testing
 @testable import SizeLedgerKit
+#if canImport(Glibc)
+import Glibc
+#elseif canImport(Darwin)
+import Darwin
+#endif
 
 /// Names that are not UTF-8 are told apart by their stored bytes.
 ///
@@ -80,6 +85,57 @@ import Testing
         builder.add(name: Array("Payload/Caf".utf8) + [0xE9] + Array(".app/y".utf8), Data(count: 1))
         let url = try temp.file("G.ipa", contents: builder.build())
         #expect(throws: InputError.severalApps("G.ipa", ["Caf\u{E9}.app", "Caf\u{E9}.app"])) { _ = try IPASource(url: url) }
+    }
+
+    /// Linux file systems store any bytes as a name; APFS refuses a name that is not UTF-8, so
+    /// on a Mac there is no such folder to walk.
+    @Test(.enabled(if: Self.fileSystemStoresAnyName()))
+    func walksAFolderWhoseNamesAreNotUTF8() throws {
+        try temp.directory("G.app")
+        let root = temp.url.appendingPathComponent("G.app")
+        let files: [(name: [UInt8], size: Int)] = [(Array("G".utf8), 100), (Self.utf8Name, 5_000), (Self.latin1Name, 10), ([0x61, 0xFF], 7)]
+        let paths = files.map { Self.bytes(of: root) + [0x2F] + $0.name }
+        // FileManager may not remove a name it cannot decode, so the test does.
+        defer { paths.forEach(Self.remove) }
+        for (path, file) in zip(paths, files) {
+            try Self.write(Data(repeating: 0x79, count: file.size), at: path)
+        }
+
+        let source = try DirectorySource(root: root, kind: .app)
+        #expect(source.entries.map(\.bytes).sorted() == [7, 10, 100, 5_000])
+        #expect(try source.contents(of: PathKey(bytes: Self.latin1Name), ranges: [0..<4]) == [Data(repeating: 0x79, count: 4)])
+        let report = try SizeLedger.analyze(root)
+        #expect(report.totals.files == 4)
+        #expect(report.totals.bytes == 5_117)
+    }
+
+    static func fileSystemStoresAnyName() -> Bool {
+        guard let temp = try? TemporaryDirectory() else { return false }
+        let path = bytes(of: temp.url) + [0x2F, 0xFF]
+        guard (try? write(Data(), at: path)) != nil else { return false }
+        remove(path)
+        return true
+    }
+
+    private static func remove(_ path: [UInt8]) {
+        _ = (path + [0]).withUnsafeBufferPointer { buffer in
+            buffer.withMemoryRebound(to: CChar.self) { unlink($0.baseAddress!) }
+        }
+    }
+
+    private static func bytes(of url: URL) -> [UInt8] {
+        url.withUnsafeFileSystemRepresentation { Array(UnsafeRawBufferPointer(start: $0, count: $0.map { strlen($0) } ?? 0)) }
+    }
+
+    /// Creates the file named by `path` exactly, which `FileManager` cannot do for bytes that are
+    /// not UTF-8.
+    private static func write(_ data: Data, at path: [UInt8]) throws {
+        let descriptor = (path + [0]).withUnsafeBufferPointer { buffer in
+            buffer.withMemoryRebound(to: CChar.self) { open($0.baseAddress!, O_CREAT | O_WRONLY | O_TRUNC, 0o644) }
+        }
+        guard descriptor >= 0 else { throw CocoaError(.fileWriteUnknown) }
+        let handle = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
+        try handle.write(contentsOf: data)
     }
 
     static let plist = try! PropertyListSerialization.data(fromPropertyList: ["CFBundleExecutable": "G"], format: .binary, options: 0)
