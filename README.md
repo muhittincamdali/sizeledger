@@ -109,7 +109,7 @@ the Swift runtime and need glibc 2.35 or later (Ubuntu 22.04, Debian 12 or newer
 ## Usage
 
 ```text
-sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--force] [--top <n>] [--color auto|always|never] [--quiet]
                     [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
@@ -117,7 +117,8 @@ sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n
 | --- | --- |
 | `<input>` | An `.app` folder, an `.ipa` file or an `.xcarchive` folder |
 | `-f, --format` | What to print: `tty` (default, a table), `markdown` or `json` |
-| `-o, --out <file>` | Also write the JSON report to a file; missing folders are created |
+| `-o, --out <file>` | Also write the JSON report to a new file; missing folders are created. A symbolic link is followed only to a device or pipe, such as `/dev/stdout` |
+| `--force` | Replace the `--out` file if it already exists; without it, an existing file is kept and the exit status is 2 |
 | `--top <n>` | How many items, languages and binaries to list (default 10) |
 | `--color` | `auto` colours only in a terminal and not when `NO_COLOR` is set |
 | `-q, --quiet` | Print nothing (with `--out`) |
@@ -136,6 +137,9 @@ sizeledger analyze build/MyApp.xcarchive --format markdown >> "$GITHUB_STEP_SUMM
 # The ten biggest files anywhere in the bundle (bytes and file name)
 jq -r '[.tree | .. | objects | select(has("children") | not)] | sort_by(-.bytes) | .[:10][] | "\(.bytes)\t\(.name)"' size/main.json
 ```
+
+`jq -r` prints names from the app as they are, including characters that the JSON file escapes,
+such as bidirectional overrides; leave out `-r` for an app you do not trust.
 
 The JSON layout is described in the [DocC article](https://muhittincamdali.github.io/sizeledger/documentation/sizeledgerkit/jsonlayout);
 [Fixtures/snapshots](Fixtures/snapshots) has complete reports.
@@ -173,7 +177,7 @@ details, and [App Clip size limits](docs/guides/app-clip-size.md) applies them t
   fixed and dynamic blocks; the Mach-O parser on thin, 32-bit, fat and fat64 files; ZIP64,
   damaged archives and file names that carry terminal escape sequences.
 
-153 tests in total, run by CI on macOS and on Linux (x86_64 and arm64); one of them needs a file
+159 tests in total, run by CI on macOS and on Linux (x86_64 and arm64); one of them needs a file
 name that is not UTF-8, which APFS refuses, so it runs on Linux only. Measuring SampleShop 2.0
 with the release build, process start included, took a median of 14.4 to 17.4 ms in three sets of
 21 runs on a Mac (Apple silicon) that was busy with other work (load average between 41 and 136);
