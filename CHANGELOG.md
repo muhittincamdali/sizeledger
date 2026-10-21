@@ -7,6 +7,18 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- An `.ipa` entry whose name is not valid UTF-8 was decoded as Latin-1 and then identified by
+  that text, so `caf\xE9.bin` and the UTF-8 `café.bin` counted as one path listed twice: the
+  second replaced the first and its bytes left the totals without a note. An archive that
+  `unzip -l` lists as 4 files and 5,000,179 B was reported as 3 files and 179 B. Entries, folders,
+  components and languages are now identified by the bytes the archive stores. Such a name is
+  still shown read as Latin-1, and the report adds a note that two rows can read the same.
+- On Linux, an `.app` folder holding a file whose name is not valid UTF-8 stopped `analyze` with
+  exit status 2 and "The file doesn't exist". Folders are now listed and opened by the names the
+  file system stores.
+
 ## [0.1.7] - 2026-10-21
 
 ### Fixed
