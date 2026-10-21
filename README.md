@@ -236,3 +236,5 @@ Bug reports with a small app that shows the problem help most. See
 ## License
 
 [MIT](LICENSE)
+
+Design notes: https://muhittincamdali.com/en/open-source/sizeledger/
