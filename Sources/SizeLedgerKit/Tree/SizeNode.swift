@@ -58,7 +58,8 @@ struct Tally: Equatable {
 
 /// Builds the tree from flat paths.
 enum TreeBuilder {
-    /// Folders are keyed by the bytes of their names, so NFC and NFD spellings stay two folders.
+    /// Folders are keyed by the stored bytes of their names, so NFC and NFD spellings stay two
+    /// folders, and so do a Latin-1 name and the UTF-8 name it reads as.
     private final class Folder {
         let name: String
         var folders: [PathKey: Folder] = [:]
@@ -72,14 +73,14 @@ enum TreeBuilder {
     static func build(rootName: String, entries: [BundleEntry], category: (BundleEntry) -> SizeCategory) -> SizeNode {
         let root = Folder(name: rootName)
         for entry in entries {
-            let parts = BundlePath.components(of: entry.path)
+            let parts = entry.key.components
             var folder = root
             for part in parts.dropLast() {
-                let key = PathKey(part)
+                let key = PathKey(bytes: part)
                 if let next = folder.folders[key] {
                     folder = next
                 } else {
-                    let next = Folder(name: part)
+                    let next = Folder(name: BundlePath.decode(part))
                     folder.folders[key] = next
                     folder = next
                 }
@@ -87,7 +88,7 @@ enum TreeBuilder {
             var tally = Tally()
             tally.add(entry)
             folder.files.append(SizeNode(
-                name: parts.last ?? entry.path,
+                name: parts.last.map(BundlePath.decode) ?? entry.path,
                 files: 1,
                 bytes: tally.bytes,
                 installBytes: tally.installBytes,

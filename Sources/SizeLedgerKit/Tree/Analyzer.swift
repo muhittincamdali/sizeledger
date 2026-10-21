@@ -30,7 +30,10 @@ struct Analyzer {
 
         var total = Tally()
         var categories: [SizeCategory: Tally] = [:]
-        // Keyed by bytes (see BundlePath), so NFC and NFD spellings of a name stay apart.
+        // Keyed by the stored bytes (see BundlePath), so NFC and NFD spellings of a name stay
+        // apart, and so do a Latin-1 name and the UTF-8 name it reads as. The decoded path has
+        // the same components as the stored one, so a component count or index found on the
+        // text picks the matching stored bytes.
         var components: [PathKey: (path: String, category: SizeCategory, tally: Tally)] = [:]
         var languages: [PathKey: (language: String, tally: Tally)] = [:]
         for entry in source.entries {
@@ -38,9 +41,12 @@ struct Analyzer {
             total.add(entry)
             categories[category, default: Tally()].add(entry)
             let component = Classifier.component(of: entry.path)
-            components[PathKey(component), default: (component, category, Tally())].tally.add(entry)
-            if let language = Classifier.language(of: entry.path) {
-                languages[PathKey(language), default: (language, Tally())].tally.add(entry)
+            let componentKey = entry.key.leading(BundlePath.components(of: component).count)
+            components[componentKey, default: (component, category, Tally())].tally.add(entry)
+            let parts = BundlePath.components(of: entry.path)
+            if let index = Classifier.languageFolder(in: parts) {
+                let language = BundlePath.droppingSuffix(Classifier.lprojSuffix, from: parts[index])
+                languages[entry.key.component(at: index), default: (language, Tally())].tally.add(entry)
             }
         }
 
@@ -81,7 +87,7 @@ struct Analyzer {
             notes.append("Info.plist at the top of \(source.bundleName) is a symbolic link, and links are not followed: \(unknown)")
             return AppInfo()
         }
-        guard let data = try? source.contents(of: "Info.plist", limit: Self.infoPlistLimit),
+        guard let data = try? source.contents(of: plist, limit: Self.infoPlistLimit),
               let info = AppInfo.parse(data)
         else {
             notes.append("Info.plist could not be read as a property list: the app's name, version and main executable are unknown.")
@@ -93,12 +99,12 @@ struct Analyzer {
     private func readBinaries(notes: inout [String]) -> [SizeReport.Binary] {
         var binaries: [SizeReport.Binary] = []
         for entry in source.entries where !entry.isSymbolicLink && entry.bytes >= Self.smallestBinary {
-            guard let prefix = try? source.contents(of: entry.path, limit: 4), MachO.format(of: prefix) != nil else {
+            guard let prefix = try? source.contents(of: entry, limit: 4), MachO.format(of: prefix) != nil else {
                 continue
             }
             do {
                 let slices = try MachO.slices(fileSize: entry.bytes) { ranges in
-                    try source.contents(of: entry.path, ranges: ranges)
+                    try source.contents(of: entry, ranges: ranges)
                 }
                 binaries.append(.init(path: entry.path, bytes: entry.bytes, slices: slices))
             } catch {
@@ -116,6 +122,11 @@ struct Analyzer {
         if !universal.isEmpty {
             let count = universal.count == 1 ? "1 binary contains" : "\(universal.count) binaries contain"
             notes.append("\(count) more than one architecture. Sizes count every slice; a device keeps one, so after App Store thinning these binaries are smaller.")
+        }
+        let notUTF8 = (source.entries + source.outsideEntries).filter { !BundlePath.isUTF8($0.key.bytes) }.count
+        if notUTF8 > 0 {
+            let count = notUTF8 == 1 ? "1 file has a name" : "\(notUTF8) files have names"
+            notes.append("\(count) that \(notUTF8 == 1 ? "is" : "are") not valid UTF-8, shown read as Latin-1. Files are told apart by their stored bytes, so two rows can read the same and still be different files.")
         }
         if !source.outsideEntries.isEmpty {
             let count = source.outsideEntries.count == 1 ? "1 file" : "\(source.outsideEntries.count) files"

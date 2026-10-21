@@ -2,7 +2,14 @@ import Foundation
 
 /// One file, directory or symbolic link listed in a ZIP archive's central directory.
 struct ZipEntry: Sendable, Equatable {
-    var path: String
+    /// The name as the central directory stores it. Two entries are the same file only when
+    /// these bytes are equal.
+    let name: [UInt8]
+    /// `name` decoded for display (see ``BundlePath/decode(_:)``). Names are UTF-8 when the
+    /// archive says so (flag bit 11) and, in practice, also when it does not: Info-ZIP and
+    /// `ditto` write UTF-8 either way, so the flag is not consulted. Two different names can read
+    /// the same, so this is never used to tell entries apart.
+    let path: String
     var compressedSize: UInt64
     var uncompressedSize: UInt64
     var method: UInt16
@@ -11,10 +18,29 @@ struct ZipEntry: Sendable, Equatable {
     /// Unix mode bits, when the archive was written on a Unix system (as Xcode's exports are).
     var unixMode: UInt32?
 
+    init(
+        name: [UInt8],
+        compressedSize: UInt64,
+        uncompressedSize: UInt64,
+        method: UInt16,
+        flags: UInt16,
+        localHeaderOffset: UInt64,
+        unixMode: UInt32? = nil
+    ) {
+        self.name = name
+        path = BundlePath.decode(name)
+        self.compressedSize = compressedSize
+        self.uncompressedSize = uncompressedSize
+        self.method = method
+        self.flags = flags
+        self.localHeaderOffset = localHeaderOffset
+        self.unixMode = unixMode
+    }
+
     var isDirectory: Bool {
         // The last byte, not the last Character: a prepended mark such as U+0600 joins the "/"
         // after it into one Character, and unzip still makes that entry a folder.
-        path.utf8.last == BundlePath.separator || unixMode.map { $0 & 0o170000 == 0o040000 } == true
+        name.last == BundlePath.separator || unixMode.map { $0 & 0o170000 == 0o040000 } == true
     }
 
     var isSymbolicLink: Bool {
@@ -182,7 +208,7 @@ struct ZipArchive: Sendable {
             let host = madeBy >> 8
             let mode = (host == unixHost || host == osxHost) ? externalAttributes >> 16 : 0
             entries.append(ZipEntry(
-                path: decodeName(name),
+                name: Array(name),
                 compressedSize: compressedSize,
                 uncompressedSize: uncompressedSize,
                 method: method,
@@ -213,13 +239,6 @@ struct ZipArchive: Sendable {
             offset -= 1
         }
         throw missing
-    }
-
-    /// Names are UTF-8 when the archive says so (flag bit 11) and, in practice, also when it does
-    /// not: Info-ZIP and `ditto` write UTF-8 either way. Invalid UTF-8 falls back to Latin-1.
-    private static func decodeName(_ bytes: Data) -> String {
-        if let name = String(data: bytes, encoding: .utf8) { return name }
-        return String(decoding: bytes.map { UInt16($0) }, as: UTF16.self)
     }
 }
 

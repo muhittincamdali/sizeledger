@@ -1,0 +1,166 @@
+import Foundation
+import Testing
+@testable import SizeLedgerKit
+#if canImport(Glibc)
+import Glibc
+#elseif canImport(Darwin)
+import Darwin
+#endif
+
+/// Names that are not UTF-8 are told apart by their stored bytes.
+///
+/// A ZIP name, or a Linux file name, is a byte string. One that is not valid UTF-8 is shown read
+/// as Latin-1, and that text can be the UTF-8 spelling of another name: the byte 0xE9 reads as
+/// "é", so `caf\xE9.bin` and the UTF-8 `café.bin` both read "café.bin". Keyed by the decoded text,
+/// the second replaced the first as if the archive listed one path twice, and its bytes left the
+/// totals without a note.
+@Suite struct RawNameTests {
+    static let utf8Name = Array("caf\u{E9}.bin".utf8)
+    static let latin1Name: [UInt8] = Array("caf".utf8) + [0xE9] + Array(".bin".utf8)
+
+    let temp: TemporaryDirectory
+
+    init() throws {
+        temp = try TemporaryDirectory()
+    }
+
+    @Test func decodesEachComponentOnItsOwn() {
+        #expect(BundlePath.decode(Self.latin1Name) == "caf\u{E9}.bin")
+        #expect(BundlePath.decode(Self.utf8Name) == "caf\u{E9}.bin")
+        // A valid UTF-8 folder keeps its reading next to a Latin-1 file name.
+        let mixed = Array("\u{E9}t\u{E9}/".utf8) + [0xFF]
+        #expect(BundlePath.decode(mixed) == "\u{E9}t\u{E9}/\u{FF}")
+        #expect(BundlePath.decode(Array("a//b/".utf8)) == "a//b/")
+        #expect(!BundlePath.isUTF8(Self.latin1Name))
+        #expect(BundlePath.isUTF8(Self.utf8Name))
+    }
+
+    @Test func countsAUTF8NameAndTheLatin1NameThatReadsTheSameAsTwoFiles() throws {
+        let url = try ipa()
+        let source = try IPASource(url: url)
+        let names = source.entries.filter { $0.path == "caf\u{E9}.bin" }
+        #expect(names.count == 2)
+        #expect(Set(names.map(\.key)) == [PathKey(bytes: Self.utf8Name), PathKey(bytes: Self.latin1Name)])
+        #expect(try source.contents(of: PathKey(bytes: Self.utf8Name), ranges: [0..<10]) == [Data(repeating: 0x7A, count: 10)])
+        #expect(try source.contents(of: PathKey(bytes: Self.latin1Name), ranges: [0..<10]) == [Data(repeating: 0x79, count: 10)])
+
+        let report = try SizeLedger.analyze(url)
+        #expect(report.totals.files == 4)
+        #expect(report.totals.bytes == 5_000_110 + UInt64(Self.plist.count))
+        #expect(report.components.filter { $0.path == "caf\u{E9}.bin" }.map(\.bytes).sorted() == [10, 5_000_000])
+        #expect(report.tree.children?.count == 4)
+        #expect(report.notes == ["1 file has a name that is not valid UTF-8, shown read as Latin-1. Files are told apart by their stored bytes, so two rows can read the same and still be different files."])
+    }
+
+    @Test func keepsLatin1FoldersAndLanguagesApartFromTheirUTF8Reading() {
+        let latin1 = { (text: String) in PathKey(bytes: text.utf8.map { $0 == UInt8(ascii: "#") ? 0xE9 : $0 }) }
+        let entries = [
+            BundleEntry(path: "Frameworks/\u{E9}.framework/a", bytes: 1),
+            BundleEntry(key: latin1("Frameworks/#.framework/b"), bytes: 2),
+            BundleEntry(path: "\u{E9}.lproj/a.strings", bytes: 4),
+            BundleEntry(key: latin1("#.lproj/b.strings"), bytes: 8),
+        ]
+        let tree = TreeBuilder.build(rootName: "G.app", entries: entries) { _ in .resources }
+        #expect(tree.children?.count == 3)
+        #expect(tree.children?.first { $0.name == "Frameworks" }?.children?.count == 2)
+
+        let report = Analyzer(source: ListedSource(entries: entries)).report(inputName: "G.app")
+        #expect(report.components.map(\.bytes).sorted() == [1, 2, 4, 8])
+        #expect(report.languages.map(\.language) == ["\u{E9}", "\u{E9}"])
+        #expect(report.languages.map(\.bytes).sorted() == [4, 8])
+    }
+
+    @Test func stillMeasuresARepeatedRawNameOnce() throws {
+        var builder = ZipBuilder()
+        builder.add("Payload/G.app/G", Data(repeating: 1, count: 100))
+        builder.add(name: Array("Payload/G.app/".utf8) + Self.latin1Name, Data(repeating: 2, count: 10))
+        builder.add(name: Array("Payload/G.app/".utf8) + Self.latin1Name, Data(repeating: 3, count: 30))
+        let source = try IPASource(url: try temp.file("G.ipa", contents: builder.build()))
+        #expect(source.entries.map(\.bytes) == [100, 30])
+    }
+
+    @Test func keepsALatin1BundleNameApartFromItsUTF8Reading() throws {
+        var builder = ZipBuilder()
+        builder.add("Payload/Caf\u{E9}.app/x", Data(count: 1))
+        builder.add(name: Array("Payload/Caf".utf8) + [0xE9] + Array(".app/y".utf8), Data(count: 1))
+        let url = try temp.file("G.ipa", contents: builder.build())
+        #expect(throws: InputError.severalApps("G.ipa", ["Caf\u{E9}.app", "Caf\u{E9}.app"])) { _ = try IPASource(url: url) }
+    }
+
+    /// Linux file systems store any bytes as a name; APFS refuses a name that is not UTF-8, so
+    /// on a Mac there is no such folder to walk.
+    @Test(.enabled(if: Self.fileSystemStoresAnyName()))
+    func walksAFolderWhoseNamesAreNotUTF8() throws {
+        try temp.directory("G.app")
+        let root = temp.url.appendingPathComponent("G.app")
+        let files: [(name: [UInt8], size: Int)] = [(Array("G".utf8), 100), (Self.utf8Name, 5_000), (Self.latin1Name, 10), ([0x61, 0xFF], 7)]
+        let paths = files.map { Self.bytes(of: root) + [0x2F] + $0.name }
+        // FileManager may not remove a name it cannot decode, so the test does.
+        defer { paths.forEach(Self.remove) }
+        for (path, file) in zip(paths, files) {
+            try Self.write(Data(repeating: 0x79, count: file.size), at: path)
+        }
+
+        let source = try DirectorySource(root: root, kind: .app)
+        #expect(source.entries.map(\.bytes).sorted() == [7, 10, 100, 5_000])
+        #expect(try source.contents(of: PathKey(bytes: Self.latin1Name), ranges: [0..<4]) == [Data(repeating: 0x79, count: 4)])
+        let report = try SizeLedger.analyze(root)
+        #expect(report.totals.files == 4)
+        #expect(report.totals.bytes == 5_117)
+    }
+
+    static func fileSystemStoresAnyName() -> Bool {
+        guard let temp = try? TemporaryDirectory() else { return false }
+        let path = bytes(of: temp.url) + [0x2F, 0xFF]
+        guard (try? write(Data(), at: path)) != nil else { return false }
+        remove(path)
+        return true
+    }
+
+    private static func remove(_ path: [UInt8]) {
+        _ = (path + [0]).withUnsafeBufferPointer { buffer in
+            buffer.withMemoryRebound(to: CChar.self) { unlink($0.baseAddress!) }
+        }
+    }
+
+    private static func bytes(of url: URL) -> [UInt8] {
+        url.withUnsafeFileSystemRepresentation { Array(UnsafeRawBufferPointer(start: $0, count: $0.map { strlen($0) } ?? 0)) }
+    }
+
+    /// Creates the file named by `path` exactly, which `FileManager` cannot do for bytes that are
+    /// not UTF-8.
+    private static func write(_ data: Data, at path: [UInt8]) throws {
+        let descriptor = (path + [0]).withUnsafeBufferPointer { buffer in
+            buffer.withMemoryRebound(to: CChar.self) { open($0.baseAddress!, O_CREAT | O_WRONLY | O_TRUNC, 0o644) }
+        }
+        guard descriptor >= 0 else { throw CocoaError(.fileWriteUnknown) }
+        let handle = FileHandle(fileDescriptor: descriptor, closeOnDealloc: true)
+        try handle.write(contentsOf: data)
+    }
+
+    static let plist = try! PropertyListSerialization.data(fromPropertyList: ["CFBundleExecutable": "G"], format: .binary, options: 0)
+
+    /// The archive from the report: Info.plist, a 100-byte executable, the UTF-8 `café.bin` of
+    /// 5,000,000 bytes and the Latin-1 `caf\xE9.bin` of 10.
+    private func ipa() throws -> URL {
+        var builder = ZipBuilder()
+        builder.add("Payload/G.app/Info.plist", Self.plist)
+        builder.add("Payload/G.app/G", Data(repeating: 0x78, count: 100))
+        builder.add(name: Array("Payload/G.app/".utf8) + Self.utf8Name, Data(repeating: 0x7A, count: 5_000_000))
+        builder.add(name: Array("Payload/G.app/".utf8) + Self.latin1Name, Data(repeating: 0x79, count: 10))
+        return try temp.file("G.ipa", contents: builder.build())
+    }
+}
+
+/// A bundle given as a list of entries, with no file contents.
+private struct ListedSource: BundleSource {
+    let entries: [BundleEntry]
+    var kind: InputKind { .app }
+    var bundleName: String { "G.app" }
+    var outsideEntries: [BundleEntry] { [] }
+    var archiveBytes: UInt64? { nil }
+
+    func contents(of key: PathKey, ranges: [Range<Int>]) throws -> [Data] {
+        throw CocoaError(.fileNoSuchFile)
+    }
+}

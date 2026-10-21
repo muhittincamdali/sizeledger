@@ -95,11 +95,14 @@ enum Classifier {
     /// The language of a file inside an `.lproj` folder anywhere in the bundle: `en` for
     /// `en.lproj/Main.strings`, `Base` for `Base.lproj`.
     static func language(of path: String) -> String? {
-        let suffix = ".lproj"
-        for part in BundlePath.components(of: path).dropLast()
-        where BundlePath.hasSuffix(part, suffix) && part.utf8.count > suffix.utf8.count {
-            return BundlePath.droppingSuffix(suffix, from: part)
-        }
-        return nil
+        let parts = BundlePath.components(of: path)
+        return languageFolder(in: parts).map { BundlePath.droppingSuffix(lprojSuffix, from: parts[$0]) }
+    }
+
+    static let lprojSuffix = ".lproj"
+
+    /// The index in `parts` of the first `.lproj` folder, the file name itself not counted.
+    static func languageFolder(in parts: [String]) -> Int? {
+        parts.dropLast().firstIndex { BundlePath.hasSuffix($0, lprojSuffix) && $0.utf8.count > lprojSuffix.utf8.count }
     }
 }

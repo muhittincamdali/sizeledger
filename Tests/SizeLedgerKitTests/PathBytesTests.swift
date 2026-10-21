@@ -70,7 +70,7 @@ import Testing
 
     @Test func treatsATrailingSlashAfterAPrependCharacterAsAFolder() {
         // U+0600 is a prepended concatenation mark: it joins the "/" after it into one Character.
-        let entry = ZipEntry(path: "Payload/G.app/x\u{600}/", compressedSize: 0, uncompressedSize: 0, method: 0, flags: 0, localHeaderOffset: 0)
+        let entry = ZipEntry(name: Array("Payload/G.app/x\u{600}/".utf8), compressedSize: 0, uncompressedSize: 0, method: 0, flags: 0, localHeaderOffset: 0)
         #expect(entry.isDirectory)
     }
 

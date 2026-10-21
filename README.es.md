@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@e5dfa8596b2661f23c0f8a8654192db243132f83 status=reviewed -->
+<!-- i18n-source: README.md@5719633c62056b6b23569d750b2987e2bd114d3e status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -181,7 +181,9 @@ App Clips.
   stored, fixed y dynamic; el parser de Mach-O con archivos thin, de 32 bits, fat y fat64; y también
   ZIP64, archivos dañados y nombres de archivo que contienen secuencias de escape de terminal.
 
-En total son 140 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64). Medir SampleShop 2.0
+En total son 146 pruebas, que CI ejecuta en macOS y en Linux (x86_64 y arm64); una de ellas necesita
+un nombre de archivo que no es UTF-8, que APFS rechaza, así que solo se ejecuta en Linux. Medir
+SampleShop 2.0
 con la compilación release, incluido el arranque del proceso, tardó una mediana de 14.4 a 17.4 ms en
 tres series de 21 ejecuciones, en un Mac (Apple silicon) ocupado con otro trabajo (carga media entre
 41 y 136); el tiempo depende de lo que más ejecute la máquina. [scripts/bench.sh](scripts/bench.sh)
@@ -203,6 +205,9 @@ repite la medición.
 - Las rutas se comparan byte a byte, como las ven una herramienta de descompresión y un sistema de
   archivos: dos nombres que solo difieren en la normalización Unicode (NFC y NFD) son dos archivos,
   y una `/` seguida de una marca combinante sigue separando dos carpetas.
+  Un nombre que no es UTF-8 válido se muestra leído como Latin-1, pero se sigue distinguiendo por
+  sus bytes guardados: `caf\xE9.bin` y el `café.bin` en UTF-8 son dos archivos que se leen igual;
+  el informe añade una nota cuando incluye un nombre así.
 - Para llegar a una cabecera Mach-O situada muy adentro de una entrada comprimida de un `.ipa`,
   sizeledger descomprime todo lo anterior y solo conserva una ventana de 32 KiB, así que una entrada
   manipulada cuesta tiempo, no memoria: alrededor de 1 s por GB descomprimido en un Mac (Apple

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@e5dfa8596b2661f23c0f8a8654192db243132f83 status=reviewed -->
+<!-- i18n-source: README.md@5719633c62056b6b23569d750b2987e2bd114d3e status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -172,7 +172,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 140개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. release 빌드로 SampleShop 2.0을
+테스트는 모두 146개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. 그중 하나는 APFS가 거부하는 UTF-8이 아닌 파일 이름이 필요해서 Linux에서만 실행됩니다. release 빌드로 SampleShop 2.0을
 측정하는 데(프로세스 시작 포함), 다른 작업으로 바쁜 Mac(Apple silicon, 부하 평균 41~136)에서 21회 실행 3세트의
 중앙값으로 14.4~17.4 ms가 걸렸습니다. 시간은 컴퓨터에서 함께 실행되는 작업에 따라 달라집니다.
 [scripts/bench.sh](scripts/bench.sh)로 같은 측정을 반복할 수 있습니다.
@@ -188,7 +188,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   `.app`은 측정되지만, 그 파일은 "Other resources" 아래에 들어갑니다.
 - 앱이 둘 이상 들어 있거나, 암호화된 항목이 있거나, stored와 DEFLATE 외의 압축을 쓰거나, 항목 경로에
   `..` 구성 요소가 있는 `.ipa`는 추측하지 않고 메시지와 함께 거부합니다.
-- 경로는 압축 해제 도구와 파일 시스템처럼 바이트 단위로 비교합니다. Unicode 정규화(NFC와 NFD)만 다른 두 이름은 두 파일이며, 결합 문자가 뒤따르는 `/`도 폴더를 구분합니다.
+- 경로는 압축 해제 도구와 파일 시스템처럼 바이트 단위로 비교합니다. Unicode 정규화(NFC와 NFD)만 다른 두 이름은 두 파일이며, 결합 문자가 뒤따르는 `/`도 폴더를 구분합니다. 올바른 UTF-8이 아닌 이름은 Latin-1로 읽어 표시하지만 저장된 바이트로 구분하므로, `caf\xE9.bin`과 UTF-8 `café.bin`은 똑같이 읽히는 두 파일입니다. 이런 이름이 있으면 보고서에 메모가 추가됩니다.
 - 압축된 `.ipa` 항목 깊숙한 곳의 Mach-O 헤더를 읽기 위해 sizeledger는 그 앞의 모든 내용을 풀지만 32 KiB 창만 유지합니다. 따라서 조작된 항목은
   메모리가 아니라 시간을 소비하며, Mac(Apple silicon)에서 풀린 1 GB당 약 1 s가 걸립니다.
 - 입력은 신뢰할 수 없으므로, 조작되었거나 손상된 입력이라도 메모리·시간·스택을 소진시킬 수 없습니다.
