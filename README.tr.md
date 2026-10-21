@@ -221,7 +221,7 @@ ile tekrarlanabilir.
   olan iki girdi taşıyan 28,6 MB'lık bir dosya, başka işlerle meşgul bir Mac'te (Apple silicon) 15
   ile 24 s sürdü; daha düşük bir `--max-bytes` bu üst sınırı düşürür. sizeledger; 500.000'den fazla
   dosyası ya da 64 klasörden derine yuvalanmış bir yolu olan bir girdiyi, 8 GiB'den fazla açılmış
-  bayt beyan eden bir `.ipa`'yı ve stored boyutunun 300 katından fazlasına açılan bir girdi (zip
+  bayt beyan eden bir `.ipa`'yı ve arşivde saklanan boyutunun 300 katından fazlasına açılan bir girdi (zip
   bombası) içeren bir `.ipa`'yı reddeder; bunları `--max-files`, `--max-depth`, `--max-bytes` ve
   `--max-ratio` ile yükseltebilirsiniz. JSON raporu her zaman yazılabilsin diye `--max-depth` en
   fazla 100 olabilir; klasörler açılmadığından `--max-bytes` yalnızca `.ipa` için geçerlidir. Bozuk
