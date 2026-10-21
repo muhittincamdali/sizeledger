@@ -34,8 +34,12 @@ Please give a reasonable amount of time to fix the issue before disclosing it pu
 
 sizeledger reads the `.app`, `.ipa` or `.xcarchive` you point it at: file sizes, the ZIP
 directory of an `.ipa`, the app's Info.plist and the headers of Mach-O files. It writes only the
-report you ask for with `--out`, makes no network requests, does not extract archives to disk and
+report you ask for with `--out`: a new file, an existing regular file at that path only with
+`--force`, or a device or pipe such as `/dev/stdout`. It does not follow a symbolic link at that
+path to a file or folder. It makes no network requests, does not extract archives to disk and
 never runs code from the app. Inputs are untrusted, so reports that fit this policy include, for
-example: a crafted `.ipa` or Mach-O file that makes sizeledger crash, hang, use unbounded memory,
-read outside the file, or write anywhere but the `--out` file; and file names or Info.plist values
-that put terminal escape sequences, Markdown links or math into the printed report.
+example: a crafted `.ipa` or Mach-O file that makes sizeledger crash, hang, use unbounded memory
+or read outside the file; an `--out` path that makes it change a file other than the one at that
+path, or replace an existing file without `--force`; and file names or Info.plist values that put
+terminal escape sequences, bidirectional overrides, Markdown links or math into the printed
+report or the JSON file.
