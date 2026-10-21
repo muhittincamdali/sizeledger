@@ -7,6 +7,8 @@ All notable changes to sizeledger are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-10-21
+
 ### Fixed
 
 - An `.ipa` entry whose name is not valid UTF-8 was decoded as Latin-1 and then identified by
@@ -211,7 +213,8 @@ First release: `sizeledger analyze` and the SizeLedgerKit library.
 - Release binaries for macOS (universal) and Linux (x86_64, aarch64), and a Homebrew formula
   written by the release workflow.
 
-[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.7...HEAD
+[Unreleased]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.8...HEAD
+[0.1.8]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/muhittincamdali/sizeledger/compare/v0.1.4...v0.1.5
