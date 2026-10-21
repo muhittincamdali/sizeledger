@@ -2,9 +2,10 @@ import Foundation
 
 /// Bounds on what one input may cost to measure. An `.app`, `.ipa` or `.xcarchive` is untrusted,
 /// so a crafted one could declare a billion files, a slice that unpacks to terabytes or a path
-/// nested thousands deep. These caps are far above any real app and stop a crafted input from
-/// exhausting memory, time or the stack before anything is read. The CLI raises them with
-/// `--max-files`, `--max-bytes`, `--max-ratio` and `--max-depth`.
+/// nested thousands deep. These caps are far above any real app. They stop a crafted input from
+/// exhausting memory or the stack before anything is read, and they bound the time it takes:
+/// what is decompressed follows the sizes the entries declare, which `maxTotalBytes` caps. The
+/// CLI raises them with `--max-files`, `--max-bytes`, `--max-ratio` and `--max-depth`.
 public struct AnalysisLimits: Sendable, Equatable {
     /// Most files (archive entries or bundle files) measured. A crafted central directory can
     /// claim far more entries than its bytes hold; reading them all would exhaust memory.

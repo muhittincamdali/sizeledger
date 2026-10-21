@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@56b4b10d9bcadcc0ca427d78448a4c4873ee6f13 status=reviewed -->
+<!-- i18n-source: README.md@b830eb2d181ba4a9637f3e9ab6d51e7b27142d17 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -139,7 +139,7 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 
 - **リファレンスと照合したリーダー**: DEFLATE デコーダーは stored、fixed、dynamic の各ブロックについて zlib の出力と、Mach-O パーサーは thin、32 ビット、fat、fat64 のファイルで照合しています。ZIP64、破損したアーカイブ、ターミナルのエスケープシーケンスを含むファイル名も確認しています。
 
-テストは全部で 146 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。そのうち 1 件は APFS が受け付けない UTF-8 ではないファイル名を必要とするため、Linux でのみ実行されます。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
+テストは全部で 153 件あり、CI が macOS と Linux (x86_64 と arm64) で実行します。そのうち 1 件は APFS が受け付けない UTF-8 ではないファイル名を必要とするため、Linux でのみ実行されます。release ビルドで SampleShop 2.0 を測定した時間 (プロセスの起動を含みます) は、他の作業で負荷のかかった Mac (Apple silicon、ロードアベレージ 41〜136) で、21 回の実行を 3 セット行った中央値が 14.4〜17.4 ms でした。時間はマシン上で他に何が動いているかによって変わります。[scripts/bench.sh](scripts/bench.sh) で同じ測定を再現できます。
 
 ## 制限事項
 
@@ -150,7 +150,11 @@ JSON の構造は [DocC の記事](https://muhittincamdali.github.io/sizeledger/
 - 複数のアプリを含む `.ipa`、暗号化されたエントリを含む `.ipa`、stored と DEFLATE 以外の圧縮を使う `.ipa`、エントリのパスに `..` を含む `.ipa` は、推測で処理せず、メッセージを表示して拒否します。
 - パスは展開ツールやファイルシステムと同じくバイト単位で比較します。Unicode の正規化 (NFC と NFD) だけが異なる 2 つの名前は 2 つのファイルとして数え、結合文字が後に続く `/` もフォルダの区切りとして扱います。有効な UTF-8 ではない名前は Latin-1 として読んで表示しますが、保存されたバイトで区別するため、`caf\xE9.bin` と UTF-8 の `café.bin` は同じに読める 2 つのファイルです。そのような名前があるとレポートに注記が加わります。
 - 圧縮された `.ipa` エントリの奥にある Mach-O ヘッダーを読むため、sizeledger はその手前をすべて展開しますが、保持するのは 32 KiB のウィンドウだけです。そのため細工されたエントリが消費するのはメモリではなく時間で、Mac (Apple silicon) では展開 1 GB あたり約 1 s です。
-- 入力は信頼できないため、細工または破損した入力でもメモリ・時間・スタックを使い尽くすことはありません。
+- 入力は信頼できないため、細工または破損した入力でもメモリやスタックを使い尽くすことはなく、かかる時間は
+  以下の上限で抑えられます。エントリ同士が格納バイトを共有する `.ipa`（重なり型の zip 爆弾）は破損として拒否
+  されます。既定の上限内で見つかった最も遅い細工 `.ipa` は、それぞれ 4.29 GB を宣言し Mach-O ヘッダーを末尾
+  に置いた 2 つのエントリを持つ 28.6 MB のファイルで、他の作業で負荷のかかった Mac (Apple silicon) で 15〜24 s
+  かかりました。`--max-bytes` を下げるとこの上限も下がります。
   sizeledger は次の入力を拒否します: ファイルが 500,000 を超える、パスが 64 フォルダより深くネストされている、
   `.ipa` が宣言する非圧縮バイトが 8 GiB を超える、または `.ipa` エントリが格納サイズの 300 倍を超えて展開される
   （zip 爆弾）。これらは `--max-files`、`--max-depth`、`--max-bytes`、`--max-ratio` で引き上げられます。

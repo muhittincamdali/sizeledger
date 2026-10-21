@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@56b4b10d9bcadcc0ca427d78448a4c4873ee6f13 status=reviewed -->
+<!-- i18n-source: README.md@b830eb2d181ba4a9637f3e9ab6d51e7b27142d17 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -183,7 +183,7 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 146 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. Bunlardan
+Toplam 153 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. Bunlardan
 biri, APFS'nin kabul etmediği UTF-8 olmayan bir dosya adı gerektirdiği için yalnızca Linux'ta
 çalışır. SampleShop
 2.0'ı release derlemesiyle ölçmek (süreç başlatma dahil), başka işlerle meşgul bir Mac'te (Apple
@@ -214,15 +214,19 @@ ile tekrarlanabilir.
 - Sıkıştırılmış bir `.ipa` girdisinin derinlerindeki bir Mach-O başlığına ulaşmak için sizeledger
   ondan önceki her şeyi açar ve yalnızca 32 KiB'lık bir pencere tutar; bu yüzden hazırlanmış bir
   girdi bellek değil zaman harcatır: bir Mac'te (Apple silicon) açılan her GB için yaklaşık 1 s.
-- Girdi güvenilmez olduğundan, hazırlanmış ya da bozuk bir girdi belleği, zamanı veya yığını
-  (stack) tüketemez. sizeledger; 500.000'den fazla dosyası ya da 64 klasörden derine yuvalanmış
-  bir yolu olan bir girdiyi, 8 GiB'den fazla açılmış bayt beyan eden bir `.ipa`'yı ve stored
-  boyutunun 300 katından fazlasına açılan bir girdi (zip bombası) içeren bir `.ipa`'yı reddeder;
-  bunları `--max-files`, `--max-depth`, `--max-bytes` ve `--max-ratio` ile yükseltebilirsiniz.
-  JSON raporu her zaman yazılabilsin diye `--max-depth` en fazla 100 olabilir; klasörler
-  açılmadığından `--max-bytes` yalnızca `.ipa` için geçerlidir. Bozuk Mach-O ya da ZIP başlıkları
-  bir "unreadable" notu veya çıkış durumu 2 olan net bir hata verir, asla çökme olmaz. Aynı ada
-  sahip çift girdi bir kez sayılır.
+- Girdi güvenilmez olduğundan, hazırlanmış ya da bozuk bir girdi belleği veya yığını (stack)
+  tüketemez; ne kadar süreceğini ise ardından sayılan sınırlar belirler. Girdileri aynı saklanan
+  baytları paylaşan bir `.ipa` (örtüşen zip bombası) bozuk sayılıp reddedilir. Varsayılan sınırlar
+  içinde bulunan en yavaş hazırlanmış `.ipa`, her biri 4,29 GB beyan eden ve Mach-O başlıkları sonda
+  olan iki girdi taşıyan 28,6 MB'lık bir dosya, başka işlerle meşgul bir Mac'te (Apple silicon) 15
+  ile 24 s sürdü; daha düşük bir `--max-bytes` bu üst sınırı düşürür. sizeledger; 500.000'den fazla
+  dosyası ya da 64 klasörden derine yuvalanmış bir yolu olan bir girdiyi, 8 GiB'den fazla açılmış
+  bayt beyan eden bir `.ipa`'yı ve stored boyutunun 300 katından fazlasına açılan bir girdi (zip
+  bombası) içeren bir `.ipa`'yı reddeder; bunları `--max-files`, `--max-depth`, `--max-bytes` ve
+  `--max-ratio` ile yükseltebilirsiniz. JSON raporu her zaman yazılabilsin diye `--max-depth` en
+  fazla 100 olabilir; klasörler açılmadığından `--max-bytes` yalnızca `.ipa` için geçerlidir. Bozuk
+  Mach-O ya da ZIP başlıkları bir "unreadable" notu veya çıkış durumu 2 olan net bir hata verir,
+  asla çökme olmaz. Aynı ada sahip çift girdi bir kez sayılır.
 
 ## Dokümantasyon
 

@@ -76,6 +76,7 @@ struct ZipArchive: Sendable {
         reader = ByteReader(data)
         do {
             entries = try Self.readCentralDirectory(reader, limits: limits)
+            try Self.checkNoOverlap(entries, reader)
         } catch let error as ZipError {
             throw error
         } catch {
@@ -219,6 +220,39 @@ struct ZipArchive: Sendable {
             offset = extraEnd + commentLength
         }
         return entries
+    }
+
+    /// Refuses an archive in which two entries share stored bytes.
+    ///
+    /// An archiver writes each entry as a local header followed by its data, one after another,
+    /// so no two of them overlap. A crafted directory can instead point thousands of entries at
+    /// the same large data: the file stays small while every entry costs a full read, and the
+    /// declared sizes add up to far more than the file holds. Each entry's local header and data
+    /// must therefore lie apart from every other's. An entry whose local header cannot be read
+    /// is left to fail when it is read, as before.
+    private static func checkNoOverlap(_ entries: [ZipEntry], _ reader: ByteReader) throws {
+        let localHeaderSize: UInt64 = 30
+        var spans: [(start: UInt64, end: UInt64, index: Int)] = []
+        spans.reserveCapacity(entries.count)
+        for (index, entry) in entries.enumerated() {
+            let start = entry.localHeaderOffset
+            guard let offset = Int(exactly: start),
+                  (try? reader.uint32LE(at: offset)) == localHeaderSignature,
+                  let nameLength = try? reader.uint16LE(at: offset + 26),
+                  let extraLength = try? reader.uint16LE(at: offset + 28)
+            else { continue }
+            let header = localHeaderSize + UInt64(nameLength) + UInt64(extraLength)
+            spans.append((start, start.addingSaturating(header).addingSaturating(entry.compressedSize), index))
+        }
+        spans.sort { $0.start != $1.start ? $0.start < $1.start : $0.index < $1.index }
+        guard var previous = spans.first else { return }
+        for span in spans.dropFirst() {
+            if span.start < previous.end {
+                let (first, second) = (min(previous.index, span.index), max(previous.index, span.index))
+                throw ZipError.malformed("\(entries[second].path) overlaps the stored data of \(entries[first].path)")
+            }
+            if span.end > previous.end { previous = span }
+        }
     }
 
     /// The end-of-central-directory record sits in the last 22 bytes plus an optional comment of

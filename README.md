@@ -173,7 +173,7 @@ details, and [App Clip size limits](docs/guides/app-clip-size.md) applies them t
   fixed and dynamic blocks; the Mach-O parser on thin, 32-bit, fat and fat64 files; ZIP64,
   damaged archives and file names that carry terminal escape sequences.
 
-146 tests in total, run by CI on macOS and on Linux (x86_64 and arm64); one of them needs a file
+153 tests in total, run by CI on macOS and on Linux (x86_64 and arm64); one of them needs a file
 name that is not UTF-8, which APFS refuses, so it runs on Linux only. Measuring SampleShop 2.0
 with the release build, process start included, took a median of 14.4 to 17.4 ms in three sets of
 21 runs on a Mac (Apple silicon) that was busy with other work (load average between 41 and 136);
@@ -201,14 +201,18 @@ measurement.
 - To reach a Mach-O header far into a compressed `.ipa` entry, sizeledger decompresses everything
   before it and keeps only a 32 KiB window, so a crafted entry costs time, not memory: about 1 s per
   decompressed GB on a Mac (Apple silicon).
-- The input is untrusted, so a crafted or damaged one cannot exhaust memory, time or the stack.
-  sizeledger refuses an input with more than 500,000 files or a path nested deeper than 64
-  folders, an `.ipa` declaring more than 8 GiB of uncompressed bytes, and an `.ipa` entry that
+- The input is untrusted, so a crafted or damaged one cannot exhaust memory or the stack, and the
+  limits that follow bound the time it takes. An `.ipa` whose entries share stored bytes (an
+  overlapping zip bomb) is refused as damaged. The slowest crafted `.ipa` found within the default
+  limits, 28.6 MB holding two entries that declare 4.29 GB each with their Mach-O headers at the
+  end, took 15 to 24 s on a Mac (Apple silicon) busy with other work; a lower `--max-bytes` lowers
+  that bound. sizeledger refuses an input with more than 500,000 files or a path nested deeper than
+  64 folders, an `.ipa` declaring more than 8 GiB of uncompressed bytes, and an `.ipa` entry that
   unpacks to more than 300 times its stored size (a zip bomb); raise these with `--max-files`,
   `--max-depth`, `--max-bytes` and `--max-ratio`. `--max-depth` goes up to 100 so that the JSON
   report can always be written, and `--max-bytes` applies to an `.ipa` only, since a folder is not
-  decompressed. Malformed Mach-O or ZIP headers give an "unreadable" note or a clear error with
-  exit status 2, never a crash. A duplicate entry path is counted once.
+  decompressed. Malformed Mach-O or ZIP headers give an "unreadable" note or a clear error with exit
+  status 2, never a crash. A duplicate entry path is counted once.
 
 ## Documentation
 

@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@56b4b10d9bcadcc0ca427d78448a4c4873ee6f13 status=reviewed -->
+<!-- i18n-source: README.md@b830eb2d181ba4a9637f3e9ab6d51e7b27142d17 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -172,7 +172,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 146개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. 그중 하나는 APFS가 거부하는 UTF-8이 아닌 파일 이름이 필요해서 Linux에서만 실행됩니다. release 빌드로 SampleShop 2.0을
+테스트는 모두 153개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. 그중 하나는 APFS가 거부하는 UTF-8이 아닌 파일 이름이 필요해서 Linux에서만 실행됩니다. release 빌드로 SampleShop 2.0을
 측정하는 데(프로세스 시작 포함), 다른 작업으로 바쁜 Mac(Apple silicon, 부하 평균 41~136)에서 21회 실행 3세트의
 중앙값으로 14.4~17.4 ms가 걸렸습니다. 시간은 컴퓨터에서 함께 실행되는 작업에 따라 달라집니다.
 [scripts/bench.sh](scripts/bench.sh)로 같은 측정을 반복할 수 있습니다.
@@ -191,7 +191,11 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
 - 경로는 압축 해제 도구와 파일 시스템처럼 바이트 단위로 비교합니다. Unicode 정규화(NFC와 NFD)만 다른 두 이름은 두 파일이며, 결합 문자가 뒤따르는 `/`도 폴더를 구분합니다. 올바른 UTF-8이 아닌 이름은 Latin-1로 읽어 표시하지만 저장된 바이트로 구분하므로, `caf\xE9.bin`과 UTF-8 `café.bin`은 똑같이 읽히는 두 파일입니다. 이런 이름이 있으면 보고서에 메모가 추가됩니다.
 - 압축된 `.ipa` 항목 깊숙한 곳의 Mach-O 헤더를 읽기 위해 sizeledger는 그 앞의 모든 내용을 풀지만 32 KiB 창만 유지합니다. 따라서 조작된 항목은
   메모리가 아니라 시간을 소비하며, Mac(Apple silicon)에서 풀린 1 GB당 약 1 s가 걸립니다.
-- 입력은 신뢰할 수 없으므로, 조작되었거나 손상된 입력이라도 메모리·시간·스택을 소진시킬 수 없습니다.
+- 입력은 신뢰할 수 없으므로, 조작되었거나 손상된 입력이라도 메모리나 스택을 소진시킬 수 없으며, 걸리는
+  시간은 아래 한도로 제한됩니다. 항목들이 저장된 바이트를 공유하는 `.ipa`(겹치는 zip 폭탄)는 손상된 것으로
+  거부됩니다. 기본 한도 안에서 찾은 가장 느린 조작된 `.ipa`는 각각 4.29 GB를 선언하고 Mach-O 헤더를 끝에
+  둔 항목 두 개를 담은 28.6 MB 파일로, 다른 작업으로 바쁜 Mac(Apple silicon)에서 15~24 s가 걸렸습니다.
+  `--max-bytes`를 낮추면 이 상한도 낮아집니다.
   sizeledger는 파일이 500,000개를 넘거나, 경로가 64개 폴더보다 깊게 중첩되었거나, `.ipa`가 선언한 비압축
   바이트가 8 GiB를 넘거나, `.ipa` 항목이 저장 크기의 300배를 넘게 풀리는(zip 폭탄) 입력을 거부합니다. 이
   값들은 `--max-files`, `--max-depth`, `--max-bytes`, `--max-ratio`로 높일 수 있습니다. JSON 보고서를 항상

@@ -51,6 +51,50 @@ import Testing
         #expect(throws: ZipError.self) { _ = try ZipArchive(data: data) }
     }
 
+    // MARK: Overlapping entries
+
+    @Test func refusesEntriesThatShareOneLocalRecord() {
+        // Thousands of directory records pointing at one large entry made every one of them a
+        // full read of the same data: a small file that took minutes to measure.
+        var builder = ZipBuilder()
+        builder.add("Payload/App.app/Info.plist", Data("x".utf8))
+        builder.add("Payload/App.app/big0", Data(repeating: 7, count: 4_096))
+        for index in 1...2_000 {
+            builder.addSharing("Payload/App.app/big\(index)", with: 1, contents: Data(count: 4_096))
+        }
+        let data = builder.build()
+        let elapsed = ContinuousClock().measure {
+            #expect(throws: ZipError.malformed("Payload/App.app/big1 overlaps the stored data of Payload/App.app/big0")) {
+                _ = try ZipArchive(data: data)
+            }
+        }
+        #expect(elapsed < .seconds(2))
+    }
+
+    @Test func refusesALocalRecordHiddenInsideAnotherEntrysData() {
+        // The second entry's local header sits inside the first entry's stored bytes, so both
+        // read the same data although their offsets differ.
+        var inner = ZipBuilder.Entry(name: Array("Payload/App.app/inner".utf8), contents: Data(repeating: 1, count: 512))
+        inner.unixMode = 0o100644
+        let outerName = "Payload/App.app/outer"
+        var builder = ZipBuilder()
+        builder.add(outerName, Data(repeating: 0, count: 16) + ZipBuilder.localRecord(inner))
+        builder.addSharing("Payload/App.app/inner", with: 0, skip: 30 + outerName.utf8.count + 16, contents: inner.contents)
+        #expect(throws: ZipError.malformed("Payload/App.app/inner overlaps the stored data of Payload/App.app/outer")) {
+            _ = try ZipArchive(data: builder.build())
+        }
+    }
+
+    @Test func acceptsEntriesThatFollowOneAnother() throws {
+        var builder = ZipBuilder()
+        builder.add("Payload/App.app/", mode: 0o040755)
+        builder.add("Payload/App.app/Info.plist", Data("x".utf8))
+        builder.add("Payload/App.app/empty")
+        builder.add("Payload/App.app/empty")
+        builder.add("Payload/App.app/data", Data(repeating: 3, count: 100))
+        #expect(try ZipArchive(data: builder.build()).entries.count == 5)
+    }
+
     // MARK: .ipa resource limits
 
     @Test func refusesAZipBombEntry() throws {
