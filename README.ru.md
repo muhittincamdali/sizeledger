@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@27ba77ecab2ba60c19dba77f90a18ca788aa921f status=reviewed -->
+<!-- i18n-source: README.md@a946680f3b690081855ec64f1e5f8d26e1fc97e9 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -243,3 +243,5 @@ SampleShop 2.0
 ## Лицензия
 
 [MIT](LICENSE)
+
+Design notes: https://muhittincamdali.com/en/open-source/sizeledger/
