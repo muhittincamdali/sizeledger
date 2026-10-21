@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d92b9b17214d5b06aee84556a3f2c08528466f90 status=reviewed -->
+<!-- i18n-source: README.md@a5349ea8a7a67592fa4082d765054bd3f21a4a47 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -116,7 +116,7 @@ Debian 12 veya daha yenisi).
 ## Kullanım
 
 ```text
-sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--force] [--top <n>] [--color auto|always|never] [--quiet]
                     [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
@@ -124,7 +124,8 @@ sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n
 | ------------------ | -------------------------------------------------------------------------- |
 | `<input>`          | Bir `.app` klasörü, bir `.ipa` dosyası veya bir `.xcarchive` klasörü       |
 | `-f, --format`     | Neyin yazdırılacağı: `tty` (varsayılan, bir tablo), `markdown` veya `json` |
-| `-o, --out <file>` | JSON raporunu ayrıca bir dosyaya yazar; eksik klasörler oluşturulur        |
+| `-o, --out <file>` | JSON raporunu ayrıca yeni bir dosyaya yazar; eksik klasörler oluşturulur. Sembolik bağ yalnızca `/dev/stdout` gibi bir aygıta ya da boruya (pipe) gidiyorsa izlenir |
+| `--force`          | `--out` dosyası zaten varsa onu değiştirir; bu seçenek olmadan var olan dosya korunur ve çıkış durumu 2 olur |
 | `--top <n>`        | Kaç öğe, dil ve ikili dosya listeleneceği (varsayılan 10)                  |
 | `--color`          | `auto`, renkleri yalnızca terminalde ve `NO_COLOR` ayarlı değilse kullanır |
 | `-q, --quiet`      | Hiçbir şey yazdırmaz (`--out` ile birlikte)                                |
@@ -143,6 +144,9 @@ sizeledger analyze build/MyApp.xcarchive --format markdown >> "$GITHUB_STEP_SUMM
 # The ten biggest files anywhere in the bundle (bytes and file name)
 jq -r '[.tree | .. | objects | select(has("children") | not)] | sort_by(-.bytes) | .[:10][] | "\(.bytes)\t\(.name)"' size/main.json
 ```
+
+`jq -r`, uygulamadaki adları olduğu gibi yazdırır; JSON dosyasının kaçışladığı çift yönlü (bidi)
+denetim karakterleri de buna dahildir. Güvenmediğiniz bir uygulamada `-r` kullanmayın.
 
 JSON yapısı [DocC makalesinde](https://muhittincamdali.github.io/sizeledger/documentation/sizeledgerkit/jsonlayout)
 anlatılır; [Fixtures/snapshots](Fixtures/snapshots) klasöründe eksiksiz raporlar bulunur.
@@ -183,7 +187,7 @@ App Clip'lere uygular.
   için zlib çıktısına karşı; Mach-O ayrıştırıcı ince (thin), 32 bit, fat ve fat64 dosyalarda;
   ayrıca ZIP64, hasarlı arşivler ve terminal kaçış dizileri içeren dosya adları.
 
-Toplam 153 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. Bunlardan
+Toplam 159 test vardır; CI bunları macOS'ta ve Linux'ta (x86_64 ve arm64) çalıştırır. Bunlardan
 biri, APFS'nin kabul etmediği UTF-8 olmayan bir dosya adı gerektirdiği için yalnızca Linux'ta
 çalışır. SampleShop
 2.0'ı release derlemesiyle ölçmek (süreç başlatma dahil), başka işlerle meşgul bir Mac'te (Apple

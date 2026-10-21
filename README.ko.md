@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d92b9b17214d5b06aee84556a3f2c08528466f90 status=reviewed -->
+<!-- i18n-source: README.md@a5349ea8a7a67592fa4082d765054bd3f21a4a47 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -110,7 +110,7 @@ sizeledger analyze path/to/MyApp.ipa
 ## 사용법
 
 ```text
-sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--force] [--top <n>] [--color auto|always|never] [--quiet]
                     [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
@@ -118,7 +118,8 @@ sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n
 | ------------------ | --------------------------------------------------------------------------- |
 | `<input>`          | `.app` 폴더, `.ipa` 파일 또는 `.xcarchive` 폴더                             |
 | `-f, --format`     | 출력 형식: `tty`(기본값, 표), `markdown` 또는 `json`                        |
-| `-o, --out <file>` | JSON 리포트를 파일로도 저장합니다. 없는 폴더는 만들어 줍니다                |
+| `-o, --out <file>` | JSON 리포트를 새 파일로도 저장합니다. 없는 폴더는 만들어 줍니다. 심볼릭 링크는 `/dev/stdout` 같은 장치나 파이프를 가리킬 때만 따라갑니다 |
+| `--force`          | `--out` 파일이 이미 있으면 바꿔 씁니다. 이 옵션이 없으면 기존 파일은 그대로 두고 종료 상태는 2입니다 |
 | `--top <n>`        | 나열할 항목, 언어, 바이너리의 개수(기본값 10)                               |
 | `--color`          | `auto`는 터미널에서만 색을 쓰며, `NO_COLOR`가 설정되어 있으면 쓰지 않습니다 |
 | `-q, --quiet`      | 아무것도 출력하지 않습니다(`--out`과 함께 사용)                             |
@@ -136,6 +137,9 @@ sizeledger analyze build/MyApp.xcarchive --format markdown >> "$GITHUB_STEP_SUMM
 # The ten biggest files anywhere in the bundle (bytes and file name)
 jq -r '[.tree | .. | objects | select(has("children") | not)] | sort_by(-.bytes) | .[:10][] | "\(.bytes)\t\(.name)"' size/main.json
 ```
+
+`jq -r`은 앱의 이름을 그대로 출력하므로, JSON 파일이 이스케이프한 양방향 제어 문자 같은 문자도
+원래대로 나옵니다. 신뢰할 수 없는 앱이라면 `-r`을 빼세요.
 
 JSON 구조는 [DocC 문서](https://muhittincamdali.github.io/sizeledger/documentation/sizeledgerkit/jsonlayout)에
 설명되어 있으며, [Fixtures/snapshots](Fixtures/snapshots)에 전체 리포트가 있습니다.
@@ -172,7 +176,7 @@ Connect에서 알 수 있습니다. sizeledger는 파일만으로 어떤 컴퓨�
   파서는 thin, 32비트, fat, fat64 파일에서 대조했습니다. ZIP64, 손상된 아카이브, 터미널 이스케이프
   시퀀스가 들어 있는 파일 이름도 확인합니다.
 
-테스트는 모두 153개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. 그중 하나는 APFS가 거부하는 UTF-8이 아닌 파일 이름이 필요해서 Linux에서만 실행됩니다. release 빌드로 SampleShop 2.0을
+테스트는 모두 159개이며, CI가 macOS와 Linux(x86_64와 arm64)에서 실행합니다. 그중 하나는 APFS가 거부하는 UTF-8이 아닌 파일 이름이 필요해서 Linux에서만 실행됩니다. release 빌드로 SampleShop 2.0을
 측정하는 데(프로세스 시작 포함), 다른 작업으로 바쁜 Mac(Apple silicon, 부하 평균 41~136)에서 21회 실행 3세트의
 중앙값으로 14.4~17.4 ms가 걸렸습니다. 시간은 컴퓨터에서 함께 실행되는 작업에 따라 달라집니다.
 [scripts/bench.sh](scripts/bench.sh)로 같은 측정을 반복할 수 있습니다.

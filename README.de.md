@@ -1,4 +1,4 @@
-<!-- i18n-source: README.md@d92b9b17214d5b06aee84556a3f2c08528466f90 status=reviewed -->
+<!-- i18n-source: README.md@a5349ea8a7a67592fa4082d765054bd3f21a4a47 status=reviewed -->
 <!-- brand:start -->
 
 <p align="center"><picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg"><img src="https://raw.githubusercontent.com/muhittincamdali/sizeledger/main/.github/brand/banner-light.svg" alt="sizeledger: Shows where every megabyte of an iOS app comes from: by category, framework, asset catalog, language and architecture."></picture></p>
@@ -114,7 +114,7 @@ enthalten die Swift-Runtime und benötigen glibc 2.35 oder neuer (Ubuntu 22.04, 
 ## Verwendung
 
 ```text
-sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n>] [--color auto|always|never] [--quiet]
+sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--force] [--top <n>] [--color auto|always|never] [--quiet]
                     [--max-files <n>] [--max-bytes <bytes>] [--max-ratio <ratio>] [--max-depth <n>]
 ```
 
@@ -122,7 +122,8 @@ sizeledger analyze <input> [--format tty|markdown|json] [--out <file>] [--top <n
 | ------------------ | ----------------------------------------------------------------------------------- |
 | `<input>`          | Ein `.app`-Ordner, eine `.ipa`-Datei oder ein `.xcarchive`-Ordner                   |
 | `-f, --format`     | Was ausgegeben wird: `tty` (Standard, eine Tabelle), `markdown` oder `json`         |
-| `-o, --out <file>` | Schreibt den JSON-Bericht zusätzlich in eine Datei; fehlende Ordner werden angelegt |
+| `-o, --out <file>` | Schreibt den JSON-Bericht zusätzlich in eine neue Datei; fehlende Ordner werden angelegt. Einem symbolischen Link folgt es nur zu einem Gerät oder einer Pipe wie `/dev/stdout` |
+| `--force`          | Ersetzt die `--out`-Datei, wenn sie schon existiert; ohne die Option bleibt eine vorhandene Datei erhalten und der Exit-Status ist 2 |
 | `--top <n>`        | Wie viele Einträge, Sprachen und Binärdateien aufgelistet werden (Standard 10)      |
 | `--color`          | `auto` färbt nur in einem Terminal und nicht, wenn `NO_COLOR` gesetzt ist           |
 | `-q, --quiet`      | Gibt nichts aus (zusammen mit `--out`)                                              |
@@ -141,6 +142,9 @@ sizeledger analyze build/MyApp.xcarchive --format markdown >> "$GITHUB_STEP_SUMM
 # The ten biggest files anywhere in the bundle (bytes and file name)
 jq -r '[.tree | .. | objects | select(has("children") | not)] | sort_by(-.bytes) | .[:10][] | "\(.bytes)\t\(.name)"' size/main.json
 ```
+
+`jq -r` gibt Namen aus der App unverändert aus, auch Zeichen, die die JSON-Datei maskiert, etwa
+bidirektionale Steuerzeichen; lass `-r` bei einer App weg, der du nicht vertraust.
 
 Der Aufbau des JSON ist im [DocC-Artikel](https://muhittincamdali.github.io/sizeledger/documentation/sizeledgerkit/jsonlayout)
 beschrieben; [Fixtures/snapshots](Fixtures/snapshots) enthält vollständige Berichte.
@@ -179,7 +183,7 @@ die Einzelheiten, und [Größenlimits für App Clips](docs/guides/app-clip-size.
   Fixed- und Dynamic-Blöcke; der Mach-O-Parser an Thin-, 32-Bit-, Fat- und Fat64-Dateien; außerdem
   ZIP64, beschädigte Archive und Dateinamen, die Escape-Sequenzen für das Terminal enthalten.
 
-Insgesamt sind es 153 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt; einer
+Insgesamt sind es 159 Tests, die CI unter macOS und unter Linux (x86_64 und arm64) ausführt; einer
 davon braucht einen Dateinamen, der kein UTF-8 ist und den APFS ablehnt, und läuft daher nur unter
 Linux. Das Messen
 von SampleShop 2.0 mit dem Release-Build, einschließlich Prozessstart, dauerte in drei Serien von 21
